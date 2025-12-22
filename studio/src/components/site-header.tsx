@@ -7,6 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import { DEFAULT_ORG, DEFAULT_PROJECT } from '@/lib/constant'
 import { Image } from "@unpic/react"
 
 export function SiteHeader() {
@@ -22,11 +23,11 @@ export function SiteHeader() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="#">Default Organization</BreadcrumbLink>
+              <BreadcrumbLink href="#">{DEFAULT_ORG}</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Default Project</BreadcrumbPage>
+              <BreadcrumbPage>{DEFAULT_PROJECT}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
