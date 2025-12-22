@@ -4,6 +4,8 @@
 
 Bunvel is a unified Backend-as-a-Service (BaaS) platform that combines authentication, real-time subscriptions, storage, and REST APIs into a single, high-performance service built on [Elysia](https://elysiajs.com) and [Bun](https://bun.sh).
 
+> **Note:** This is currently a hobby project for learning and understanding backend concepts. It is not yet production-ready, but with community contributions, it may evolve into a production-ready solution in the future.
+
 Unlike traditional BaaS solutions that rely on microservices, Bunvel runs as a single application, making it incredibly fast and easy to deploy.
 
 ## ✨ Features
