@@ -1,0 +1,129 @@
+services:
+  app:
+    container_name: bunvel-app
+    image: bunvel/app
+    build: 
+      context: ./app
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=development
+      - REDIS_URL=redis://cache:6379
+      - DATABASE_URL_SERVICE=postgres://postgres:postgres@postgres:5432/bunvel
+      - POSTGREST_URL=http://rest:8001
+    volumes:
+      - ./app:/app
+    networks:
+      - bunvel-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+
+  studio:
+    container_name: bunvel-studio
+    image: bunvel/studio
+    build:
+      context: ./studio
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - API_URL=http://localhost:8000
+      - VITE_URL=http://localhost:3000
+    volumes:
+      - ./studio:/app
+    networks:
+      - bunvel-network
+    depends_on:
+      app:
+        condition: service_started
+
+  postgres:
+    container_name: bunvel-postgres
+    image: postgres:18.1
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bunvel
+      POSTGRES_INITDB_ARGS: --data-checksums
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./app/src/migrations:/docker-entrypoint-initdb.d
+    # command: 
+    #   - "postgres"
+    #   - "-c"
+    #   - "shared_preload_libraries=pg_stat_statements,auto_explain"
+    #   - "-c"
+    #   - "shared_buffers=256MB"
+    #   - "-c"
+    #   - "work_mem=16MB"
+    #   - "-c"
+    #   - "maintenance_work_mem=64MB"
+    #   - "-c"
+    #   - "random_page_cost=1.1"
+    #   - "-c"
+    #   - "log_statement=all"
+    #   - "-c"
+    #   - "log_min_duration_statement=1000"
+    #   - "-c"
+    #   - "log_connections=on"
+    #   - "-c"
+    #   - "log_disconnections=on"
+    #   - "-c"
+    #   - "log_lock_waits=on"
+    networks:
+      - bunvel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bunvel"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+  cache:
+    container_name: bunvel-cache
+    image: valkey/valkey:9.0.1
+    command: valkey-server --save 60 1 --loglevel warning
+    volumes:
+      - cache_data:/data
+    networks:
+      - bunvel-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  
+  rest:
+    image: postgrest/postgrest:v14.1
+    container_name: bunvel-rest
+    restart: always
+    environment:
+      PGRST_DB_URI: "postgres://postgres:postgres@postgres:5432/bunvel"
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_SERVER_PORT: 8001
+    networks:
+      - bunvel-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+  cache_data:
+
+networks:
+  bunvel-network:
+    driver: bridge
