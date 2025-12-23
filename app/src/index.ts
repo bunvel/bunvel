@@ -63,10 +63,6 @@ const app = new Elysia()
     }
   })
 
-  // Application routes
-  .use(restService)
-  .use(metaService)
-
   // Health check endpoint
   .get("/health", () => ({
     status: "ok",
@@ -82,6 +78,10 @@ const app = new Elysia()
     environment: process.env.NODE_ENV || "development",
     documentation: "/docs", // If you add API documentation
   }))
+
+  // Application routes
+  .use(restService)
+  .use(metaService)
 
   // Global error handler
   .onError(({ code, error, set }) => {
