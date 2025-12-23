@@ -1,11 +1,18 @@
 services:
   app:
     container_name: bunvel-app
-    image: bunvel/app:0.0.0
+    image: bunvel/app:0.0.2
     ports:
       - "8000:8000"
     environment:
       - NODE_ENV=production
+      - JWT_SECRET=generate_a_secure_random_string_here
+      - JWT_REFRESH_SECRET=generate_a_secure_random_string_here
+      - JWT_EXPIRES_IN=15m
+      - JWT_REFRESH_EXPIRES_IN=7d
+      - ALLOWED_ORIGINS=http://localhost:3000
+      - RATE_LIMIT_WINDOW_MS=900000
+      - RATE_LIMIT_MAX_REQUESTS=100
       - REDIS_URL=redis://cache:6379
       - DATABASE_URL_SERVICE=postgres://postgres:postgres@postgres:5432/bunvel
       - POSTGREST_URL=http://rest:8001
@@ -45,7 +52,7 @@ services:
       POSTGRES_INITDB_ARGS: --data-checksums
     volumes:
       - postgres_data:/var/lib/postgresql
-      - ./app/src/migrations:/docker-entrypoint-initdb.d
+      - ./app/src/database/migrations:/docker-entrypoint-initdb.d
     networks:
       - bunvel-network
     healthcheck:

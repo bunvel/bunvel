@@ -1,6 +1,5 @@
 import Elysia from "elysia";
-
-const POSTGREST_URL = process.env.POSTGREST_URL || "http://rest:8001";
+import { env } from "../../utils/config";
 
 const ALLOWED_METHODS = new Set(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"]);
 const JSON_CONTENT_TYPE = "application/json";
@@ -20,7 +19,7 @@ export const restService = new Elysia({
 
     const url = new URL(request.url);
     const targetPath = url.pathname.replace(/^\/rest/, "");
-    const target = new URL(targetPath, POSTGREST_URL.replace(/\/$/, "")).toString();
+    const target = new URL(targetPath, env.POSTGREST_URL.replace(/\/$/, "")).toString();
     const targetWithQuery = url.search ? `${target}${url.search}` : target;
 
     const headers = new Headers(request.headers);

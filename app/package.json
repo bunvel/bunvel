@@ -17,7 +17,9 @@
     "elysia": "^1.4.19",
     "elysia-helmet": "^3.0.0",
     "elysia-http-exception": "^0.1.5",
-    "elysia-rate-limit": "^4.4.2"
+    "elysia-rate-limit": "^4.4.2",
+    "logixlysia": "^6.0.1",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.10",
