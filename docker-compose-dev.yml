@@ -9,16 +9,18 @@ services:
       - "8000:8000"
     environment:
       - NODE_ENV=development
-      - JWT_SECRET=generate_a_secure_random_string_here
-      - JWT_REFRESH_SECRET=generate_a_secure_random_string_here
-      - JWT_EXPIRES_IN=15m
-      - JWT_REFRESH_EXPIRES_IN=7d
-      - ALLOWED_ORIGINS=http://localhost:3000
-      - RATE_LIMIT_WINDOW_MS=900000
-      - RATE_LIMIT_MAX_REQUESTS=100
-      - REDIS_URL=redis://cache:6379
-      - DATABASE_URL_SERVICE=postgres://postgres:postgres@postgres:5432/bunvel
-      - POSTGREST_URL=http://rest:8001
+      - JWT_SECRET=${JWT_SECRET:-generate_a_secure_random_string_here}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-generate_a_secure_random_string_here}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-15m}
+      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN:-7d}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      - REDIS_URL=${REDIS_URL:-redis://cache:6379}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-bunvel}
+      - POSTGREST_URL=${POSTGREST_URL:-http://rest:8001}
     volumes:
       - ./app:/app
     networks:
@@ -39,10 +41,10 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - API_URL=http://localhost:8000
-      - VITE_URL=http://localhost:3000
-      - STUDIO_DEFAULT_ORGANIZATION=Default Organization
-      - STUDIO_DEFAULT_PROJECT=Default Project
+      - API_URL=${API_URL:-http://localhost:8000}
+      - VITE_URL=${VITE_URL:-http://localhost:3000}
+      - STUDIO_DEFAULT_ORGANIZATION=${STUDIO_DEFAULT_ORGANIZATION:-Default Organization}
+      - STUDIO_DEFAULT_PROJECT=${STUDIO_DEFAULT_PROJECT:-Default Project}
     volumes:
       - ./studio:/app
     networks:
@@ -56,9 +58,9 @@ services:
     image: postgres:18.1
     shm_size: 128mb
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: bunvel
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-bunvel}
       POSTGRES_INITDB_ARGS: --data-checksums
     volumes:
       - postgres_data:/var/lib/postgresql
@@ -91,9 +93,9 @@ services:
     container_name: bunvel-rest
     restart: always
     environment:
-      PGRST_DB_URI: "postgres://postgres:postgres@postgres:5432/bunvel"
+      PGRST_DB_URI: "postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-bunvel}"
       PGRST_DB_SCHEMA: public
-      PGRST_DB_ANON_ROLE: postgres
+      PGRST_DB_ANON_ROLE: ${POSTGRES_USER:-postgres}
       PGRST_SERVER_PORT: 8001
     networks:
       - bunvel-network

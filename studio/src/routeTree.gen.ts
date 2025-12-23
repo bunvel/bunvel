@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as mainRouteRouteImport } from './routes/(main)/route'
 import { Route as mainIndexRouteImport } from './routes/(main)/index'
+import { Route as mainSqlIndexRouteImport } from './routes/(main)/sql/index'
+import { Route as mainExplorerIndexRouteImport } from './routes/(main)/explorer/index'
 
 const mainRouteRoute = mainRouteRouteImport.update({
   id: '/(main)',
@@ -21,24 +23,40 @@ const mainIndexRoute = mainIndexRouteImport.update({
   path: '/',
   getParentRoute: () => mainRouteRoute,
 } as any)
+const mainSqlIndexRoute = mainSqlIndexRouteImport.update({
+  id: '/sql/',
+  path: '/sql/',
+  getParentRoute: () => mainRouteRoute,
+} as any)
+const mainExplorerIndexRoute = mainExplorerIndexRouteImport.update({
+  id: '/explorer/',
+  path: '/explorer/',
+  getParentRoute: () => mainRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof mainIndexRoute
+  '/explorer': typeof mainExplorerIndexRoute
+  '/sql': typeof mainSqlIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof mainIndexRoute
+  '/explorer': typeof mainExplorerIndexRoute
+  '/sql': typeof mainSqlIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(main)': typeof mainRouteRouteWithChildren
   '/(main)/': typeof mainIndexRoute
+  '/(main)/explorer/': typeof mainExplorerIndexRoute
+  '/(main)/sql/': typeof mainSqlIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/explorer' | '/sql'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/(main)' | '/(main)/'
+  to: '/' | '/explorer' | '/sql'
+  id: '__root__' | '/(main)' | '/(main)/' | '/(main)/explorer/' | '/(main)/sql/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -61,15 +79,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainIndexRouteImport
       parentRoute: typeof mainRouteRoute
     }
+    '/(main)/sql/': {
+      id: '/(main)/sql/'
+      path: '/sql'
+      fullPath: '/sql'
+      preLoaderRoute: typeof mainSqlIndexRouteImport
+      parentRoute: typeof mainRouteRoute
+    }
+    '/(main)/explorer/': {
+      id: '/(main)/explorer/'
+      path: '/explorer'
+      fullPath: '/explorer'
+      preLoaderRoute: typeof mainExplorerIndexRouteImport
+      parentRoute: typeof mainRouteRoute
+    }
   }
 }
 
 interface mainRouteRouteChildren {
   mainIndexRoute: typeof mainIndexRoute
+  mainExplorerIndexRoute: typeof mainExplorerIndexRoute
+  mainSqlIndexRoute: typeof mainSqlIndexRoute
 }
 
 const mainRouteRouteChildren: mainRouteRouteChildren = {
   mainIndexRoute: mainIndexRoute,
+  mainExplorerIndexRoute: mainExplorerIndexRoute,
+  mainSqlIndexRoute: mainSqlIndexRoute,
 }
 
 const mainRouteRouteWithChildren = mainRouteRoute._addFileChildren(

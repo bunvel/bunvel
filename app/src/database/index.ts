@@ -1,17 +1,11 @@
 import { SQL } from "bun";
 import { env } from "../utils/config";
 
-const connectionString = env.DATABASE_URL_SERVICE!;
-const isProduction = env.NODE_ENV === 'production';
+const connectionString = `postgres://${env.POSTGRES_USER}:${env.POSTGRES_PASSWORD}@postgres:5432/${env.POSTGRES_DB}`;
 
 // Update database configuration
 export const db = new SQL(connectionString, {
-  // Connection pool settings
-  max: 20, // Maximum number of connections
-  // Enable SSL in production
-  tls: isProduction ? { 
-    rejectUnauthorized: true 
-  } : false,
+  max: 20,
   connectionTimeout: 2000,
   idleTimeout: 30000,
   maxLifetime: 600000,

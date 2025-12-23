@@ -13,7 +13,9 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(32, 'JWT_REFRESH_SECRET must be at least 32 characters'),
   
   // Database
-  DATABASE_URL_SERVICE: z.url('Invalid database URL format'),
+  POSTGRES_USER: z.string().min(1, 'POSTGRES_USER is required'),
+  POSTGRES_PASSWORD: z.string().min(1, 'POSTGRES_PASSWORD is required'),
+  POSTGRES_DB: z.string().min(1, 'POSTGRES_DB is required'),
   
   // Redis
   REDIS_URL: z.url('Invalid Redis URL format'),

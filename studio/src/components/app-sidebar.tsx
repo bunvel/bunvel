@@ -1,4 +1,4 @@
-import { Home } from 'lucide-react'
+import { Code, Database, Home } from 'lucide-react'
 import * as React from 'react'
 
 import { NavMain } from '@/components/nav-main'
@@ -17,6 +17,16 @@ const data = {
       title: 'Dashboard',
       url: '/',
       icon: Home,
+    },
+    {
+      title: 'SQL Editor',
+      url: '/sql',
+      icon: Code,
+    },
+    {
+      title: 'Data Explorer',
+      url: '/explorer',
+      icon: Database,
     },
   ],
   navSecondary: [],
