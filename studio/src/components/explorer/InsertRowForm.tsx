@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 import { AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { WarningInsertRow } from './Warning';
 
 interface InsertRowFormProps {
   tab: TableTab;
@@ -68,13 +69,17 @@ export function InsertRowForm({ tab, onInsert, children }: InsertRowFormProps) {
     return (
       <div key={field.name} className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor={inputId} className="text-sm font-medium">
-            {field.label}
-            {field.required && <span className="text-destructive ml-1">*</span>}
-          </Label>
-          {field.dbType && (
-            <span className="text-xs text-muted-foreground">{field.dbType}</span>
-          )}
+          <div className="flex items-center gap-1">
+            <Label htmlFor={inputId} className="text-sm font-medium">
+              {field.label}
+              {field.required && <span className="text-destructive ml-1">*</span>}
+            </Label>
+            {field.dbType && (
+              <span className="text-xs text-muted-foreground">
+                ({field.dbType})
+              </span>
+            )}
+          </div>
         </div>
 
         {inputProps.type === 'select' ? (
@@ -140,7 +145,7 @@ export function InsertRowForm({ tab, onInsert, children }: InsertRowFormProps) {
       
       <SheetContent 
         side="right" 
-        className="w-[500px] p-0 flex flex-col"
+        className="min-w-md p-0 flex flex-col"
       >
         <div className="flex flex-col h-full">
           {/* Fixed Header */}
@@ -151,6 +156,7 @@ export function InsertRowForm({ tab, onInsert, children }: InsertRowFormProps) {
               </SheetTitle>
               <SheetDescription className="text-sm text-muted-foreground">
                 Add a new row to {tab.schema}.{tab.table}
+                <WarningInsertRow />
               </SheetDescription>
             </SheetHeader>
           </div>
