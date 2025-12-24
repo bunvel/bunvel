@@ -56,14 +56,11 @@ function RouteComponent() {
   return (
     <div className="h-full">
       <div className="h-full flex flex-col">
-        <div className="flex items-center justify-between mx-4 my-2">
+        <div className="bg-card flex items-center justify-between px-4 py-2">
           <h1 className="font-bold">Authentication Users</h1>
           <div className="flex space-x-2">
             <Button variant="outline">
               Add User
-            </Button>
-            <Button variant="secondary">
-              Import
             </Button>
           </div>
         </div>
