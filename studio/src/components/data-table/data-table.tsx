@@ -1,27 +1,28 @@
 import { Button } from '@/components/ui/button'
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table'
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 
 export interface ColumnDef<T> {
   key: string
   header: string
   cell: (row: T) => ReactNode
   className?: string
+  dataType?: string
 }
 
 interface DataTableProps<T> {
@@ -84,7 +85,9 @@ export function DataTable<T>({
   )
 
   return (
-    <div className={`flex flex-col h-full overflow-hidden bg-card ${className}`}>
+    <div
+      className={`flex flex-col h-full overflow-hidden bg-card ${className}`}
+    >
       <div className="flex-1 min-h-0">
         <ScrollArea className="h-full w-full">
           <Table className="w-full border border-border">
@@ -96,43 +99,86 @@ export function DataTable<T>({
                     className={`
                       border-r border-border last:border-r-0 
                       text-foreground font-medium ${column.className || ''}
-                    `}
+`}
                   >
-                    {column.header}
+                    <div className="flex flex-col">
+                      <span>
+                        {column.header}{' '}
+                        {column.dataType && (
+                          <span className="text-xs font-normal text-muted-foreground">
+                            {column.dataType}
+                          </span>
+                        )}
+                      </span>
+                    </div>
                   </TableHead>
                 ))}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading ? (
-                renderLoadingState()
-              ) : data.length === 0 ? (
-                renderEmptyState()
-              ) : (
-                data.map((row, rowIndex) => (
-                  <TableRow
-                    key={rowIndex}
-                    className="border-b border-border last:border-b-0"
-                  >
-                    {columns.map((column) => (
-                      <TableCell
-                        key={`${column.key}-${rowIndex}`}
-                        className={`
-                          border-r border-border last:border-r-0 
-                          text-muted-foreground ${column.className || ''}
-                        `}
+              {isLoading
+                ? renderLoadingState()
+                : data.length === 0
+                  ? renderEmptyState()
+                  : data.map((row, rowIndex) => (
+                      <TableRow
+                        key={rowIndex}
+                        className="border-b border-border last:border-b-0"
                       >
-                        {column.cell(row)}
-                      </TableCell>
+                        {columns.map((column) => (
+                          <TableCell
+                            key={`${column.key}-${rowIndex}`}
+                            className={`
+                              border-r border-border last:border-r-0 
+                              text-muted-foreground ${column.className || ''}
+                            `}
+                          >
+                            {column.cell(row) !== null &&
+                            typeof column.cell(row) === 'object' &&
+                            !React.isValidElement(column.cell(row)) ? (
+                              <div className="flex items-center">
+                                <span className="font-mono text-xs bg-muted/20 px-2 py-1 rounded truncate max-w-[200px] inline-block">
+                                  {(() => {
+                                    try {
+                                      return JSON.stringify(
+                                        column.cell(row),
+                                        (_, value) => {
+                                          // Handle circular references
+                                          if (
+                                            typeof value === 'object' &&
+                                            value !== null
+                                          ) {
+                                            // Return a clean object without React internals
+                                            if (
+                                              value.constructor.name ===
+                                                'Object' ||
+                                              Array.isArray(value)
+                                            ) {
+                                              return value
+                                            }
+                                            return `[${value.constructor.name}]`
+                                          }
+                                          return value
+                                        },
+                                      )
+                                    } catch (e) {
+                                      return '[Complex Object]'
+                                    }
+                                  })()}
+                                </span>
+                              </div>
+                            ) : (
+                              column.cell(row)
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
                     ))}
-                  </TableRow>
-                ))
-              )}
             </TableBody>
           </Table>
         </ScrollArea>
       </div>
-      
+
       {showPagination && (
         <div className="flex items-center justify-between px-4 py-2 border-t border-border bg-card">
           <div className="flex items-center space-x-4">
@@ -141,7 +187,9 @@ export function DataTable<T>({
               <DropdownMenuTrigger
                 render={
                   <Button variant="outline" size="sm" className="h-8 px-2">
-                    {pageSize === Number.MAX_SAFE_INTEGER ? 'No limit' : pageSize}
+                    {pageSize === Number.MAX_SAFE_INTEGER
+                      ? 'No limit'
+                      : pageSize}
                     <ChevronDown className="ml-2 h-4 w-4" />
                   </Button>
                 }
