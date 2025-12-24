@@ -1,4 +1,4 @@
-import { Code, Database, Home } from 'lucide-react'
+import { Code, Database, Home, UserLock } from 'lucide-react'
 import * as React from 'react'
 
 import { NavMain } from '@/components/nav-main'
@@ -27,6 +27,11 @@ const data = {
       title: 'Data Explorer',
       url: '/explorer',
       icon: Database,
+    },
+    {
+      title: 'Authentication',
+      url: '/auth',
+      icon: UserLock,
     },
   ],
   navSecondary: [],

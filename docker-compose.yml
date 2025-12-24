@@ -33,8 +33,8 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - API_URL=${API_URL:-http://app:8000}
-      - VITE_URL=${VITE_URL:-http://localhost:3000}
+      - API_URL=${API_URL:-http://localhost:8000}
+      - BUNVEL_STUDIO_URL=${BUNVEL_STUDIO_URL:-http://localhost:3000}
       - STUDIO_DEFAULT_ORGANIZATION=${STUDIO_DEFAULT_ORGANIZATION:-Default Organization}
       - STUDIO_DEFAULT_PROJECT=${STUDIO_DEFAULT_PROJECT:-Default Project}
     networks:

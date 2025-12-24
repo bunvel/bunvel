@@ -13,6 +13,7 @@ import { Route as mainRouteRouteImport } from './routes/(main)/route'
 import { Route as mainIndexRouteImport } from './routes/(main)/index'
 import { Route as mainSqlIndexRouteImport } from './routes/(main)/sql/index'
 import { Route as mainExplorerIndexRouteImport } from './routes/(main)/explorer/index'
+import { Route as mainAuthIndexRouteImport } from './routes/(main)/auth/index'
 
 const mainRouteRoute = mainRouteRouteImport.update({
   id: '/(main)',
@@ -33,14 +34,21 @@ const mainExplorerIndexRoute = mainExplorerIndexRouteImport.update({
   path: '/explorer/',
   getParentRoute: () => mainRouteRoute,
 } as any)
+const mainAuthIndexRoute = mainAuthIndexRouteImport.update({
+  id: '/auth/',
+  path: '/auth/',
+  getParentRoute: () => mainRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof mainIndexRoute
+  '/auth': typeof mainAuthIndexRoute
   '/explorer': typeof mainExplorerIndexRoute
   '/sql': typeof mainSqlIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof mainIndexRoute
+  '/auth': typeof mainAuthIndexRoute
   '/explorer': typeof mainExplorerIndexRoute
   '/sql': typeof mainSqlIndexRoute
 }
@@ -48,15 +56,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(main)': typeof mainRouteRouteWithChildren
   '/(main)/': typeof mainIndexRoute
+  '/(main)/auth/': typeof mainAuthIndexRoute
   '/(main)/explorer/': typeof mainExplorerIndexRoute
   '/(main)/sql/': typeof mainSqlIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/explorer' | '/sql'
+  fullPaths: '/' | '/auth' | '/explorer' | '/sql'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/explorer' | '/sql'
-  id: '__root__' | '/(main)' | '/(main)/' | '/(main)/explorer/' | '/(main)/sql/'
+  to: '/' | '/auth' | '/explorer' | '/sql'
+  id:
+    | '__root__'
+    | '/(main)'
+    | '/(main)/'
+    | '/(main)/auth/'
+    | '/(main)/explorer/'
+    | '/(main)/sql/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -93,17 +108,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainExplorerIndexRouteImport
       parentRoute: typeof mainRouteRoute
     }
+    '/(main)/auth/': {
+      id: '/(main)/auth/'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof mainAuthIndexRouteImport
+      parentRoute: typeof mainRouteRoute
+    }
   }
 }
 
 interface mainRouteRouteChildren {
   mainIndexRoute: typeof mainIndexRoute
+  mainAuthIndexRoute: typeof mainAuthIndexRoute
   mainExplorerIndexRoute: typeof mainExplorerIndexRoute
   mainSqlIndexRoute: typeof mainSqlIndexRoute
 }
 
 const mainRouteRouteChildren: mainRouteRouteChildren = {
   mainIndexRoute: mainIndexRoute,
+  mainAuthIndexRoute: mainAuthIndexRoute,
   mainExplorerIndexRoute: mainExplorerIndexRoute,
   mainSqlIndexRoute: mainSqlIndexRoute,
 }

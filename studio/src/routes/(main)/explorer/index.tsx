@@ -212,7 +212,6 @@ function RouteComponent() {
                 isLoading={activeTab.isLoading}
                 onPageChange={(newPage) => handlePageChange(activeTab.id, newPage)}
                 currentPage={activeTab.page}
-                totalPages={Math.ceil(activeTab.totalRows / pageSize)}
                 onPageSizeChange={handlePageSizeChange}
                 pageSize={pageSize}
               />
