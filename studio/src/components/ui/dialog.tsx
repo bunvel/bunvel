@@ -1,10 +1,10 @@
 "use client"
 
-import * as React from "react"
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
+import * as React from "react"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { XIcon } from "lucide-react"
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
@@ -99,7 +99,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "gap-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+        "gap-2 flex flex-col-reverse sm:flex-row sm:justify-end",
         className
       )}
       {...props}
@@ -147,5 +147,6 @@ export {
   DialogOverlay,
   DialogPortal,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 }
+

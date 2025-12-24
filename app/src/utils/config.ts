@@ -22,11 +22,10 @@ const envSchema = z.object({
   
   // PostgREST
   POSTGREST_URL: z.url('Invalid PostgREST URL format'),
+
   
-  // CORS
-  ALLOWED_ORIGINS: z.string().transform(origins => 
-    origins.split(',').map(origin => origin.trim())
-  ),
+  // Studio
+  VITE_BUNVEL_STUDIO_URL: z.url('Invalid VITE_BUNVEL_STUDIO_URL format'),
   
   // Rate Limiting
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),
@@ -50,13 +49,3 @@ if (!_env.success) {
 }
 
 export const env = _env.data as EnvConfig;
-
-// Log environment info on startup
-if (env.NODE_ENV !== 'test') {
-  console.log(`🚀 Environment: ${env.NODE_ENV}`);
-  console.log(`🌐 Server will run on port: ${env.PORT}`);
-  console.log(`🔒 JWT enabled with expiration: ${env.JWT_EXPIRES_IN}`);
-  console.log(`🔄 JWT refresh enabled with expiration: ${env.JWT_REFRESH_EXPIRES_IN}`);
-  console.log(`🌍 Allowed origins: ${env.ALLOWED_ORIGINS.join(', ')}`);
-  console.log(`⏱️  Rate limiting: ${env.RATE_LIMIT_MAX_REQUESTS} requests per ${env.RATE_LIMIT_WINDOW_MS / 1000 / 60} minutes`);
-}

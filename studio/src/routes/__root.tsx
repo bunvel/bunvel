@@ -130,7 +130,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           disableTransitionOnChange
         >
           {children}
-          <Toaster/>
+          <Toaster />
         </ThemeProvider>
         <TanStackDevtools
           config={{

@@ -6,7 +6,7 @@ export const corsPlugin = new Elysia().use(
   cors({
     origin: (request) => {
       const origin = request.headers.get("origin");
-      if (!origin || env.ALLOWED_ORIGINS.includes(origin)) {
+      if (!origin || env.VITE_BUNVEL_STUDIO_URL === origin) {
         return true;
       }
       return false;
