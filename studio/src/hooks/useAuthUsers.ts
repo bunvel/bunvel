@@ -25,7 +25,7 @@ export const useAuthUsers = (): UseAuthUsersReturn => {
   const [totalCount, setTotalCount] = useState<number>(0)
 
   // In useAuthUsers.ts, update the fetchUsers function
-  const fetchUsers = async (page: number = 1, pageSize: number = 10) => {
+  const fetchUsers = async (page: number = 1, pageSize: number = 100) => {
     setIsLoading(true)
     setError(null)
 
@@ -66,7 +66,7 @@ export const useAuthUsers = (): UseAuthUsersReturn => {
             FROM auth.users
             ORDER BY created_at DESC
             LIMIT ${pageSize} OFFSET ${offset}
-          `,
+          `
         }),
       })
 
@@ -108,7 +108,7 @@ export const useAuthUsers = (): UseAuthUsersReturn => {
 
   // Initial fetch
   useEffect(() => {
-    fetchUsers(1, 10)
+    fetchUsers(1, 100)
   }, [])
 
   return {
