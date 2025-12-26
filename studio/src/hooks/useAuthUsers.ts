@@ -5,16 +5,7 @@ import { toast } from 'sonner'
 export interface AuthUser {
   id: string
   email: string | null
-  phone: string | null
-  email_confirmed: boolean
-  phone_confirmed: boolean
-  provider: string
-  providers: Record<string, any>
-  user_metadata: Record<string, any>
-  app_metadata: Record<string, any>
   last_sign_in_at: string | null
-  banned_until: string | null
-  is_anonymous: boolean
   created_at: string
   updated_at: string
 }
@@ -40,7 +31,7 @@ export const useAuthUsers = (): UseAuthUsersReturn => {
 
     try {
       const offset = (page - 1) * pageSize
-      
+
       // First, get the total count
       const countResponse = await fetch(QUERY_URL, {
         method: 'POST',
@@ -51,7 +42,9 @@ export const useAuthUsers = (): UseAuthUsersReturn => {
       })
 
       if (!countResponse.ok) {
-        throw new Error(`Failed to fetch user count: ${countResponse.status} ${countResponse.statusText}`)
+        throw new Error(
+          `Failed to fetch user count: ${countResponse.status} ${countResponse.statusText}`,
+        )
       }
 
       const countData = await countResponse.json()
@@ -67,16 +60,7 @@ export const useAuthUsers = (): UseAuthUsersReturn => {
             SELECT 
               id,
               email,
-              phone,
-              email_confirmed,
-              phone_confirmed,
-              provider,
-              providers,
-              user_metadata,
-              app_metadata,
               last_sign_in_at,
-              banned_until,
-              is_anonymous,
               created_at,
               updated_at
             FROM auth.users
@@ -97,14 +81,24 @@ export const useAuthUsers = (): UseAuthUsersReturn => {
       // Process the users data
       const processedUsers = usersData.map((user: any) => ({
         ...user,
-        providers: typeof user.providers === 'string' ? JSON.parse(user.providers) : user.providers || {},
-        user_metadata: typeof user.user_metadata === 'string' ? JSON.parse(user.user_metadata) : user.user_metadata || {},
-        app_metadata: typeof user.app_metadata === 'string' ? JSON.parse(user.app_metadata) : user.app_metadata || {},
+        providers:
+          typeof user.providers === 'string'
+            ? JSON.parse(user.providers)
+            : user.providers || {},
+        user_metadata:
+          typeof user.user_metadata === 'string'
+            ? JSON.parse(user.user_metadata)
+            : user.user_metadata || {},
+        app_metadata:
+          typeof user.app_metadata === 'string'
+            ? JSON.parse(user.app_metadata)
+            : user.app_metadata || {},
       }))
 
       setUsers(processedUsers)
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load users'
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to load users'
       setError(errorMessage)
       toast.error(errorMessage)
     } finally {

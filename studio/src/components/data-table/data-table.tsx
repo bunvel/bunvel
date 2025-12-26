@@ -42,10 +42,9 @@ interface DataTableProps<T> {
 }
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [
-  { value: 10, label: '10' },
-  { value: 25, label: '25' },
-  { value: 50, label: '50' },
   { value: 100, label: '100' },
+  { value: 500, label: '500' },
+  { value: 1000, label: '1000' },
   { value: Number.MAX_SAFE_INTEGER, label: 'No limit' },
 ]
 
@@ -53,7 +52,7 @@ export function DataTable<T>({
   columns,
   data,
   isLoading = false,
-  pageSize = 10,
+  pageSize = 100,
   onPageSizeChange,
   currentPage = 1,
   onPageChange,
