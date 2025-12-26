@@ -6,11 +6,9 @@ Bunvel is a unified Backend-as-a-Service (BaaS) platform that combines authentic
 
 > **Note:** This is currently a hobby project for learning and understanding backend concepts. It is not yet production-ready, but with community contributions, it may evolve into a production-ready solution in the future.
 
-Unlike traditional BaaS solutions that rely on microservices, Bunvel runs as a single application, making it incredibly fast and easy to deploy.
-
 ## ✨ Features
 
-- 🔐 **Authentication** - Complete auth system with JWT, social providers, and email/password
+- 🔐 **Authentication** - Auth with email/password
 - 💾 **Storage** - File upload/download with bucket management and CDN integration
 - ⚡ **Realtime** - WebSocket subscriptions for live data updates
 - 🔌 **REST API** - Auto-generated REST APIs from your database schema
@@ -36,7 +34,7 @@ Bunvel consists of two main components:
 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/yourusername/bunvel.git
+git clone https://github.com/bunvel/bunvel.git
 cd bunvel
 ```
 
@@ -47,7 +45,7 @@ docker-compose up -d
 ```
 
 
-The backend will be available at `http://localhost:3000` and the studio at `http://localhost:3001`.
+The backend will be available at `http://localhost:8000` and the studio at `http://localhost:3000`.
 
 ## 📚 Documentation
 
@@ -73,7 +71,7 @@ Bunvel is inspired by [Supabase](https://supabase.com) but takes a different arc
 
 ## 💬 Community
 
-- [GitHub Discussions](https://github.com/yourusername/bunvel/discussions)
+- [GitHub Discussions](https://github.com/bunvel/bunvel/discussions)
 - [Discord](https://discord.gg/bunvel) *(coming soon)*
 - [Twitter](https://twitter.com/bunvel) *(coming soon)*
 
