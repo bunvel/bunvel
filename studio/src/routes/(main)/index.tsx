@@ -35,6 +35,18 @@ function Dashboard() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-4">
       <NoticeBanner />
+      <div className="text-sm text-gray-500 dark:text-gray-400">
+        API URL: {import.meta.env.VITE_API_URL || 'Not set'}
+      </div>
+      <div className="text-sm text-gray-500 dark:text-gray-400">
+        Studio URL: {import.meta.env.VITE_BUNVEL_STUDIO_URL || 'Not set'}
+      </div>
+      <div className="text-sm text-gray-500 dark:text-gray-400">
+        Default Org: {import.meta.env.VITE_STUDIO_DEFAULT_ORGANIZATION || 'Not set'}
+      </div>
+      <div className="text-sm text-gray-500 dark:text-gray-400">
+        Default Project: {import.meta.env.VITE_STUDIO_DEFAULT_PROJECT || 'Not set'}
+      </div>
     </div>
   )
 }
