@@ -7,7 +7,7 @@ export interface QueryResult {
 }
 
 export const useSqlQuery = () => {
-  const [query, setQuery] = useState('select 1');
+  const [query, setQuery] = useState('SELECT 1');
   const [results, setResults] = useState<QueryResult[]>([]);
   const [columns, setColumns] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
