@@ -17,7 +17,7 @@ export interface TableTab {
 export const useTableExplorer = () => {
   const [tabs, setTabs] = useState<TableTab[]>([])
   const [activeTabId, setActiveTabId] = useState<string | null>(null)
-  const [pageSize, setPageSize] = useState(100)
+  const [pageSize, setPageSize] = useState(50)
 
   const fetchTableData = async (
     schema: string,

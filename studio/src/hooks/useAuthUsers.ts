@@ -26,7 +26,7 @@ export const useAuthUsers = (): UseAuthUsersReturn => {
   const [error, setError] = useState<string | null>(null)
   const [totalCount, setTotalCount] = useState<number>(0)
 
-  const fetchUsers = async (page: number = 1, pageSize: number = 100) => {
+  const fetchUsers = async (page: number = 1, pageSize: number = 50) => {
     setIsLoading(true)
     setError(null)
 
@@ -60,7 +60,7 @@ export const useAuthUsers = (): UseAuthUsersReturn => {
 
   // Initial fetch
   useEffect(() => {
-    fetchUsers(1, 100)
+    fetchUsers(1, 50)
   }, [])
 
   return {

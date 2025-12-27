@@ -24,6 +24,7 @@
     "@tanstack/react-router-devtools": "^1.143.11",
     "@tanstack/react-router-ssr-query": "^1.143.11",
     "@tanstack/react-start": "^1.143.11",
+    "@tanstack/react-table": "^8.21.3",
     "@tanstack/router-plugin": "^1.143.11",
     "@unpic/react": "^1.0.2",
     "class-variance-authority": "^0.7.1",
