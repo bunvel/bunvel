@@ -27,9 +27,19 @@ export const AuthUsersTable = () => {
       cell: (user: AuthUser) => user.id,
     },
     {
+      key: 'name',
+      header: 'Name',
+      cell: (user: AuthUser) => user.name,
+    },
+    {
       key: 'email',
       header: 'Email',
       cell: (user: AuthUser) => user.email,
+    },
+    {
+      key: 'phone',
+      header: 'Phone',
+      cell: (user: AuthUser) => user.phone,
     },
     {
       key: 'created_at',

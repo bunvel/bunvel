@@ -1,10 +1,12 @@
-import { QUERY_URL } from '@/lib/constant'
+import Endpoints from '@/data/endpoints'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 export interface AuthUser {
   id: string
+  name: string | null
   email: string | null
+  phone: string | null
   last_sign_in_at: string | null
   created_at: string
   updated_at: string
@@ -24,83 +26,33 @@ export const useAuthUsers = (): UseAuthUsersReturn => {
   const [error, setError] = useState<string | null>(null)
   const [totalCount, setTotalCount] = useState<number>(0)
 
-  // In useAuthUsers.ts, update the fetchUsers function
   const fetchUsers = async (page: number = 1, pageSize: number = 100) => {
     setIsLoading(true)
     setError(null)
 
     try {
-      const offset = (page - 1) * pageSize
-
-      // First, get the total count
-      const countResponse = await fetch(QUERY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: 'SELECT COUNT(*) as count FROM auth.users',
-        }),
+      const response = await fetch(`${Endpoints.GET_AUTH_USERS}?page=${page}&limit=${pageSize}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
       })
-
-      if (!countResponse.ok) {
+      
+      if (!response.ok) {
         throw new Error(
-          `Failed to fetch user count: ${countResponse.status} ${countResponse.statusText}`,
+          `Failed to fetch users: ${response.status} ${response.statusText}`
         )
       }
-
-      const countData = await countResponse.json()
-      const total = countData[0]?.count || 0
-      setTotalCount(total)
-
-      // Then fetch the paginated users
-      const usersResponse = await fetch(QUERY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `
-            SELECT 
-              id,
-              email,
-              last_sign_in_at,
-              created_at,
-              updated_at
-            FROM auth.users
-            ORDER BY created_at DESC
-            LIMIT ${pageSize} OFFSET ${offset}
-          `
-        }),
-      })
-
-      if (!usersResponse.ok) {
-        throw new Error(
-          `Failed to fetch users: ${usersResponse.status} ${usersResponse.statusText}`,
-        )
-      }
-
-      const usersData = await usersResponse.json()
-
-      // Process the users data
-      const processedUsers = usersData.map((user: any) => ({
-        ...user,
-        providers:
-          typeof user.providers === 'string'
-            ? JSON.parse(user.providers)
-            : user.providers || {},
-        user_metadata:
-          typeof user.user_metadata === 'string'
-            ? JSON.parse(user.user_metadata)
-            : user.user_metadata || {},
-        app_metadata:
-          typeof user.app_metadata === 'string'
-            ? JSON.parse(user.app_metadata)
-            : user.app_metadata || {},
-      }))
-
-      setUsers(processedUsers)
+      
+      const { data, totalCount } = await response.json()
+      setUsers(data)
+      setTotalCount(totalCount)
+      setError(null)
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to load users'
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred'
+      toast.error(`Failed to fetch users: ${errorMessage}`)
       setError(errorMessage)
-      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }
