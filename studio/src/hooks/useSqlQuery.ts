@@ -1,4 +1,4 @@
-import { QUERY_URL } from '@/lib/constant';
+import Endpoints from '@/data/endpoints';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -20,7 +20,7 @@ export const useSqlQuery = () => {
     setColumns([]);
 
     try {
-      const response = await fetch(QUERY_URL, {
+      const response = await fetch(Endpoints.QUERY_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

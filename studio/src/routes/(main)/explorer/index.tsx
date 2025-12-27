@@ -18,7 +18,6 @@ function RouteComponent() {
     closeTab,
     handlePageChange,
     handlePageSizeChange,
-    insertRow,
   } = useTableExplorer()
 
   const handleTableSelect = (schema: string, table: string) => {
@@ -64,7 +63,9 @@ function RouteComponent() {
                   title={`${tab.schema}.${tab.table}`}
                 >
                   <span className="mr-2">
-                    <span className="text-muted-foreground text-xs">{tab.schema}.</span>
+                    <span className="text-muted-foreground text-xs">
+                      {tab.schema}.
+                    </span>
                     {tab.table}
                   </span>
                   <button
@@ -96,10 +97,16 @@ function RouteComponent() {
                 onPageSizeChange={handlePageSizeChange}
                 pageSize={pageSize}
                 onInsert={
-                  activeTab && activeTab.schema !== 'auth' 
-                    ? (data) => insertRow(activeTab.id, data).then(() => {}) 
+                  activeTab && activeTab.schema !== 'auth'
+                    ? (data) =>
+                        (async () => {
+                          console.log(data)
+                        })()
                     : undefined
                 }
+                onRefresh={async () => {}}
+                onFilter={async () => {}}
+                onSort={async () => {}}
               />
             ) : (
               <div className="h-full flex items-center justify-center text-muted-foreground">

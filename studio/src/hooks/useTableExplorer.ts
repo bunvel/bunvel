@@ -1,4 +1,4 @@
-import { QUERY_URL } from '@/lib/constant'
+import Endpoints from '@/data/endpoints'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -34,7 +34,7 @@ export const useTableExplorer = () => {
 
     try {
       // Fetch column types
-      const columnTypesResponse = await fetch(QUERY_URL, {
+      const columnTypesResponse = await fetch(Endpoints.QUERY_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -64,7 +64,7 @@ export const useTableExplorer = () => {
 
       // Fetch table data with pagination
       const offset = (page - 1) * pageSize
-      const dataResponse = await fetch(QUERY_URL, {
+      const dataResponse = await fetch(Endpoints.QUERY_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -83,7 +83,7 @@ export const useTableExplorer = () => {
       const data = await dataResponse.json()
 
       // Get total row count for pagination
-      const countResponse = await fetch(QUERY_URL, {
+      const countResponse = await fetch(Endpoints.QUERY_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -159,61 +159,6 @@ export const useTableExplorer = () => {
     }
   }
 
-  const insertRow = async (tabId: string, data: Record<string, any>) => {
-    const tab = tabs.find((t) => t.id === tabId)
-    if (!tab) return
-
-    try {
-      const response = await fetch(QUERY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `INSERT INTO "${tab.schema}"."${tab.table}" (${Object.keys(data)
-            .map((k) => `"${k}"`)
-            .join(', ')})
-            VALUES (${Object.entries(data).map(([key, value]) => {
-              const columnType = tab.columnTypes[key]?.toLowerCase()
-              
-              if (value === null || value === undefined) {
-                return 'NULL'
-              }
-              
-              if (columnType?.includes('json')) {
-                return `'${JSON.stringify(value).replace(/'/g, "''")}'::jsonb`
-              }
-              
-              if (value instanceof Date) {
-                return `'${value.toISOString()}'::timestamp`
-              }
-              
-              if (typeof value === 'string') {
-                return `'${value.replace(/'/g, "''")}'`
-              }
-              
-              if (typeof value === 'boolean') {
-                return value ? 'true' : 'false'
-              }
-              
-              return value
-            }).join(', ')})
-            RETURNING *`,
-        }),
-      })
-
-      if (!response.ok) {
-        const error = await response.text()
-        throw new Error(error)
-      }
-
-      // Refresh the table data
-      await fetchTableData(tab.schema, tab.table, tab.page)
-      return true
-    } catch (error) {
-      console.error('Error inserting row:', error)
-      throw error
-    }
-  }
-
   return {
     tabs,
     activeTabId,
@@ -223,7 +168,6 @@ export const useTableExplorer = () => {
     closeTab,
     handlePageChange,
     handlePageSizeChange,
-    insertRow,
   }
 }
 

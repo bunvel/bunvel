@@ -1,7 +1,6 @@
 import { DataTable } from '@/components/data-table/data-table'
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
-import { InsertRowForm } from './InsertRowForm'
+import { Filter, Plus, RefreshCcw, SortAsc } from 'lucide-react'
 
 interface TableViewerProps {
   table: string
@@ -15,6 +14,9 @@ interface TableViewerProps {
   onPageSizeChange: (size: number) => void
   pageSize: number
   onInsert?: (data: Record<string, any>) => Promise<void>
+  onRefresh?: () => Promise<void>
+  onFilter?: () => Promise<void>
+  onSort?: () => Promise<void>
 }
 
 export const TableViewer = ({
@@ -29,6 +31,9 @@ export const TableViewer = ({
   onPageSizeChange,
   pageSize,
   onInsert,
+  onRefresh,
+  onFilter,
+  onSort,
 }: TableViewerProps) => {
   if (!table) {
     return (
@@ -63,27 +68,30 @@ export const TableViewer = ({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="bg-card flex items-center gap-2 p-2 border-b">
+      <div className="flex items-center gap-2 p-2 border-b">
         {onInsert && table && schema !== 'auth' && (
-          <InsertRowForm
-            tab={{
-              id: `${schema}.${table}`,
-              schema,
-              table,
-              columns,
-              columnTypes,
-              data: [],
-              isLoading: false,
-              page: 1,
-              totalRows: 0,
-            }}
-            onInsert={onInsert}
-          >
-            <Button variant="outline" size="sm" className="h-8">
-              <Plus className="h-4 w-4 mr-1" />
-              Insert
-            </Button>
-          </InsertRowForm>
+          <Button variant="default" size="sm" className="h-8">
+            <Plus className="h-4 w-4 mr-1" />
+            Insert
+          </Button>
+        )}
+        {onRefresh && table && (
+          <Button variant="outline" size="sm" className="h-8">
+            <RefreshCcw className="h-4 w-4 mr-1" />
+            Refresh
+          </Button>
+        )}
+        {onFilter && table && (
+          <Button variant="outline" size="sm" className="h-8">
+            <Filter className="h-4 w-4 mr-1" />
+            Filter
+          </Button>
+        )}
+        {onSort && table && (
+          <Button variant="outline" size="sm" className="h-8">
+            <SortAsc className="h-4 w-4 mr-1" />
+            Sort
+          </Button>
         )}
         {schema === 'auth' && (
           <div className="text-sm text-muted-foreground px-2">

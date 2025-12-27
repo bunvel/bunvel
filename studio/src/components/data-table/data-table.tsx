@@ -85,7 +85,7 @@ export function DataTable<T>({
 
   return (
     <div
-      className={`flex flex-col h-full overflow-hidden bg-card ${className}`}
+      className={`flex flex-col h-full overflow-hidden ${className}`}
     >
       <div className="flex-1 min-h-0">
         <ScrollArea className="h-full w-full">
