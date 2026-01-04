@@ -111,7 +111,7 @@ export function SqlEditor() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="min-h-[350px] border-b">
+      <div className="h-[350px] border-b">
         <SqlQueryForm
           query={query}
           onQueryChange={handleQueryChange}

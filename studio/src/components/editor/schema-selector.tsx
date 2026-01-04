@@ -31,26 +31,23 @@ export function SchemaSelector() {
   )
   const defaultSchema = hasPublicSchema ? 'public' : ''
 
-// In schema-selector.tsx, update the loading state to:
-if (isFetching) {
-  return (
-    <div className="p-4">
-      <div className="h-8 w-full rounded-md border border-input px-3 py-2 flex items-center justify-between">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-4 w-4" />
+  // In schema-selector.tsx, update the loading state to:
+  if (isFetching) {
+    return (
+      <div className="p-4">
+        <div className="h-8 w-full rounded-md border border-input px-3 py-2 flex items-center justify-between">
+          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-4 w-4" />
+        </div>
       </div>
-    </div>
-  )
-}
+    )
+  }
 
   if (error) {
     return (
       <div className="text-red-500 p-4">
         Error loading schemas: {error.message}
-        <Button
-          onClick={() => refetch()}
-          className="ml-2 text-sm text-blue-500 hover:underline"
-        >
+        <Button variant="link" onClick={() => refetch()}>
           Retry
         </Button>
       </div>

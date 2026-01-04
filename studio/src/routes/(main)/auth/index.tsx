@@ -5,5 +5,5 @@ export const Route = createFileRoute('/(main)/auth/')({
 })
 
 function RouteComponent() {
-  return <div>Hello "/(main)/auth/"!</div>
+  return <div className="flex items-center justify-center h-full">Auth not yet implemented</div>
 }

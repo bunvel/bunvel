@@ -96,8 +96,8 @@ export function TableList() {
         return (
           <Button
             key={`${table.table_schema}.${table.table_name}`}
-            variant="ghost"
-            className={`w-full justify-start ${isActive ? 'bg-accent' : ''}`}
+            variant={`${isActive ? 'default' : 'ghost'}`}
+            className="w-full justify-start"
             onClick={(e) => {
               e.preventDefault()
               handleTableClick(table)
