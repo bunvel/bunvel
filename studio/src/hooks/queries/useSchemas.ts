@@ -1,4 +1,4 @@
-import { getSchemas } from '@/services/editorService';
+import { getSchemas } from '@/services/schema.service';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from './query-key';
 

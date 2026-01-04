@@ -1,12 +1,11 @@
 import { DataTable } from '@/components/data-table/data-table'
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
+import { formatDataType } from '@/utils/format'
+import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-} from '@tanstack/react-table'
+import { ColumnDef, ColumnFiltersState, SortingState } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 import { TableToolbar } from './table-toolbar'
 
@@ -16,9 +15,7 @@ interface SearchParams {
   [key: string]: unknown
 }
 
-export interface Table extends Record<string, any> {
-  [key: string]: any
-}
+export interface Table extends Record<string, any> {}
 
 export interface TableMetadata {
   columns: Array<{
@@ -68,21 +65,52 @@ export function TableViewer() {
 
   const isLoading = isMetadataLoading || isTableDataLoading
 
+  // Helper to sort and group columns
+  const getSortedColumns = (cols: TableMetadata['columns']) => {
+    if (!cols) return [];
+    
+    const primaryKeys = cols.filter(c => c.is_primary_key)
+      .sort((a, b) => a.column_name.localeCompare(b.column_name));
+    
+    const foreignKeys = cols.filter(c => !c.is_primary_key && c.is_foreign_key)
+      .sort((a, b) => a.column_name.localeCompare(b.column_name));
+      
+    const otherCols = cols.filter(c => !c.is_primary_key && !c.is_foreign_key)
+      .sort((a, b) => a.column_name.localeCompare(b.column_name));
+    
+    return [...primaryKeys, ...foreignKeys, ...otherCols];
+  };
+
   // Generate columns from metadata
   type TableData = Record<string, any>
 
   const columns = useMemo<ColumnDef<TableData>[]>(() => {
-    if (!metadata?.columns) {
-      return []
-    }
-
-    return metadata.columns.map((column: any) => ({
+    if (!metadata?.columns) return [];
+    
+    return getSortedColumns(metadata.columns).map(column => ({
       id: column.column_name,
-      header: column.column_name,
+      header: () => (
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-1 group">
+            <span>{column.column_name}</span>
+            <div className="flex items-center gap-1">
+              {column.is_primary_key && (
+                <HugeiconsIcon icon={Key01Icon} className="h-3.5 w-3.5 text-amber-500" />
+              )}
+              {column.is_foreign_key && (
+                <HugeiconsIcon icon={Link02Icon} className="h-3.5 w-3.5 text-blue-500" />
+              )}
+            </div>
+          </div>
+          <span className="text-xs text-muted-foreground font-normal">
+            {formatDataType(column.data_type)}
+          </span>
+        </div>
+      ),
       accessorKey: column.column_name,
       cell: (info: any) => {
-        const value = info.getValue()
-        return value === null || value === undefined ? 'NULL' : String(value)
+        const value = info.getValue();
+        return value === null || value === undefined ? 'NULL' : String(value);
       },
       meta: {
         dataType: column.data_type,

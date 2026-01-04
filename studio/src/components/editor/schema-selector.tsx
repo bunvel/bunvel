@@ -7,8 +7,8 @@ import {
 } from '@/components/ui/select'
 import { useSchemas } from '@/hooks/queries/useSchemas'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
+import { CreateSchemaSheet } from './create-schema-sheet'
 
 interface Schema {
   schema_name: string
@@ -31,24 +31,26 @@ export function SchemaSelector() {
   )
   const defaultSchema = hasPublicSchema ? 'public' : ''
 
-  if (isFetching) {
-    return (
-      <div className="p-4">
-        <div className="h-8 w-full rounded-md border border-input px-3 py-2 flex items-center justify-between">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-4 w-4" />
-        </div>
+if (isFetching) {
+  return (
+    <div className="flex flex-col gap-2 p-4">
+      <div className="h-8 w-full rounded-md border border-input px-3 flex items-center justify-between">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-4 w-4" />
       </div>
-    )
-  }
+      <div className="h-8 w-full rounded-md border border-input px-3 flex items-center justify-between">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-4 w-4" />
+      </div>
+    </div>
+  )
+}
 
   if (error) {
     return (
       <div className="text-red-500 p-4">
         Error loading schemas: {error.message}
-        <Button variant="link" onClick={() => refetch()}>
-          Retry
-        </Button>
+        <button onClick={() => refetch()}>Retry</button>
       </div>
     )
   }
@@ -79,10 +81,10 @@ export function SchemaSelector() {
         value={search.schema || defaultSchema}
         defaultValue={defaultSchema}
       >
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="w-full mb-2">
           <SelectValue title="Select a schema" />
         </SelectTrigger>
-        <SelectContent className="p-2">
+        <SelectContent>
           {schemas?.data?.map((schema: Schema) => (
             <SelectItem key={schema.schema_name} value={schema.schema_name}>
               {schema.schema_name}
@@ -90,6 +92,7 @@ export function SchemaSelector() {
           ))}
         </SelectContent>
       </Select>
+      <CreateSchemaSheet />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
-import { Table } from '@/services/editorService'
+import { Table } from '@/services/schema.service'
 import { EyeFreeIcons, TableIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
