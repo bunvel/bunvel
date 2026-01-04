@@ -1,5 +1,4 @@
 // SQL queries for database metadata and operations
-
 export const SQL_QUERIES = {
   // Get all non-system schemas
   GET_SCHEMAS: `

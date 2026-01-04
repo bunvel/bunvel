@@ -1,20 +1,31 @@
 import { useCallback } from 'react'
+import { toast } from 'sonner'
 
 export function useCopy() {
   const copyToClipboard = useCallback(
     async (text: string, successMessage?: string, errorMessage?: string) => {
       try {
+        // Modern clipboard API with permission handling
+        if (!navigator.clipboard) {
+          throw new Error('Clipboard API not supported in this browser')
+        }
+
+        // Request permission if needed (not all browsers require this)
+        const permission = await navigator.permissions.query({ name: 'clipboard-write' as PermissionName })
+        if (permission.state === 'denied') {
+          throw new Error('Clipboard write permission denied')
+        }
+
         await navigator.clipboard.writeText(text)
+        
         if (successMessage) {
-          // You might want to use your toast system here
-          console.log(successMessage)
+          console.log(successMessage);
         }
         return true
       } catch (err) {
         console.error('Failed to copy:', err)
-        if (errorMessage) {
-          console.error(errorMessage)
-        }
+        const errorMsg = errorMessage || 'Failed to copy to clipboard. Please check browser permissions.'
+        console.error(errorMsg)
         return false
       }
     },
@@ -71,10 +82,10 @@ export function useCopy() {
           text = `INSERT INTO ${tableName} (${columns.join(', ')})\nVALUES\n${values};`
         }
 
-        await navigator.clipboard.writeText(text)
-        return true
+        return await copyToClipboard(text, 'Copied to clipboard')
       } catch (err) {
         console.error('Failed to copy rows:', err)
+        toast.error('Failed to copy rows')
         return false
       }
     },

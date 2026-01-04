@@ -13,7 +13,6 @@ import { Route as mainRouteRouteImport } from './routes/(main)/route'
 import { Route as mainIndexRouteImport } from './routes/(main)/index'
 import { Route as mainSqlIndexRouteImport } from './routes/(main)/sql/index'
 import { Route as mainEditorIndexRouteImport } from './routes/(main)/editor/index'
-import { Route as mainAuthIndexRouteImport } from './routes/(main)/auth/index'
 
 const mainRouteRoute = mainRouteRouteImport.update({
   id: '/(main)',
@@ -34,21 +33,14 @@ const mainEditorIndexRoute = mainEditorIndexRouteImport.update({
   path: '/editor/',
   getParentRoute: () => mainRouteRoute,
 } as any)
-const mainAuthIndexRoute = mainAuthIndexRouteImport.update({
-  id: '/auth/',
-  path: '/auth/',
-  getParentRoute: () => mainRouteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof mainIndexRoute
-  '/auth': typeof mainAuthIndexRoute
   '/editor': typeof mainEditorIndexRoute
   '/sql': typeof mainSqlIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof mainIndexRoute
-  '/auth': typeof mainAuthIndexRoute
   '/editor': typeof mainEditorIndexRoute
   '/sql': typeof mainSqlIndexRoute
 }
@@ -56,22 +48,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(main)': typeof mainRouteRouteWithChildren
   '/(main)/': typeof mainIndexRoute
-  '/(main)/auth/': typeof mainAuthIndexRoute
   '/(main)/editor/': typeof mainEditorIndexRoute
   '/(main)/sql/': typeof mainSqlIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/editor' | '/sql'
+  fullPaths: '/' | '/editor' | '/sql'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/editor' | '/sql'
-  id:
-    | '__root__'
-    | '/(main)'
-    | '/(main)/'
-    | '/(main)/auth/'
-    | '/(main)/editor/'
-    | '/(main)/sql/'
+  to: '/' | '/editor' | '/sql'
+  id: '__root__' | '/(main)' | '/(main)/' | '/(main)/editor/' | '/(main)/sql/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -108,26 +93,17 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainEditorIndexRouteImport
       parentRoute: typeof mainRouteRoute
     }
-    '/(main)/auth/': {
-      id: '/(main)/auth/'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof mainAuthIndexRouteImport
-      parentRoute: typeof mainRouteRoute
-    }
   }
 }
 
 interface mainRouteRouteChildren {
   mainIndexRoute: typeof mainIndexRoute
-  mainAuthIndexRoute: typeof mainAuthIndexRoute
   mainEditorIndexRoute: typeof mainEditorIndexRoute
   mainSqlIndexRoute: typeof mainSqlIndexRoute
 }
 
 const mainRouteRouteChildren: mainRouteRouteChildren = {
   mainIndexRoute: mainIndexRoute,
-  mainAuthIndexRoute: mainAuthIndexRoute,
   mainEditorIndexRoute: mainEditorIndexRoute,
   mainSqlIndexRoute: mainSqlIndexRoute,
 }

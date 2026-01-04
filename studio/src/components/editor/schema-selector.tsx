@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/select'
 import { useSchemas } from '@/hooks/queries/useSchemas'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
 import { CreateSchemaSheet } from './create-schema-sheet'
 
@@ -50,7 +51,7 @@ if (isFetching) {
     return (
       <div className="text-red-500 p-4">
         Error loading schemas: {error.message}
-        <button onClick={() => refetch()}>Retry</button>
+        <Button variant="link" onClick={() => refetch()}>Retry</Button>
       </div>
     )
   }

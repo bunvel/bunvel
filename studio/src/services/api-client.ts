@@ -30,17 +30,17 @@ class ApiClient {
     endpoint: string,
     method: HttpMethod = 'GET',
     data?: any,
-    customHeaders: HeadersInit = {}
+    customHeaders: HeadersInit = {},
   ): Promise<ApiResponse<T>> {
     let url = `${this.baseUrl}${endpoint}`
     const headers = new Headers(this.defaultHeaders)
-    
+
     // Add custom headers
     const customHeadersObj = new Headers(customHeaders)
     customHeadersObj.forEach((value, key) => {
       headers.set(key, value)
     })
-    
+
     const config: RequestInit = {
       method,
       headers,

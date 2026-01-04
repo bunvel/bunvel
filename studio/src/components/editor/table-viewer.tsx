@@ -49,7 +49,7 @@ export function TableViewer() {
         acc[filter.id] = filter.value
         return acc
       },
-      {} as Record<string, unknown>,
+      {} as TableRow,
     ),
     primaryKeys: metadata?.primary_keys || [],
   })

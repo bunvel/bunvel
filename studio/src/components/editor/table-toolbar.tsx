@@ -6,8 +6,7 @@ import {
   ExportButton,
   FilterButton,
   InsertButton,
-  RefreshButton,
-  SortButton,
+  SortButton
 } from './toolbar-buttons'
 
 export interface TableToolbarProps {
@@ -42,7 +41,6 @@ export function TableToolbar({
             <InsertButton disabled={isReadOnly} />
             <FilterButton />
             <SortButton />
-            <RefreshButton />
           </>
         )}
       </div>

@@ -244,6 +244,5 @@ export const getTableData = createServerFn({ method: 'POST' })
     } catch (error) {
       console.error('Error in getTableData:', error)
       handleApiError(error)
-      throw error
     }
   })
