@@ -12,7 +12,7 @@ export const corsPlugin = new Elysia().use(
       return false;
     },
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     exposeHeaders: ["Content-Length"],
     credentials: true,
     maxAge: 86400, // 24 hours
