@@ -3,48 +3,6 @@ import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
 
-export interface SchemaResult {
-  data: Record<string, any>[]
-}
-
-export interface SchemaError {
-  message: string
-  code?: string
-  details?: any
-}
-
-export interface Schema {
-  schema_name: string
-}
-
-export const getSchemas = createServerFn({ method: 'POST' }).handler(
-  async () => {
-    try {
-      const response = await apiClient.post<Array<{ schema_name: string }>>(
-        '/meta/query',
-        { query: SQL_QUERIES.GET_SCHEMAS },
-      )
-
-      if (!Array.isArray(response.data)) {
-        throw new Error('Invalid response format: expected an array of rows')
-      }
-
-      return {
-        data: response.data,
-      }
-    } catch (error) {
-      console.error('Failed to fetch schemas:', error)
-      handleApiError(error)
-    }
-  },
-)
-
-export interface Table {
-  table_name: string
-  table_schema: string
-  table_type: 'BASE TABLE' | 'VIEW' | string
-}
-
 export interface ColumnMetadata {
   column_name: string
   data_type: string
@@ -89,24 +47,6 @@ export interface TableDataParams {
   filters?: Record<string, any>
   primaryKeys?: string[] // Add this line
 }
-
-export const getTables = createServerFn({ method: 'POST' })
-  .inputValidator((d: string) => d)
-  .handler(async ({ data }) => {
-    try {
-      const response = await apiClient.post<Table[]>(
-        '/meta/parameterized-query',
-        {
-          query: SQL_QUERIES.GET_TABLES,
-          params: [data],
-        },
-      )
-      return response.data
-    } catch (error) {
-      console.error('Error fetching tables:', error)
-      handleApiError(error)
-    }
-  })
 
 export interface TableMetadataResult {
   data: TableMetadata

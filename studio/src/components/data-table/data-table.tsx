@@ -283,9 +283,7 @@ export function DataTable<TData, TValue = unknown>({
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="bg-secondary">
-                    <div className="text-sm">
-                      {formatCellValue('No results')}
-                    </div>
+                    <div className="text-sm">No results</div>
                   </TableCell>
                 </TableRow>
               )}
