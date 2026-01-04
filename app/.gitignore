@@ -41,5 +41,5 @@ yarn-error.log*
 **/*.log
 package-lock.json
 **/*.bun
-
+bun-sql.md
 bunvel-app
