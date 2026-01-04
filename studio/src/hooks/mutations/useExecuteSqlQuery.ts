@@ -1,7 +1,7 @@
-import { executeQuery } from '@/services/sqlService';
+import { executeQuery } from '@/services/sql.service';
 import { useMutation } from '@tanstack/react-query';
 
-export function useSqlQuery() {
+export function useExecuteSqlQuery() {
   return useMutation({
     mutationFn: (query: string) => {
       if (!query?.trim()) {

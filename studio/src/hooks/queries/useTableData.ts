@@ -1,4 +1,4 @@
-import { getTableData, getTableMetadata } from '@/services/editorService';
+import { getTableData, getTableMetadata } from '@/services/editor.service';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from './query-key';
 

@@ -1,4 +1,4 @@
-import { useSqlQuery } from '@/hooks/queries/useSqlQuery'
+import { useExecuteSqlQuery } from '@/hooks/mutations/useExecuteSqlQuery'
 import { ColumnDef } from '@tanstack/react-table'
 import { useCallback, useMemo, useState } from 'react'
 import { DataTable } from '../data-table/data-table'
@@ -18,7 +18,7 @@ export function SqlEditor() {
     data: queryResult,
     error,
     isPending: isExecuting,
-  } = useSqlQuery()
+  } = useExecuteSqlQuery()
 
   const handleQueryChange = (newQuery: string) => {
     setQuery(newQuery)
@@ -85,33 +85,44 @@ export function SqlEditor() {
 
   const handleRowSelectionChange = useCallback((selectedRows: any[]) => {
     // Convert selected rows to row selection state
-    const rowSelection = selectedRows.reduce(
-      (acc, index) => ({
-        ...acc,
-        [index]: true,
-      }),
+    const newRowSelection = selectedRows.reduce<Record<string, boolean>>(
+      (acc, index) => {
+        acc[index] = true
+        return acc
+      },
       {},
     )
 
-    setTableState((prev) => ({
-      ...prev,
-      rowSelection,
-    }))
+    // Only update state if the selection actually changed
+    setTableState((prev) => {
+      const currentSelection = Object.keys(prev.rowSelection)
+        .filter((key) => prev.rowSelection[key])
+        .sort()
+        .join(',')
+
+      const newSelection = Object.keys(newRowSelection).sort().join(',')
+
+      // If the selection hasn't changed, return previous state to prevent re-render
+      if (currentSelection === newSelection) {
+        return prev
+      }
+
+      return {
+        ...prev,
+        rowSelection: newRowSelection,
+      }
+    })
   }, [])
 
-  // Default data when there's no result yet
-  const displayData = useMemo(() => {
-    if (queryResult?.data) {
-      return queryResult.data.length > 0
-        ? queryResult.data
-        : [{ message: 'Run query to see results' }]
-    }
-    return [{ message: 'Run query to see results' }]
-  }, [queryResult?.data])
+  // Use query result data directly, empty states are handled in JSX
+  const displayData = useMemo(
+    () => queryResult?.data || [],
+    [queryResult?.data],
+  )
 
   return (
     <div className="flex flex-col h-full">
-      <div className="min-h-[350px] border-b">
+      <div className="h-[350px] border-b overflow-y-auto">
         <SqlQueryForm
           query={query}
           onQueryChange={handleQueryChange}

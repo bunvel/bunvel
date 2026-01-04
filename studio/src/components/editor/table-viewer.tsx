@@ -1,12 +1,11 @@
 import { DataTable } from '@/components/data-table/data-table'
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
+import { formatCellValue, formatDataType, getSortedColumns } from '@/utils/format'
+import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-} from '@tanstack/react-table'
+import { ColumnDef, ColumnFiltersState, SortingState } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 import { TableToolbar } from './table-toolbar'
 
@@ -16,26 +15,14 @@ interface SearchParams {
   [key: string]: unknown
 }
 
-// Move these interfaces to a separate types file if used elsewhere
-export interface Table extends Record<string, any> {
-  [key: string]: any // Consider replacing with more specific types
-}
+type TableRow = Record<string, unknown>
 
-export interface TableMetadata {
-  columns: Array<{
-    column_name: string
-    data_type: string
-    is_primary_key: boolean
-    is_foreign_key: boolean
-  }>
-  primary_keys: string[]
-}
 
 export function TableViewer() {
   const search = useSearch({ strict: false }) as SearchParams
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [selectedRows, setSelectedRows] = useState<Table[]>([])
+  const [selectedRows, setSelectedRows] = useState<TableRow[]>([])
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE,
@@ -69,21 +56,32 @@ export function TableViewer() {
 
   const isLoading = isMetadataLoading || isTableDataLoading
 
-  // Generate columns from metadata
-  type TableData = Record<string, any>
-
-  const columns = useMemo<ColumnDef<TableData>[]>(() => {
-    if (!metadata?.columns) {
-      return []
-    }
-
-    return metadata.columns.map((column: any) => ({
+  const columns = useMemo<ColumnDef<TableRow>[]>(() => {
+    if (!metadata?.columns) return [];
+    
+    return getSortedColumns(metadata.columns).map(column => ({
       id: column.column_name,
-      header: column.column_name,
+      header: () => (
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-1 group">
+            <span>{column.column_name}</span>
+            <div className="flex items-center gap-1">
+              {column.is_primary_key && (
+                <HugeiconsIcon icon={Key01Icon} className="h-3.5 w-3.5 text-amber-500" />
+              )}
+              {column.is_foreign_key && (
+                <HugeiconsIcon icon={Link02Icon} className="h-3.5 w-3.5 text-blue-500" />
+              )}
+            </div>
+          </div>
+          <span className="text-xs text-muted-foreground font-normal">
+            {formatDataType(column.data_type)}
+          </span>
+        </div>
+      ),
       accessorKey: column.column_name,
-      cell: (info: any) => {
-        const value = info.getValue()
-        return value === null || value === undefined ? 'NULL' : String(value)
+      cell: (info) => {
+        return formatCellValue(info.getValue());
       },
       meta: {
         dataType: column.data_type,
