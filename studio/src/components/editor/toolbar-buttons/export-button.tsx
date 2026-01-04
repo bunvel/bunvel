@@ -30,11 +30,6 @@ export function ExportButton({
 
   const handleExport = async (format: 'json' | 'csv' | 'sql') => {
 
-    if (selectedRows.length === 0) {
-      toast.error('No data to export')
-      return
-    }
-
     const success = await exportData(
       selectedRows,
       `${schema}_${table}`,

@@ -3,33 +3,29 @@ import { toast } from 'sonner'
 
 export function useCopy() {
   const copyToClipboard = useCallback(
-    async (text: string, errorMessage?: string) => {
-      try {
-        // Modern clipboard API with permission handling
-        if (!navigator.clipboard) {
-          throw new Error('Clipboard API not supported in this browser')
-        }
+    async (text: string) => {
+      if (!navigator?.clipboard) {
+        throw new Error('Clipboard API not supported in this browser')
+      }
 
-        // Check clipboard permissions if supported
-        if (navigator.permissions) {
-          try {
-            const permission = await navigator.permissions.query({ name: 'clipboard-write' as PermissionName })
-            if (permission.state === 'denied') {
-              throw new Error('Clipboard write permission denied')
-            }
-          } catch (error) {
-            // Ignore all errors from permission query; if truly denied, the clipboard operation will fail
-            // Only check if we got an explicit 'denied' state (handled above)
+      // Check clipboard permissions if supported
+      if (navigator.permissions) {
+        try {
+          const permission = await navigator.permissions.query({ name: 'clipboard-write' as PermissionName })
+          if (permission.state === 'denied') {
+            throw new Error('Clipboard write permission denied')
           }
+        } catch (error) {
+          // Ignore all errors from permission query; if truly denied, the clipboard operation will fail
+          // Only check if we got an explicit 'denied' state (handled above)
         }
+      }
 
+      try {
         await navigator.clipboard.writeText(text)
-
         return true
       } catch (err) {
-        console.error('Failed to copy:', err)
-        const errorMsg = errorMessage || 'Failed to copy to clipboard. Please check browser permissions.'
-        toast.error(errorMsg)
+        console.error('Failed to copy to clipboard:', err)
         return false
       }
     },
@@ -64,7 +60,7 @@ export function useCopy() {
             ),
           ]
           text = csvRows.join('\n')
-        } else if (format === 'sql' && tableName) {
+        } else if (format === 'sql') {
           // Simple SQL insert statements
           const columns = Object.keys(rows[0] || {})
           const values = rows
@@ -86,10 +82,17 @@ export function useCopy() {
           text = `INSERT INTO ${tableName} (${columns.join(', ')})\nVALUES\n${values};`
         }
 
-        return await copyToClipboard(text, 'Copied to clipboard')
+        const success = await copyToClipboard(text)
+        if (success) {
+          toast.success('Copied to clipboard')
+          return true
+        }
+        toast.error('Failed to copy to clipboard. Please check browser permissions.')
+        return false
       } catch (err) {
         console.error('Failed to copy rows:', err)
-        toast.error('Failed to copy rows')
+        const errorMessage = err instanceof Error ? err.message : 'Failed to copy to clipboard'
+        toast.error(errorMessage)
         return false
       }
     },

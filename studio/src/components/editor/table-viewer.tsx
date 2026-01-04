@@ -95,9 +95,7 @@ export function TableViewer() {
         return formatCellValue(info.getValue())
       },
       meta: {
-        dataType: column.data_type,
-        isPrimaryKey: column.is_primary_key,
-        isForeignKey: column.is_foreign_key,
+        dataType: column.data_type
       },
     }))
   }, [metadata])

@@ -13,7 +13,6 @@ import {
   Database as FileTypeSql,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { toast } from 'sonner'
 
 interface CopyButtonProps {
   selectedRows: Record<string, unknown>[]
@@ -23,22 +22,8 @@ interface CopyButtonProps {
 export function CopyButton({ selectedRows, table }: CopyButtonProps) {
   const { copyRows } = useCopy()
 
-  const handleCopy = async (format: 'json' | 'csv' | 'sql') => {
-    try {
-      const success = await copyRows(
-        selectedRows,
-        format,
-        table,
-      )
-
-      if (success) {
-        toast.success(`Copied ${selectedRows.length} rows as ${format.toUpperCase()} to clipboard`)
-      } else {
-        toast.error('Failed to copy rows')
-      }
-    } catch (error) {
-      toast.error('An error occurred while copying')
-    }
+  const handleCopy = (format: 'json' | 'csv' | 'sql') => {
+    copyRows(selectedRows, format, table)
   }
 
   return (
