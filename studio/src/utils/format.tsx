@@ -1,3 +1,4 @@
+import { TableMetadata } from '@/services/editor.service'
 import React from 'react'
 
 /**
@@ -97,4 +98,20 @@ export function formatCellValue(value: unknown): React.ReactNode {
 
   // Handle numbers, bigints, symbols, etc.
   return String(value)
+}
+
+// Helper to sort and group columns
+export function getSortedColumns(cols: TableMetadata['columns']) {
+  if (!cols) return [];
+  
+  const primaryKeys = cols.filter(c => c.is_primary_key)
+    .sort((a, b) => a.column_name.localeCompare(b.column_name));
+  
+  const foreignKeys = cols.filter(c => !c.is_primary_key && c.is_foreign_key)
+    .sort((a, b) => a.column_name.localeCompare(b.column_name));
+    
+  const otherCols = cols.filter(c => !c.is_primary_key && !c.is_foreign_key)
+    .sort((a, b) => a.column_name.localeCompare(b.column_name));
+  
+  return [...primaryKeys, ...foreignKeys, ...otherCols];
 }

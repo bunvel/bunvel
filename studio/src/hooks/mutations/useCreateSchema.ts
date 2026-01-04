@@ -12,22 +12,17 @@ export function useCreateSchema() {
   return useMutation({
     mutationFn: async ({ name }: CreateSchemaVariables) => {
       const result = await createSchema({
-        data: {
-          schemaName: name,
-          ifNotExists: true,
-        },
+        data: name,
       })
       return result
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.schemas.all(),
-      })
-      return data
+      });
     },
     onError: (error: Error) => {
-      console.error('Schema creation failed:', error)
-      throw error
+      console.error('Schema creation failed:', error);
     },
   })
 }

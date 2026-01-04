@@ -2,10 +2,6 @@ import { getSchemas } from '@/services/schema.service';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from './query-key';
 
-export interface Schema {
-  schema_name: string;
-}
-
 export function useSchemas() {
   return useQuery({
     queryKey: queryKeys.schemas.all(),

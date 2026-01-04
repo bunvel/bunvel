@@ -25,29 +25,23 @@ export function CreateSchemaSheet() {
       name: '',
     },
     onSubmit: async ({ value }) => {
-      try {
-        await createSchema(
-          { name: value.name },
-          {
-            onSuccess: () => {
-              toast.success('Schema created', {
-                description: `Schema "${value.name}" has been created successfully.`,
-              })
-              setOpen(false)
-            },
-            onError: (error) => {
-              toast.error('Error creating schema', {
-                description: error.message || 'Failed to create schema',
-              })
-            },
+      createSchema(
+        { name: value.name },
+        {
+          onSuccess: () => {
+            toast.success('Schema created', {
+              description: `Schema "${value.name}" has been created successfully.`,
+            })
+            form.reset()
+            setOpen(false)
           },
-        )
-      } catch (error) {
-        // This will catch any synchronous errors
-        toast.error('Error', {
-          description: 'An unexpected error occurred',
-        })
-      }
+          onError: (error) => {
+            toast.error('Error creating schema', {
+              description: error.message || 'Failed to create schema',
+            })
+          },
+        },
+      )
     },
   })
 

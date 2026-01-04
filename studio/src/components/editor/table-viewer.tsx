@@ -1,7 +1,7 @@
 import { DataTable } from '@/components/data-table/data-table'
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
-import { formatDataType } from '@/utils/format'
+import { formatCellValue, formatDataType, getSortedColumns } from '@/utils/format'
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
@@ -15,17 +15,8 @@ interface SearchParams {
   [key: string]: unknown
 }
 
-export interface Table extends Record<string, any> {}
+export type Table = Record<string, any>
 
-export interface TableMetadata {
-  columns: Array<{
-    column_name: string
-    data_type: string
-    is_primary_key: boolean
-    is_foreign_key: boolean
-  }>
-  primary_keys: string[]
-}
 
 export function TableViewer() {
   const search = useSearch({ strict: false }) as SearchParams
@@ -65,22 +56,6 @@ export function TableViewer() {
 
   const isLoading = isMetadataLoading || isTableDataLoading
 
-  // Helper to sort and group columns
-  const getSortedColumns = (cols: TableMetadata['columns']) => {
-    if (!cols) return [];
-    
-    const primaryKeys = cols.filter(c => c.is_primary_key)
-      .sort((a, b) => a.column_name.localeCompare(b.column_name));
-    
-    const foreignKeys = cols.filter(c => !c.is_primary_key && c.is_foreign_key)
-      .sort((a, b) => a.column_name.localeCompare(b.column_name));
-      
-    const otherCols = cols.filter(c => !c.is_primary_key && !c.is_foreign_key)
-      .sort((a, b) => a.column_name.localeCompare(b.column_name));
-    
-    return [...primaryKeys, ...foreignKeys, ...otherCols];
-  };
-
   // Generate columns from metadata
   type TableData = Record<string, any>
 
@@ -109,8 +84,7 @@ export function TableViewer() {
       ),
       accessorKey: column.column_name,
       cell: (info: any) => {
-        const value = info.getValue();
-        return value === null || value === undefined ? 'NULL' : String(value);
+        return formatCellValue(info.getValue());
       },
       meta: {
         dataType: column.data_type,

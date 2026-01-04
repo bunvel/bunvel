@@ -1,4 +1,4 @@
-import { useSqlQuery } from '@/hooks/queries/useSqlQuery'
+import { useExecuteSqlQuery } from '@/hooks/mutations/useExecuteSqlQuery'
 import { ColumnDef } from '@tanstack/react-table'
 import { useCallback, useMemo, useState } from 'react'
 import { DataTable } from '../data-table/data-table'
@@ -18,7 +18,7 @@ export function SqlEditor() {
     data: queryResult,
     error,
     isPending: isExecuting,
-  } = useSqlQuery()
+  } = useExecuteSqlQuery()
 
   const handleQueryChange = (newQuery: string) => {
     setQuery(newQuery)
@@ -87,34 +87,38 @@ export function SqlEditor() {
     // Convert selected rows to row selection state
     const newRowSelection = selectedRows.reduce<Record<string, boolean>>(
       (acc, index) => {
-        acc[index] = true;
-        return acc;
+        acc[index] = true
+        return acc
       },
-      {}
-    );
+      {},
+    )
 
     // Only update state if the selection actually changed
     setTableState((prev) => {
-      const currentSelection = Object.keys(prev.rowSelection).filter(
-        key => prev.rowSelection[key]
-      ).sort().join(',');
-      
-      const newSelection = Object.keys(newRowSelection).sort().join(',');
-      
+      const currentSelection = Object.keys(prev.rowSelection)
+        .filter((key) => prev.rowSelection[key])
+        .sort()
+        .join(',')
+
+      const newSelection = Object.keys(newRowSelection).sort().join(',')
+
       // If the selection hasn't changed, return previous state to prevent re-render
       if (currentSelection === newSelection) {
-        return prev;
+        return prev
       }
-      
+
       return {
         ...prev,
         rowSelection: newRowSelection,
-      };
-    });
+      }
+    })
   }, [])
 
   // Use query result data directly, empty states are handled in JSX
-  const displayData = useMemo(() => queryResult?.data || [], [queryResult?.data])
+  const displayData = useMemo(
+    () => queryResult?.data || [],
+    [queryResult?.data],
+  )
 
   return (
     <div className="flex flex-col h-full">
