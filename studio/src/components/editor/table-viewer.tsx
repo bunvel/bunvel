@@ -16,6 +16,8 @@ interface SearchParams {
 }
 
 type TableRow = Record<string, unknown>
+type FilterMap = Record<string, unknown>
+
 
 
 export function TableViewer() {
@@ -49,7 +51,7 @@ export function TableViewer() {
         acc[filter.id] = filter.value
         return acc
       },
-      {} as TableRow,
+      {} as FilterMap,
     ),
     primaryKeys: metadata?.primary_keys || [],
   })

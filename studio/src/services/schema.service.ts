@@ -40,7 +40,7 @@ export const createSchema = createServerFn({ method: 'POST' })
         )
       }
 
-      const query = `CREATE SCHEMA IF NOT EXISTS ${data}`
+      const query = `CREATE SCHEMA IF NOT EXISTS ${data.replace(/"/g, '""')}`
 
       const response = await apiClient.post('/meta/query', {
         query,

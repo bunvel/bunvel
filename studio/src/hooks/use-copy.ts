@@ -10,22 +10,31 @@ export function useCopy() {
           throw new Error('Clipboard API not supported in this browser')
         }
 
-        // Request permission if needed (not all browsers require this)
-        const permission = await navigator.permissions.query({ name: 'clipboard-write' as PermissionName })
-        if (permission.state === 'denied') {
-          throw new Error('Clipboard write permission denied')
+        // Check clipboard permissions if supported
+        if (navigator.permissions) {
+          try {
+            const permission = await navigator.permissions.query({ name: 'clipboard-write' as PermissionName })
+            if (permission.state === 'denied') {
+              throw new Error('Clipboard write permission denied')
+            }
+          } catch (error) {
+            // Ignore errors from unsupported permission queries
+            if (!(error instanceof TypeError)) {
+              throw error // Re-throw non-TypeError
+            }
+          }
         }
 
         await navigator.clipboard.writeText(text)
         
         if (successMessage) {
-          console.log(successMessage);
+          toast.success(successMessage);
         }
         return true
       } catch (err) {
         console.error('Failed to copy:', err)
         const errorMsg = errorMessage || 'Failed to copy to clipboard. Please check browser permissions.'
-        console.error(errorMsg)
+        toast.error(errorMsg)
         return false
       }
     },

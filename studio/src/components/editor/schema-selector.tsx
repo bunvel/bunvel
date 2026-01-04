@@ -51,7 +51,7 @@ if (isFetching) {
     return (
       <div className="text-red-500 p-4">
         Error loading schemas: {error.message}
-        <Button variant="link" onClick={() => refetch()}>Retry</Button>
+        <Button variant="link" onClick={() => refetch()} className="ml-2">Retry</Button>
       </div>
     )
   }
