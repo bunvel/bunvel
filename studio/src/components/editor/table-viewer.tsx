@@ -16,9 +16,8 @@ interface SearchParams {
   [key: string]: unknown
 }
 
-// Move these interfaces to a separate types file if used elsewhere
 export interface Table extends Record<string, any> {
-  [key: string]: any // Consider replacing with more specific types
+  [key: string]: any
 }
 
 export interface TableMetadata {

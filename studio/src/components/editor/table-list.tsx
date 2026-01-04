@@ -96,7 +96,7 @@ export function TableList() {
         return (
           <Button
             key={`${table.table_schema}.${table.table_name}`}
-            variant={`${isActive ? 'default' : 'ghost'}`}
+            variant={isActive ? 'default' : 'ghost'}
             className="w-full justify-start"
             onClick={(e) => {
               e.preventDefault()

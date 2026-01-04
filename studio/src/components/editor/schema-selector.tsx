@@ -31,7 +31,6 @@ export function SchemaSelector() {
   )
   const defaultSchema = hasPublicSchema ? 'public' : ''
 
-  // In schema-selector.tsx, update the loading state to:
   if (isFetching) {
     return (
       <div className="p-4">
