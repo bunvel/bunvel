@@ -8,7 +8,7 @@ export function useExport() {
       data: T[],
       fileName: string,
       format: ExportFormat = 'json',
-      tableName?: string,
+      tableName: string,
     ): Promise<boolean> => {
       try {
         if (!data || data.length === 0) {
@@ -16,10 +16,6 @@ export function useExport() {
           return false
         }
 
-        if (format === 'sql' && !tableName) {
-          console.error('Table name is required for SQL export')
-          return false
-        }
         let content = ''
         let mimeType = 'text/plain'
         let fileExtension = 'txt'
@@ -36,7 +32,10 @@ export function useExport() {
               headers
                 .map((field) => {
                   const value = row[field] ?? ''
-                  return `"${value.toString().replace(/"/g, '""')}"`
+                  const stringValue = typeof value === 'object' && value !== null
+                    ? JSON.stringify(value)
+                    : String(value)
+                  return `"${stringValue.replace(/"/g, '""')}"`
                 })
                 .join(','),
             ),
@@ -45,7 +44,7 @@ export function useExport() {
           content = csvRows.join('\n')
           mimeType = 'text/csv'
           fileExtension = 'csv'
-        } else if (format === 'sql' && tableName) {
+        } else if (format === 'sql') {
           const columns = Object.keys(data[0] || {})
           const values = data
             .map(
@@ -69,31 +68,26 @@ export function useExport() {
           fileExtension = 'sql'
         }
 
-        try {
-          const blob = new Blob([content], {
-            type: `${mimeType};charset=utf-8;`,
-          })
-          const url = URL.createObjectURL(blob)
-          const link = document.createElement('a')
+        const blob = new Blob([content], {
+          type: `${mimeType};charset=utf-8;`,
+        })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
 
-          link.href = url
-          link.download = `${fileName}.${fileExtension}`
-          link.style.display = 'none'
+        link.href = url
+        link.download = `${fileName}.${fileExtension}`
+        link.style.display = 'none'
 
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
 
-          // Cleanup blob URL after short delay
-          setTimeout(() => URL.revokeObjectURL(url), 100)
+        // Cleanup blob URL after short delay
+        setTimeout(() => URL.revokeObjectURL(url), 100)
 
-          return true
-        } catch (error) {
-          console.error('Error during export:', error)
-          return false
-        }
-      } catch (err) {
-        console.error('Export failed:', err)
+        return true
+      } catch (error) {
+        console.error('Export failed:', error)
         return false
       }
     },

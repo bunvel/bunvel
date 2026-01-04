@@ -17,7 +17,7 @@ import { toast } from 'sonner'
 
 interface CopyButtonProps {
   selectedRows: Record<string, unknown>[]
-  table?: string
+  table: string
 }
 
 export function CopyButton({ selectedRows, table }: CopyButtonProps) {
@@ -28,7 +28,7 @@ export function CopyButton({ selectedRows, table }: CopyButtonProps) {
       const success = await copyRows(
         selectedRows,
         format,
-        format === 'sql' ? table : undefined,
+        table,
       )
 
       if (success) {

@@ -17,8 +17,8 @@ import { toast } from 'sonner'
 
 interface ExportButtonProps {
   selectedRows: any[]
-  table?: string
-  schema?: string
+  table: string
+  schema: string
 }
 
 export function ExportButton({
@@ -29,10 +29,6 @@ export function ExportButton({
   const { exportData } = useExport()
 
   const handleExport = async (format: 'json' | 'csv' | 'sql') => {
-    if (!table || !schema) {
-      toast.error('Table and schema are required for export')
-      return
-    }
 
     if (selectedRows.length === 0) {
       toast.error('No data to export')
@@ -43,7 +39,7 @@ export function ExportButton({
       selectedRows,
       `${schema}_${table}`,
       format,
-      format === 'sql' ? table : undefined,
+      table,
     )
 
     if (success) {

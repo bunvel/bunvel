@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 export function useCopy() {
   const copyToClipboard = useCallback(
-    async (text: string, successMessage?: string, errorMessage?: string) => {
+    async (text: string, errorMessage?: string) => {
       try {
         // Modern clipboard API with permission handling
         if (!navigator.clipboard) {
@@ -18,18 +18,13 @@ export function useCopy() {
               throw new Error('Clipboard write permission denied')
             }
           } catch (error) {
-            // Ignore errors from unsupported permission queries
-            if (!(error instanceof TypeError)) {
-              throw error // Re-throw non-TypeError
-            }
+            // Ignore all errors from permission query; if truly denied, the clipboard operation will fail
+            // Only check if we got an explicit 'denied' state (handled above)
           }
         }
 
         await navigator.clipboard.writeText(text)
-        
-        if (successMessage) {
-          toast.success(successMessage);
-        }
+
         return true
       } catch (err) {
         console.error('Failed to copy:', err)
@@ -46,7 +41,7 @@ export function useCopy() {
     async (
       rows: any[],
       format: 'json' | 'csv' | 'sql' = 'json',
-      tableName?: string,
+      tableName: string,
     ) => {
       try {
         let text = ''
@@ -98,7 +93,7 @@ export function useCopy() {
         return false
       }
     },
-    [],
+    [copyToClipboard],
   )
 
   return {

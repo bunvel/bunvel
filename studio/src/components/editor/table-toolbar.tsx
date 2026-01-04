@@ -11,8 +11,8 @@ import {
 
 export interface TableToolbarProps {
   selectedRows: any[]
-  schema?: string
-  table?: string
+  schema: string
+  table: string
 }
 export function TableToolbar({
   selectedRows,
