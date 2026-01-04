@@ -15,14 +15,14 @@ interface SearchParams {
   [key: string]: unknown
 }
 
-export type Table = Record<string, any>
+type TableRow = Record<string, unknown>
 
 
 export function TableViewer() {
   const search = useSearch({ strict: false }) as SearchParams
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [selectedRows, setSelectedRows] = useState<Table[]>([])
+  const [selectedRows, setSelectedRows] = useState<TableRow[]>([])
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE,
@@ -56,10 +56,7 @@ export function TableViewer() {
 
   const isLoading = isMetadataLoading || isTableDataLoading
 
-  // Generate columns from metadata
-  type TableData = Record<string, any>
-
-  const columns = useMemo<ColumnDef<TableData>[]>(() => {
+  const columns = useMemo<ColumnDef<TableRow>[]>(() => {
     if (!metadata?.columns) return [];
     
     return getSortedColumns(metadata.columns).map(column => ({
@@ -83,7 +80,7 @@ export function TableViewer() {
         </div>
       ),
       accessorKey: column.column_name,
-      cell: (info: any) => {
+      cell: (info) => {
         return formatCellValue(info.getValue());
       },
       meta: {

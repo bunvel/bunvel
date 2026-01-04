@@ -47,6 +47,13 @@ export const createSchema = createServerFn({ method: 'POST' })
   .inputValidator((d: string) => d)
   .handler(async ({ data }) => {
     try {
+      // Validate identifier format
+      if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(data)) {
+        throw new Error(
+          'Invalid schema name: must start with a letter or underscore and contain only letters, numbers, or underscores',
+        )
+      }
+
       // Properly quote the schema name to handle special characters
       const schemaName = `"${data.replace(/"/g, '""')}"`
       const query = `CREATE SCHEMA IF NOT EXISTS ${schemaName}`
