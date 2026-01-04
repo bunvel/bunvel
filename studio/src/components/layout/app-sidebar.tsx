@@ -7,8 +7,7 @@ import { Sidebar, SidebarContent, SidebarFooter } from '@/components/ui/sidebar'
 import {
   Home01Icon,
   SqlIcon,
-  TableIcon,
-  UserLockIcon
+  TableIcon
 } from '@hugeicons/core-free-icons'
 
 const data = {
@@ -32,12 +31,7 @@ const data = {
       title: 'Table Editor',
       url: '/editor',
       icon: TableIcon,
-    },
-    {
-      title: 'Authentication',
-      url: '/auth',
-      icon: UserLockIcon,
-    },
+    }
   ],
   navSecondary: [],
 }

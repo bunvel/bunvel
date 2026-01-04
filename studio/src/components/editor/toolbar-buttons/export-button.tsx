@@ -17,44 +17,77 @@ import { toast } from 'sonner'
 
 interface ExportButtonProps {
   selectedRows: any[]
-  table?: string
-  schema?: string
+  table: string
+  schema: string
 }
 
-export function ExportButton({ selectedRows, table, schema }: ExportButtonProps) {
+export function ExportButton({
+  selectedRows,
+  table,
+  schema,
+}: ExportButtonProps) {
   const { exportData } = useExport()
 
-  const handleExport = (format: 'json' | 'csv' | 'sql') => {
-    if (!table || !schema) return
-    
-    exportData(
-      selectedRows, 
-      `${schema}_${table}`, 
+  const handleExport = async (format: 'json' | 'csv' | 'sql') => {
+
+    const success = await exportData(
+      selectedRows,
+      `${schema}_${table}`,
       format,
-      format === 'sql' ? table : undefined
+      table,
     )
-    toast.success(`Exported ${selectedRows.length} rows as ${format.toUpperCase()}`)
+
+    if (success) {
+      toast.success(
+        `Exported ${selectedRows.length} rows as ${format.toUpperCase()}`,
+      )
+    } else {
+      toast.error('Export failed. Please try again.')
+    }
   }
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button variant="outline" size="sm" className="gap-1">
-          <span>Export</span>
-          <HugeiconsIcon icon={ArrowDown} className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            disabled={!table || !schema || selectedRows.length === 0}
+          >
+            <span>Export</span>
+            <HugeiconsIcon icon={ArrowDown} className="h-4 w-4" />
+          </Button>
+        }
+      ></DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-full">
-        <DropdownMenuItem onSelect={() => handleExport('json')}>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onClick={(e) => {
+            e.preventDefault()
+            handleExport('json')
+          }}
+        >
           <HugeiconsIcon icon={FileJson} className="mr-2 h-4 w-4" />
           <span>Export as JSON</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => handleExport('csv')}>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onClick={(e) => {
+            e.preventDefault()
+            handleExport('csv')
+          }}
+        >
           <HugeiconsIcon icon={FileText} className="mr-2 h-4 w-4" />
           <span>Export as CSV</span>
         </DropdownMenuItem>
-        <DropdownMenuItem 
-          onSelect={() => handleExport('sql')}
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onClick={(e) => {
+            e.preventDefault()
+            handleExport('sql')
+          }}
           disabled={!table}
         >
           <HugeiconsIcon icon={FileTypeSql} className="mr-2 h-4 w-4" />

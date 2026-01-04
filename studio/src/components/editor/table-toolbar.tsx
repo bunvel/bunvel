@@ -6,14 +6,13 @@ import {
   ExportButton,
   FilterButton,
   InsertButton,
-  RefreshButton,
-  SortButton,
+  SortButton
 } from './toolbar-buttons'
 
 export interface TableToolbarProps {
   selectedRows: any[]
-  schema?: string
-  table?: string
+  schema: string
+  table: string
 }
 export function TableToolbar({
   selectedRows,
@@ -42,7 +41,6 @@ export function TableToolbar({
             <InsertButton disabled={isReadOnly} />
             <FilterButton />
             <SortButton />
-            <RefreshButton />
           </>
         )}
       </div>

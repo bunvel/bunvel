@@ -1,20 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
-export interface SchemaResult {
-  data: Record<string, any>[]
-}
-
-export interface SchemaError {
-  message: string
-  code?: string
-  details?: any
-}
-
-export interface Schema {
-  schema_name: string
-}
-
 export interface Table {
   table_name: string
   table_schema: string
@@ -54,9 +40,7 @@ export const createSchema = createServerFn({ method: 'POST' })
         )
       }
 
-      // Properly quote the schema name to handle special characters
-      const schemaName = `"${data.replace(/"/g, '""')}"`
-      const query = `CREATE SCHEMA IF NOT EXISTS ${schemaName}`
+      const query = `CREATE SCHEMA IF NOT EXISTS ${data.replace(/"/g, '""')}`
 
       const response = await apiClient.post('/meta/query', {
         query,

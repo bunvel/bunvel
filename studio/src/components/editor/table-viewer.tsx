@@ -1,11 +1,19 @@
 import { DataTable } from '@/components/data-table/data-table'
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
-import { formatCellValue, formatDataType, getSortedColumns } from '@/utils/format'
+import {
+  formatCellValue,
+  formatDataType,
+  getSortedColumns,
+} from '@/utils/format'
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
-import { ColumnDef, ColumnFiltersState, SortingState } from '@tanstack/react-table'
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+} from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 import { TableToolbar } from './table-toolbar'
 
@@ -16,7 +24,7 @@ interface SearchParams {
 }
 
 type TableRow = Record<string, unknown>
-
+type FilterMap = Record<string, unknown>
 
 export function TableViewer() {
   const search = useSearch({ strict: false }) as SearchParams
@@ -44,22 +52,19 @@ export function TableViewer() {
     pageSize: pagination.pageSize,
     sortBy: sorting[0]?.id,
     sortDirection: sorting[0]?.desc ? 'desc' : 'asc',
-    filters: columnFilters.reduce(
-      (acc, filter) => {
-        acc[filter.id] = filter.value
-        return acc
-      },
-      {} as Record<string, unknown>,
-    ),
+    filters: columnFilters.reduce((acc, filter) => {
+      acc[filter.id] = filter.value
+      return acc
+    }, {} as FilterMap),
     primaryKeys: metadata?.primary_keys || [],
   })
 
   const isLoading = isMetadataLoading || isTableDataLoading
 
   const columns = useMemo<ColumnDef<TableRow>[]>(() => {
-    if (!metadata?.columns) return [];
-    
-    return getSortedColumns(metadata.columns).map(column => ({
+    if (!metadata?.columns) return []
+
+    return getSortedColumns(metadata.columns).map((column) => ({
       id: column.column_name,
       header: () => (
         <div className="flex flex-col gap-0.5">
@@ -67,10 +72,16 @@ export function TableViewer() {
             <span>{column.column_name}</span>
             <div className="flex items-center gap-1">
               {column.is_primary_key && (
-                <HugeiconsIcon icon={Key01Icon} className="h-3.5 w-3.5 text-amber-500" />
+                <HugeiconsIcon
+                  icon={Key01Icon}
+                  className="h-3.5 w-3.5 text-amber-500"
+                />
               )}
               {column.is_foreign_key && (
-                <HugeiconsIcon icon={Link02Icon} className="h-3.5 w-3.5 text-blue-500" />
+                <HugeiconsIcon
+                  icon={Link02Icon}
+                  className="h-3.5 w-3.5 text-blue-500"
+                />
               )}
             </div>
           </div>
@@ -81,18 +92,16 @@ export function TableViewer() {
       ),
       accessorKey: column.column_name,
       cell: (info) => {
-        return formatCellValue(info.getValue());
+        return formatCellValue(info.getValue())
       },
       meta: {
-        dataType: column.data_type,
-        isPrimaryKey: column.is_primary_key,
-        isForeignKey: column.is_foreign_key,
+        dataType: column.data_type
       },
     }))
   }, [metadata])
 
   // Show message when no table is selected
-  if (!search.table) {
+  if (!search.schema || !search.table) {
     return (
       <div className="h-full flex items-center justify-center text-muted-foreground bg-card">
         <div className="text-center p-8">
