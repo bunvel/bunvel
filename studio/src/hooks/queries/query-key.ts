@@ -1,0 +1,17 @@
+export const queryKeys = {
+  sql: {
+    query: (query: string) => ['sqlQuery', query] as const,
+  },
+  schemas: {
+    all: () => ['schemas'] as const,
+  },
+  tables: {
+    list: (schema: string) => ['tables', schema] as const,
+    metadata: (schema: string, table: string) => ['tableMetadata', schema, table] as const,
+    data: (params: { schema: string; table: string; page: number; pageSize: number; sortBy?: string; sortDirection?: 'asc' | 'desc'; filters?: Record<string, any> }) => 
+      ['tableData', params] as const,
+  },
+  // Add more query keys here as needed
+} as const
+
+export type QueryKeys = typeof queryKeys

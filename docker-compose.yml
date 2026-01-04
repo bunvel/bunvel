@@ -1,0 +1,95 @@
+services:
+  app:
+    container_name: bunvel-app
+    image: bunvel/app:0.0.0
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGREST_URL=http://rest:8001
+      - VITE_BUNVEL_STUDIO_URL=${VITE_BUNVEL_STUDIO_URL}
+      - VITE_STUDIO_DEFAULT_ORGANIZATION=${VITE_STUDIO_DEFAULT_ORGANIZATION}
+      - VITE_STUDIO_DEFAULT_PROJECT=${VITE_STUDIO_DEFAULT_PROJECT}
+    networks:
+      - bunvel-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+  
+  studio:
+    container_name: bunvel-studio
+    image: bunvel/studio:0.0.0
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - VITE_API_URL=${VITE_API_URL}
+      - VITE_BUNVEL_STUDIO_URL=${VITE_BUNVEL_STUDIO_URL}
+      - VITE_STUDIO_DEFAULT_ORGANIZATION=${VITE_STUDIO_DEFAULT_ORGANIZATION}
+      - VITE_STUDIO_DEFAULT_PROJECT=${VITE_STUDIO_DEFAULT_PROJECT}
+    networks:
+      - bunvel-network
+    depends_on:
+      app:
+        condition: service_started
+
+  postgres:
+    container_name: bunvel-postgres
+    image: postgres:18.1
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_INITDB_ARGS: --data-checksums
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./app/src/database/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - bunvel-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bunvel"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+
+  rest:
+    container_name: bunvel-rest
+    image: postgrest/postgrest:v14.1
+    restart: always
+    environment:
+      PGRST_DB_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: ${POSTGRES_USER}
+      PGRST_SERVER_PORT: 8001
+    networks:
+      - bunvel-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8001"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+
+networks:
+  bunvel-network:
+    driver: bridge
