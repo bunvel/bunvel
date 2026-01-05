@@ -66,7 +66,7 @@ export const getTables = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     try {
       const response = await apiClient.post<Table[]>(
-        '/meta/parameterized-query',
+        '/meta/query/parameterized',
         {
           query: SQL_QUERIES.GET_TABLES,
           params: [data],

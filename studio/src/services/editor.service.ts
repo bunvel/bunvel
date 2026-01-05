@@ -76,7 +76,7 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
           foreign_table_name?: string
           foreign_column_name?: string
         }>
-      >('/meta/parameterized-query', {
+      >('/meta/query/parameterized', {
         query: SQL_QUERIES.GET_TABLE_METADATA,
         params: [data.schema, data.table],
       })
@@ -98,7 +98,7 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
       // Fetch primary keys
       const primaryKeysResponse = await apiClient.post<
         Array<{ column_name: string }>
-      >('/meta/parameterized-query', {
+      >('/meta/query/parameterized', {
         query: SQL_QUERIES.GET_PRIMARY_KEYS,
         params: [data.schema, data.table],
       })
@@ -114,7 +114,7 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
           foreign_table_name: string
           foreign_column_name: string
         }>
-      >('/meta/parameterized-query', {
+      >('/meta/query/parameterized', {
         query: SQL_QUERIES.GET_FOREIGN_KEYS,
         params: [data.schema, data.table],
       })
@@ -215,7 +215,7 @@ export const getTableData = createServerFn({ method: 'POST' })
 
       // First, get the total count
       const countResult = await apiClient.post<Array<{ total: number }>>(
-        '/meta/parameterized-query',
+        '/meta/query/parameterized',
         {
           query: countQuery,
           params: [...filterValues],
@@ -226,7 +226,7 @@ export const getTableData = createServerFn({ method: 'POST' })
 
       // Then get the paginated data
       const result = await apiClient.post<Array<Record<string, any>>>(
-        '/meta/parameterized-query',
+        '/meta/query/parameterized',
         {
           query: dataQuery,
           params: [...filterValues],
