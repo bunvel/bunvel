@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 export function InsertButton({ disabled = false }: { disabled?: boolean }) {
   const onClick = () => {
-    toast('Insert not implemented yet')
+    toast.info('Insert functionality not yet implemented', { description: 'Adding new rows will be available in a future update' })
   }
 
   return (

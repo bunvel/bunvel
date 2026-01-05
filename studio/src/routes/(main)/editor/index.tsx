@@ -16,7 +16,7 @@ function RouteComponent() {
         <Separator/>
         <TableList />
       </div>
-      <div className="w-[80%] h-full overflow-hidden">
+      <div className="w-[80%] bg-card h-full overflow-hidden">
         <TableViewer/>
       </div>
     </div>

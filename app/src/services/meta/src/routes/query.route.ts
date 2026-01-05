@@ -1,48 +1,55 @@
 import Elysia, { t } from "elysia";
 import { db } from "../../../../database";
-import { MAX_PARAMS_LENGTH, MAX_QUERY_LENGTH } from "../../../../utils/constant";
+import {
+  MAX_PARAMS_LENGTH,
+  MAX_QUERY_LENGTH,
+} from "../../../../utils/constant";
 
-export const queryRoutes = new Elysia({ prefix: '/query' })
+export const queryRoutes = new Elysia({ prefix: "/query" })
   // Raw query endpoint (multiple statements allowed, no parameters)
   .post(
     "/",
     async ({ body, set }) => {
       if (!body.query || body.query.length > MAX_QUERY_LENGTH) {
         set.status = 400;
-        return Response.json({ message: `Query too long. Maximum length is ${MAX_QUERY_LENGTH} characters.` });
+        return Response.json({
+          message: `Query too long. Maximum length is ${MAX_QUERY_LENGTH} characters.`,
+        });
       }
 
       try {
-        const statements = body.query
-          .split(';')
-          .map(s => s.trim())
-          .filter(s => s.length > 0);
+        const query = body.query.trim();
 
-        let selectResult = [];
-        let hasSelect = false;
-
-        for (const statement of statements) {
-          const firstWord = statement.trim().split(/\s+/)[0].toUpperCase();
-          const result = await db.unsafe(statement);
-          
-          if (firstWord === 'SELECT' && !hasSelect) {
-            selectResult = Array.isArray(result) ? result : [result];
-            hasSelect = true;
-          }
+        if (!query) {
+          set.status = 400;
+          return Response.json({ message: "Empty query" });
         }
 
-        return hasSelect ? Response.json(selectResult) : Response.json([]);
-        
+        // Execute FULL query as-is
+        const result = await db.unsafe(query);
+
+        // Normalize response
+        if (Array.isArray(result)) {
+          return Response.json(result);
+        }
+
+        if (result === undefined || result === null) {
+          return Response.json([]);
+        }
+
+        return Response.json([result]);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Query execution failed";
+        const message =
+          error instanceof Error ? error.message : "Query execution failed";
+
         set.status = 400;
-        return Response.json({ message: errorMessage });
+        return Response.json({ message });
       }
     },
     {
       body: t.Object({
         query: t.String({
-          description: "SQL query to execute (can contain multiple statements separated by semicolons)",
+          description: "SQL query to execute (single or multi-statement)",
           maxLength: MAX_QUERY_LENGTH,
         }),
       }),
@@ -54,19 +61,24 @@ export const queryRoutes = new Elysia({ prefix: '/query' })
     async ({ body, set }) => {
       if (body.query.length > MAX_QUERY_LENGTH) {
         set.status = 400;
-        return Response.json({ message: `Query too long. Maximum length is ${MAX_QUERY_LENGTH} characters.` });
+        return Response.json({
+          message: `Query too long. Maximum length is ${MAX_QUERY_LENGTH} characters.`,
+        });
       }
 
       if (JSON.stringify(body.params).length > MAX_PARAMS_LENGTH) {
         set.status = 400;
-        return Response.json({ message: `Parameters too large. Maximum size is ${MAX_PARAMS_LENGTH} characters.` });
+        return Response.json({
+          message: `Parameters too large. Maximum size is ${MAX_PARAMS_LENGTH} characters.`,
+        });
       }
 
       try {
         const result = await db.unsafe(body.query, body.params);
         return Response.json(Array.isArray(result) ? result : [result]);
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Query execution failed";
+        const errorMessage =
+          error instanceof Error ? error.message : "Query execution failed";
         set.status = 400;
         return Response.json({ message: errorMessage });
       }
@@ -78,7 +90,8 @@ export const queryRoutes = new Elysia({ prefix: '/query' })
           maxLength: MAX_QUERY_LENGTH,
         }),
         params: t.Array(t.Unknown(), {
-          description: "Array of parameter values to be safely interpolated into the query",
+          description:
+            "Array of parameter values to be safely interpolated into the query",
         }),
       }),
     }

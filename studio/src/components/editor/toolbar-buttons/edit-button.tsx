@@ -12,7 +12,7 @@ export function EditButton({ selectRows, disabled = false }: EditButtonProps) {
   const isDisabled = selectRows.length !== 1 || disabled
 
   const onClick = () => {
-    toast('Edit selected rows:', { description: JSON.stringify(selectRows, null, 2) })
+    toast.info('Edit functionality not yet implemented', { description: `Selected row: ${JSON.stringify(selectRows[0] || {}, null, 2)}` })
   }
 
   return (

@@ -10,7 +10,7 @@ interface DeleteButtonProps {
 
 export function DeleteButton({ selectRows, disabled = false }: DeleteButtonProps) {
   const onClick = () => {
-    toast('Delete selected rows:', { description: selectRows.length })
+    toast.info('Delete functionality not yet implemented', { description: `Selected ${selectRows.length} row${selectRows.length === 1 ? '' : 's'} will be deleted` })
   }
 
   return (

@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 export function SortButton() {
 
   const onClick = () => {
-    toast('Sort not implemented yet')
+    toast.info('Sort functionality not yet implemented', { description: 'Sorting rows will be available in a future update' })
   }
   
   return (

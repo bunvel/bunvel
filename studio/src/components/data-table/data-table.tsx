@@ -253,7 +253,7 @@ export function DataTable<TData, TValue = unknown>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className="border-r p-2"
+                        className="border p-2"
                         style={{
                           width:
                             cell.column.getSize() !== 150

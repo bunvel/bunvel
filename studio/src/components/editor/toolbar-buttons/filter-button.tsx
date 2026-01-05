@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 export function FilterButton() {
   const onClick = () => {
-    toast('Filter not implemented yet')
+    toast.info('Filter functionality not yet implemented', { description: 'Filtering rows will be available in a future update' })
   }
 
   return (

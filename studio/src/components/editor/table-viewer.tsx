@@ -15,19 +15,19 @@ import {
   SortingState,
 } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
+import { TableTabs } from './table-tabs'
 import { TableToolbar } from './table-toolbar'
 
 interface SearchParams {
   schema?: string
   table?: string
-  [key: string]: unknown
 }
 
 type TableRow = Record<string, unknown>
 type FilterMap = Record<string, unknown>
 
 export function TableViewer() {
-  const search = useSearch({ strict: false }) as SearchParams
+  const { schema, table } = useSearch({ strict: false }) as SearchParams
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [selectedRows, setSelectedRows] = useState<TableRow[]>([])
@@ -38,8 +38,8 @@ export function TableViewer() {
 
   // Get table metadata for columns
   const { data: metadata, isLoading: isMetadataLoading } = useTableMetadata(
-    search.schema,
-    search.table,
+    schema,
+    table,
   )
 
   // Get table data with pagination, sorting, and filtering
@@ -47,7 +47,7 @@ export function TableViewer() {
     data: tableData,
     isLoading: isTableDataLoading,
     error,
-  } = useTableData(search.schema, search.table, {
+  } = useTableData(schema, table, {
     page: pagination.pageIndex + 1, // +1 because backend is 1-indexed
     pageSize: pagination.pageSize,
     sortBy: sorting[0]?.id,
@@ -95,13 +95,13 @@ export function TableViewer() {
         return formatCellValue(info.getValue())
       },
       meta: {
-        dataType: column.data_type
+        dataType: column.data_type,
       },
     }))
   }, [metadata])
 
   // Show message when no table is selected
-  if (!search.schema || !search.table) {
+  if (!schema || !table) {
     return (
       <div className="h-full flex items-center justify-center text-muted-foreground bg-card">
         <div className="text-center p-8">
@@ -114,11 +114,9 @@ export function TableViewer() {
 
   return (
     <div className="h-full flex flex-col">
-      <TableToolbar
-        selectedRows={selectedRows}
-        schema={search.schema}
-        table={search.table}
-      />
+      <TableTabs />
+
+      <TableToolbar selectedRows={selectedRows} schema={schema} table={table} />
 
       <div className="flex-1 overflow-auto">
         <DataTable

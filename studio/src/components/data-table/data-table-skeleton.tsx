@@ -30,12 +30,12 @@ export function DataTableSkeleton({
             <TableHeader className="sticky top-0 z-10 bg-card">
               <TableRow className="border-b h-10">
                 {enableRowSelection && (
-                  <TableHead className="w-12 border-r">
+                  <TableHead className="w-12 border">
                     <Skeleton className="h-4 w-4 mx-auto" />
                   </TableHead>
                 )}
                 {Array.from({ length: columnCount }).map((_, i) => (
-                  <TableHead key={i} className="border-r last:border-r-0">
+                  <TableHead key={i} className="border">
                     <Skeleton className="h-4 w-3/4" />
                   </TableHead>
                 ))}
@@ -45,14 +45,14 @@ export function DataTableSkeleton({
               {Array.from({ length: rows }).map((_, rowIndex) => (
                 <TableRow key={rowIndex} className={rowIndex < rows - 1 ? "border-b h-10" : "border-b h-10"}>
                   {enableRowSelection && (
-                    <TableCell className="w-12 border-r">
+                    <TableCell className="w-12 border">
                       <Skeleton className="h-4 w-4 mx-auto" />
                     </TableCell>
                   )}
                   {Array.from({ length: columnCount }).map((_, cellIndex) => (
                     <TableCell 
                       key={cellIndex} 
-                      className="border-r last:border-r-0"
+                      className="border"
                     >
                       <SkeletonCell />
                     </TableCell>
@@ -62,7 +62,7 @@ export function DataTableSkeleton({
             </TableBody>
           </Table>
         </div>
-        <div className="border-t bg-background h-12">
+        <div className="border-t bg-card h-12">
           <div className="flex items-center justify-between px-2 h-full">
             <div className="flex-1">
               <Skeleton className="h-4 w-48" />

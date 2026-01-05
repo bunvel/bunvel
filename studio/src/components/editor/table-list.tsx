@@ -16,12 +16,14 @@ export function TableList() {
   const search = useSearch({ strict: false }) as SearchParams
   const { schema } = search
   const { data: tables = [], isLoading, error } = useTables(schema)
+
   const handleTableClick = (table: Table) => {
     navigate({
       search: {
-        schema: table.table_schema,
+        ...search,
         table: table.table_name,
-      } as any, // Type assertion to handle search params
+        schema: table.table_schema,
+      } as any,
     })
   }
 
@@ -90,12 +92,15 @@ export function TableList() {
   return (
     <div className="space-y-1 p-4">
       {tables.map((table) => {
-        const isActive = search.table === table.table_name
+        const isActive =
+          search.table === table.table_name &&
+          search.schema === table.table_schema
+        const tableKey = `${table.table_schema}.${table.table_name}`
         const isView = table.table_type === 'VIEW'
 
         return (
           <Button
-            key={`${table.table_schema}.${table.table_name}`}
+            key={tableKey}
             variant={isActive ? 'default' : 'ghost'}
             className="w-full justify-start"
             onClick={(e) => {
@@ -115,11 +120,6 @@ export function TableList() {
               />
             )}
             <span className="truncate">{table.table_name}</span>
-            {table.table_schema !== schema && (
-              <span className="ml-2 truncate text-muted-foreground text-xs">
-                {table.table_schema}
-              </span>
-            )}
           </Button>
         )
       })}
