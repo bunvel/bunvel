@@ -1,14 +1,9 @@
 import * as React from 'react'
 
 import { NavMain } from '@/components/layout/nav-main'
-import { NavSecondary } from '@/components/layout/nav-secondary'
-import { NavUser } from '@/components/layout/nav-user'
 import { Sidebar, SidebarContent, SidebarFooter } from '@/components/ui/sidebar'
-import {
-  Home01Icon,
-  SqlIcon,
-  TableIcon
-} from '@hugeicons/core-free-icons'
+import { Home01Icon, SqlIcon, TableIcon } from '@hugeicons/core-free-icons'
+import { NavUser } from './nav-user'
 
 const data = {
   user: {
@@ -31,9 +26,8 @@ const data = {
       title: 'Table Editor',
       url: '/editor',
       icon: TableIcon,
-    }
+    },
   ],
-  navSecondary: [],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -45,7 +39,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     >
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

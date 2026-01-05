@@ -7,32 +7,45 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Moon01Icon, Sun01Icon } from '@hugeicons/core-free-icons'
+import { Laptop, Moon01Icon, Sun01Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
 export function ModeToggle() {
   const { setTheme } = useTheme()
 
+  const { theme } = useTheme()
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger  
+      <DropdownMenuTrigger
         render={
           <Button variant="outline" size="icon">
-            <HugeiconsIcon icon={Sun01Icon} className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-            <HugeiconsIcon icon={Moon01Icon} className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+            <HugeiconsIcon
+              icon={Sun01Icon}
+              className={`h-[1.2rem] w-[1.2rem] transition-all ${theme === 'light' ? 'scale-100' : 'scale-0'}`}
+            />
+            <HugeiconsIcon
+              icon={Moon01Icon}
+              className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${theme === 'dark' ? 'scale-100' : 'scale-0'}`}
+            />
+            <HugeiconsIcon
+              icon={Laptop}
+              className={`absolute h-[1.2rem] w-[1.2rem] transition-all ${theme === 'system' ? 'scale-100' : 'scale-0'}`}
+            />
             <span className="sr-only">Toggle theme</span>
           </Button>
         }
+        title="Theme Mode"
       ></DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme('light')}>
-          Light
+          <HugeiconsIcon icon={Sun01Icon} /> Light
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('dark')}>
-          Dark
+          <HugeiconsIcon icon={Moon01Icon} /> Dark
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('system')}>
-          System
+          <HugeiconsIcon icon={Laptop} /> System
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
