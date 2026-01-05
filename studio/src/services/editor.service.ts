@@ -37,15 +37,24 @@ export interface TableDataResult {
   totalPages: number
 }
 
+// Define possible filter value types
+type FilterValue = string | number | boolean | null | undefined
+
+// Define the filters type with string keys and FilterValue values
+type Filters = Record<string, FilterValue>
+
+export type SortDirection = 'asc' | 'desc'
+
 export interface TableDataParams {
   schema: string
   table: string
   page: number
   pageSize: number
   sortBy?: string
-  sortDirection?: 'asc' | 'desc'
-  filters?: Record<string, any>
-  primaryKeys?: string[] // Add this line
+  sortDirection?: SortDirection
+  filters?: Filters
+  primaryKeys?: string[]
+  firstColumnName?: string
 }
 
 export interface TableMetadataResult {
@@ -141,37 +150,19 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
   })
 
 export const getTableData = createServerFn({ method: 'POST' })
-  .inputValidator(async (d: TableDataParams) => {
-    // First try to get the first column if no sort column is specified
-    let defaultSortColumn =
-      d.primaryKeys?.[0] || Object.keys(d.filters || {})[0]
-
-    // If no primary key or filter column, we'll fetch the first column from the table
-    if (!defaultSortColumn && d.schema && d.table) {
-      try {
-        // Get the first column from the table metadata
-        const metadata = await getTableMetadata({
-          data: { schema: d.schema, table: d.table },
-        })
-        if (metadata?.data?.columns?.length > 0) {
-          defaultSortColumn = metadata.data.columns[0].column_name
-        }
-      } catch (error) {
-        console.warn(
-          'Could not fetch table metadata for default sort column',
-          error,
-        )
-      }
-    }
-
-    // As a last resort, don't specify a sort column (let the database use its default)
-    const sortBy = d.sortBy || defaultSortColumn
+  .inputValidator((d: TableDataParams) => {
+    // Use the provided sortBy, primary key, filter column, or firstColumnName as fallback
+    const defaultSortColumn = 
+      d.sortBy || 
+      d.primaryKeys?.[0] || 
+      Object.keys(d.filters || {})[0] ||
+      d.firstColumnName
 
     return {
       ...d,
       page: d.page || 1,
       pageSize: d.pageSize || DEFAULT_PAGE_SIZE,
-      sortBy: sortBy,
+      sortBy: defaultSortColumn,
       sortDirection: d.sortDirection || 'asc',
       filters: d.filters || {},
     } as TableDataParams

@@ -190,7 +190,7 @@ export function DataTable<TData, TValue = unknown>({
         : 'An unknown error occurred'
 
     return (
-      <div className="flex items-center justify-center h-32 text-red-500">
+      <div className="bg-card flex items-center justify-center h-full text-red-500">
         Error loading data: {errorMessage}
       </div>
     )
@@ -199,7 +199,7 @@ export function DataTable<TData, TValue = unknown>({
   // Show empty state if no data is available
   if (data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-32 text-muted-foreground">
+      <div className="bg-card flex items-center justify-center h-full text-muted-foreground">
         No data available
       </div>
     )
