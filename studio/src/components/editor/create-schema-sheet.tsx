@@ -49,9 +49,8 @@ export function CreateSchemaSheet() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         render={
-          <Button variant="outline" className="w-full justify-start gap-2">
+          <Button variant="outline" size="icon">
             <HugeiconsIcon icon={Plus} className="h-4 w-4" />
-            <span>Create Schema</span>
           </Button>
         }
       ></SheetTrigger>

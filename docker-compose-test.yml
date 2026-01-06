@@ -74,7 +74,7 @@ services:
 
   rest:
     container_name: bunvel-rest
-    image: postgrest/postgrest:v14.1
+    image: postgrest/postgrest:v14.3
     restart: always
     environment:
       PGRST_DB_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"

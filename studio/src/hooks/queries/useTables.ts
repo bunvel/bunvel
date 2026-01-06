@@ -7,7 +7,7 @@ export function useTables(schema?: string) {
     queryKey: schema ? queryKeys.tables.list(schema) : ['tables', null],
     queryFn: async () => {
       if (!schema) return [];
-      const result = await getTables({ data: schema });
+      const result = await getTables({ data: {schema} });
       return result || [];
     },
     enabled: !!schema,

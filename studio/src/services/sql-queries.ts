@@ -2,141 +2,157 @@
 export const SQL_QUERIES = {
   // Get all non-system schemas
   GET_SCHEMAS: `
-    SELECT schema_name 
-    FROM information_schema.schemata 
-    WHERE schema_name NOT IN ('pg_catalog', 'information_schema', 'pg_toast', 'pg_temp_1', 'pg_toast_temp_1') 
-    ORDER BY schema_name
+    SELECT 
+      n.nspname AS schema_name
+    FROM 
+      pg_namespace n
+    WHERE 
+      n.nspname NOT LIKE 'pg_%'
+      AND n.nspname <> 'information_schema'
+    ORDER BY 
+      n.nspname;
   `,
 
   // Get all tables and views in a schema
   GET_TABLES: `
     SELECT 
-      table_name, 
-      table_schema,
-      table_type
-    FROM information_schema.tables 
-    WHERE table_schema = $1 
-    AND table_type IN ('BASE TABLE', 'VIEW')
-    ORDER BY table_type, table_name
+      CASE c.relkind
+        WHEN 'r' THEN 'TABLE'
+        WHEN 'v' THEN 'VIEW'
+        WHEN 'm' THEN 'MATERIALIZED VIEW'
+      END AS kind,
+      c.relname AS name
+    FROM 
+      pg_catalog.pg_class c
+      JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+    WHERE 
+      n.nspname = $1
+      AND c.relkind IN ('r', 'v', 'm')
+      AND NOT c.relispartition
+    ORDER BY 
+      kind, 
+      name;
   `,
 
   // Get detailed table metadata including columns, primary keys, and foreign keys
   GET_TABLE_METADATA: `
-    WITH 
-    -- Get all columns for the table
-    table_columns AS (
-      SELECT 
-        c.column_name,
-        c.data_type,
-        c.is_nullable,
-        c.column_default,
-        c.is_identity,
-        c.is_updatable
-      FROM 
-        information_schema.columns c
-      WHERE 
-        c.table_schema = $1 
-        AND c.table_name = $2
-    ),
-    -- Get primary key columns
-    pk_columns AS (
-      SELECT 
-        a.attname as column_name
-      FROM 
-        pg_index i
-        JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
-        JOIN pg_class t ON t.oid = i.indrelid
-        JOIN pg_namespace n ON n.oid = t.relnamespace
-      WHERE 
-        n.nspname = $1 
-        AND t.relname = $2
-        AND i.indisprimary
-    ),
-    -- Get foreign key columns
-    fk_columns AS (
+    WITH object AS (
       SELECT
-        kcu.column_name,
-        ccu.table_schema AS foreign_table_schema,
-        ccu.table_name AS foreign_table_name,
-        ccu.column_name AS foreign_column_name,
-        tc.constraint_name
+        c.oid,
+        c.relkind
       FROM 
-        information_schema.table_constraints AS tc
-        JOIN information_schema.key_column_usage AS kcu
-          ON tc.constraint_catalog = kcu.constraint_catalog
-          AND tc.constraint_schema = kcu.constraint_schema
-          AND tc.constraint_name = kcu.constraint_name
-        JOIN information_schema.constraint_column_usage AS ccu
-          ON tc.constraint_catalog = ccu.constraint_catalog
-          AND tc.constraint_schema = ccu.constraint_schema
-          AND tc.constraint_name = ccu.constraint_name
+        pg_class c
+        JOIN pg_namespace n ON n.oid = c.relnamespace
       WHERE 
-        tc.constraint_type = 'FOREIGN KEY'
-        AND tc.table_schema = $1
-        AND tc.table_name = $2
+        n.nspname = $1
+        AND c.relname = $2
+        AND c.relkind IN ('r', 'v', 'm')
+    ),
+    columns AS (
+      SELECT
+        a.attname AS column_name,
+        pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type,
+        NOT a.attnotnull AS is_nullable,
+        pg_get_expr(ad.adbin, ad.adrelid) AS column_default,
+        a.attidentity != '' AS is_identity,
+        (o.relkind = 'r') AS is_updatable,
+        a.attnum
+      FROM 
+        pg_attribute a
+        JOIN object o ON o.oid = a.attrelid
+        LEFT JOIN pg_attrdef ad ON ad.adrelid = a.attrelid AND ad.adnum = a.attnum
+      WHERE 
+        a.attnum > 0
+        AND NOT a.attisdropped
+    ),
+    primary_keys AS (
+      SELECT
+        a.attname AS column_name
+      FROM 
+        pg_constraint c
+        JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = ANY (c.conkey)
+        JOIN object o ON o.oid = c.conrelid
+      WHERE 
+        c.contype = 'p'
+    ),
+    foreign_keys AS (
+      SELECT
+        a.attname AS column_name,
+        fn.nspname AS foreign_table_schema,
+        fc.relname AS foreign_table_name,
+        fa.attname AS foreign_column_name
+      FROM 
+        pg_constraint c
+        JOIN object o ON o.oid = c.conrelid
+        JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = ANY (c.conkey)
+        JOIN pg_class fc ON fc.oid = c.confrelid
+        JOIN pg_namespace fn ON fn.oid = fc.relnamespace
+        JOIN pg_attribute fa ON fa.attrelid = c.confrelid AND fa.attnum = ANY (c.confkey)
+      WHERE 
+        c.contype = 'f'
     )
-    
-    SELECT 
+    SELECT
       c.column_name,
       c.data_type,
       c.is_nullable,
       c.column_default,
       c.is_identity,
       c.is_updatable,
-      CASE WHEN pk.column_name IS NOT NULL THEN true ELSE false END as is_primary_key,
-      CASE WHEN fk.column_name IS NOT NULL THEN true ELSE false END as is_foreign_key,
+      (pk.column_name IS NOT NULL) AS is_primary_key,
+      (fk.column_name IS NOT NULL) AS is_foreign_key,
       fk.foreign_table_schema,
       fk.foreign_table_name,
       fk.foreign_column_name
     FROM 
-      table_columns c
-      LEFT JOIN pk_columns pk ON c.column_name = pk.column_name
-      LEFT JOIN fk_columns fk ON c.column_name = fk.column_name
-    ORDER BY c.column_name
+      columns c
+      LEFT JOIN primary_keys pk USING (column_name)
+      LEFT JOIN foreign_keys fk USING (column_name)
+    ORDER BY 
+      c.attnum;
   `,
 
   // Get primary keys for a table
   GET_PRIMARY_KEYS: `
-    SELECT 
-      kcu.column_name
+    SELECT
+      a.attname AS column_name
     FROM 
-      information_schema.table_constraints tc
-      JOIN information_schema.key_column_usage kcu
-        ON tc.constraint_catalog = kcu.constraint_catalog
-        AND tc.constraint_schema = kcu.constraint_schema
-        AND tc.constraint_name = kcu.constraint_name
-      JOIN information_schema.constraint_column_usage ccu
-        ON tc.constraint_catalog = ccu.constraint_catalog
-        AND tc.constraint_schema = ccu.constraint_schema
-        AND tc.constraint_name = ccu.constraint_name
+      pg_constraint c
+      JOIN pg_class t ON t.oid = c.conrelid
+      JOIN pg_namespace n ON n.oid = t.relnamespace
+      JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY (c.conkey)
     WHERE 
-      tc.constraint_type = 'PRIMARY KEY'
-      AND tc.table_schema = $1 
-      AND tc.table_name = $2
+      c.contype = 'p'
+      AND n.nspname = $1
+      AND t.relname = $2
+    ORDER BY 
+      array_position(c.conkey, a.attnum);
   `,
 
   // Get foreign keys for a table
   GET_FOREIGN_KEYS: `
     SELECT
-      tc.constraint_name,
-      kcu.column_name,
-      ccu.table_schema AS foreign_table_schema,
-      ccu.table_name AS foreign_table_name,
-      ccu.column_name AS foreign_column_name
+      c.conname AS constraint_name,
+      a.attname AS column_name,
+      fn.nspname AS foreign_table_schema,
+      ft.relname AS foreign_table_name,
+      fa.attname AS foreign_column_name,
+      c.confupdtype AS on_update,
+      c.confdeltype AS on_delete
     FROM 
-      information_schema.table_constraints AS tc
-      JOIN information_schema.key_column_usage AS kcu
-        ON tc.constraint_catalog = kcu.constraint_catalog
-        AND tc.constraint_schema = kcu.constraint_schema
-        AND tc.constraint_name = kcu.constraint_name
-      JOIN information_schema.constraint_column_usage AS ccu
-        ON tc.constraint_catalog = ccu.constraint_catalog
-        AND tc.constraint_schema = ccu.constraint_schema
-        AND tc.constraint_name = ccu.constraint_name
+      pg_constraint c
+      JOIN pg_class t ON t.oid = c.conrelid
+      JOIN pg_namespace n ON n.oid = t.relnamespace
+      JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY (c.conkey)
+      JOIN pg_class ft ON ft.oid = c.confrelid
+      JOIN pg_namespace fn ON fn.oid = ft.relnamespace
+      JOIN pg_attribute fa ON fa.attrelid = ft.oid AND fa.attnum = ANY (c.confkey)
     WHERE 
-      tc.constraint_type = 'FOREIGN KEY'
-      AND tc.table_schema = $1
-      AND tc.table_name = $2
+      c.contype = 'f'
+      AND n.nspname = $1
+      AND t.relname = $2
+    ORDER BY 
+      c.conname, 
+      array_position(c.conkey, a.attnum);
   `
 } as const;
 

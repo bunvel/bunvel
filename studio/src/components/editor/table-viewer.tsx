@@ -10,9 +10,7 @@ import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
+  ColumnDef
 } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 import { TableTabs } from './table-tabs'
@@ -24,12 +22,10 @@ interface SearchParams {
 }
 
 type TableRow = Record<string, unknown>
-type FilterMap = Record<string, unknown>
+
 
 export function TableViewer() {
   const { schema, table } = useSearch({ strict: false }) as SearchParams
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [selectedRows, setSelectedRows] = useState<TableRow[]>([])
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -50,12 +46,6 @@ export function TableViewer() {
   } = useTableData(schema, table, {
     page: pagination.pageIndex + 1, // +1 because backend is 1-indexed
     pageSize: pagination.pageSize,
-    sortBy: sorting[0]?.id,
-    sortDirection: sorting[0]?.desc ? 'desc' : 'asc',
-    filters: columnFilters.reduce((acc, filter) => {
-      acc[filter.id] = filter.value
-      return acc
-    }, {} as FilterMap),
     primaryKeys: metadata?.primary_keys || [],
   })
 
@@ -126,14 +116,10 @@ export function TableViewer() {
           error={error}
           enableRowSelection={true}
           onRowSelectionChange={setSelectedRows}
-          onSortingChange={setSorting}
-          onColumnFiltersChange={setColumnFilters}
           onPaginationChange={setPagination}
           pageCount={tableData?.totalPages || 0}
           state={{
             pagination,
-            sorting,
-            columnFilters,
             rowSelection: {},
           }}
         />

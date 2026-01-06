@@ -1,10 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
+
 export interface Table {
-  table_name: string
-  table_schema: string
-  table_type: 'BASE TABLE' | 'VIEW' | string
+  name: string
+  kind: 'BASE TABLE' | 'VIEW' | 'MATERIALIZED VIEW' | string
 }
 
 export const getSchemas = createServerFn({ method: 'POST' }).handler(
@@ -57,11 +57,11 @@ export const createSchema = createServerFn({ method: 'POST' })
   })
 
 export const getTables = createServerFn({ method: 'POST' })
-  .inputValidator((d: string) => {
-    if (!d || typeof d !== 'string') {
+  .inputValidator((data: { schema: string }) => {
+    if (!data?.schema) {
       throw new Error('Schema name is required')
     }
-    return d
+    return data
   })
   .handler(async ({ data }) => {
     try {
@@ -69,10 +69,10 @@ export const getTables = createServerFn({ method: 'POST' })
         '/meta/query/parameterized',
         {
           query: SQL_QUERIES.GET_TABLES,
-          params: [data],
+          params: [data.schema],
         },
       )
-      return response.data
+      return response.data as Table[]
     } catch (error) {
       console.error('Error fetching tables:', error)
       handleApiError(error)

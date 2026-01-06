@@ -2,9 +2,17 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
 import { Table } from '@/services/schema.service'
-import { EyeFreeIcons, TableIcon } from '@hugeicons/core-free-icons'
+import {
+  EyeFreeIcons,
+  MaterialAndTextureFreeIcons,
+  MoreVertical,
+  Plus,
+  TableIcon
+} from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { Activity, useMemo, useState } from 'react'
+import { Input } from '../ui/input'
 
 interface SearchParams {
   schema?: string
@@ -16,13 +24,22 @@ export function TableList() {
   const search = useSearch({ strict: false }) as SearchParams
   const { schema } = search
   const { data: tables = [], isLoading, error } = useTables(schema)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredTables = useMemo(() => {
+    if (!searchQuery) return tables
+    const query = searchQuery.toLowerCase()
+    return tables.filter(
+      (table) =>
+        table.name.toLowerCase().includes(query)
+    )
+  }, [tables, searchQuery])
 
   const handleTableClick = (table: Table) => {
     navigate({
       search: {
         ...search,
-        table: table.table_name,
-        schema: table.table_schema,
+        table: table.name,
       } as any,
     })
   }
@@ -43,16 +60,27 @@ export function TableList() {
 
   if (isLoading) {
     return (
-      <div className="space-y-1 w-full p-4">
-        {[...Array(5)].map((_, i) => (
-          <div
-            key={i}
-            className="h-8 w-full rounded-md border border-input px-3 flex items-center"
-          >
-            <Skeleton className="h-4 w-4 mr-3" />
+      <div className="space-y-4 w-full p-4">
+        <div className="flex gap-1">
+          <div className="h-8 w-full rounded-md border border-input px-3 flex items-center justify-between">
             <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-4" />
           </div>
-        ))}
+          <div className="h-8 w-9 rounded-md border border-input flex items-center justify-center">
+            <Skeleton className="h-4 w-4" />
+          </div>
+        </div>
+        <div className="space-y-1">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="h-8 w-full rounded-md border border-input px-3 flex items-center"
+            >
+              <Skeleton className="h-4 w-4 mr-3" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -90,39 +118,62 @@ export function TableList() {
   }
 
   return (
-    <div className="space-y-1 p-4">
-      {tables.map((table) => {
-        const isActive =
-          search.table === table.table_name &&
-          search.schema === table.table_schema
-        const tableKey = `${table.table_schema}.${table.table_name}`
-        const isView = table.table_type === 'VIEW'
-
-        return (
-          <Button
-            key={tableKey}
-            variant={isActive ? 'default' : 'ghost'}
-            className="w-full justify-start"
-            onClick={(e) => {
-              e.preventDefault()
-              handleTableClick(table)
-            }}
+    <div className="space-y-4 w-full p-4">
+      <div className="flex gap-1">
+        <Input
+          placeholder="Search tables & views..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-1"
+        />
+        <Button variant="outline" size="icon">
+          <HugeiconsIcon icon={Plus} className="h-4 w-4" />
+        </Button>
+      </div>
+      <div className="space-y-1">
+        {filteredTables.length === 0 ? (
+          <div
+            key="no-results"
+            className="py-4 text-center text-sm text-muted-foreground"
           >
-            {isView ? (
-              <HugeiconsIcon
-                icon={EyeFreeIcons}
-                className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
-              />
-            ) : (
-              <HugeiconsIcon
-                icon={TableIcon}
-                className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
-              />
-            )}
-            <span className="truncate">{table.table_name}</span>
-          </Button>
-        )
-      })}
+            {searchQuery
+              ? `No tables found matching "${searchQuery}"`
+              : 'No tables found'}
+          </div>
+        ) : (
+          filteredTables.map((table) => {
+            const isActive =
+              search.table === table.name 
+            const tableKey = `${table.name}`
+            const isView = table.kind === 'VIEW'
+            const isMaterializedView = table.kind === 'MATERIALIZED VIEW'
+
+            return (
+              <Button
+                key={tableKey}
+                variant={isActive ? 'default' : 'ghost'}
+                className="w-full justify-start"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleTableClick(table)
+                }}
+              >
+                <HugeiconsIcon
+                  icon={isView ? EyeFreeIcons : isMaterializedView ? MaterialAndTextureFreeIcons : TableIcon}
+                  className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
+                />
+                <span className="truncate">{table.name}</span>
+                <Activity mode={isActive ? 'visible' : 'hidden'}>
+                  <HugeiconsIcon
+                    icon={MoreVertical}
+                    className="ml-auto h-4 w-4 shrink-0"
+                  />
+                </Activity>
+              </Button>
+            )
+          })
+        )}
+      </div>
     </div>
   )
 }

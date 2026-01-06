@@ -34,13 +34,12 @@ export function SchemaSelector() {
 
 if (isFetching) {
   return (
-    <div className="flex flex-col gap-2 p-4">
+    <div className="flex gap-1 px-4 py-2">
       <div className="h-8 w-full rounded-md border border-input px-3 flex items-center justify-between">
         <Skeleton className="h-4 w-32" />
         <Skeleton className="h-4 w-4" />
       </div>
-      <div className="h-8 w-full rounded-md border border-input px-3 flex items-center justify-between">
-        <Skeleton className="h-4 w-32" />
+      <div className="h-8 w-9 rounded-md border border-input flex items-center justify-center">
         <Skeleton className="h-4 w-4" />
       </div>
     </div>
@@ -76,13 +75,13 @@ if (isFetching) {
   }
 
   return (
-    <div className="p-4">
+    <div className="flex gap-1 px-4 py-2">
       <Select
         onValueChange={handleSchemaChange}
         value={search.schema || defaultSchema}
         defaultValue={defaultSchema}
       >
-        <SelectTrigger className="w-full mb-2">
+        <SelectTrigger className="w-full">
           <SelectValue title="Select a schema" />
         </SelectTrigger>
         <SelectContent>

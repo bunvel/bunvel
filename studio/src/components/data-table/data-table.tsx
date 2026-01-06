@@ -35,8 +35,6 @@ interface DataTableProps<TData, TValue = unknown> {
   enableRowSelection?: boolean
   onRowClick?: (row: TData) => void
   onRowSelectionChange?: (selectedRows: TData[]) => void
-  onSortingChange?: (sorting: SortingState) => void
-  onColumnFiltersChange?: (filters: ColumnFiltersState) => void
   onPaginationChange?: (pagination: {
     pageIndex: number
     pageSize: number
@@ -44,8 +42,8 @@ interface DataTableProps<TData, TValue = unknown> {
   pageCount: number
   state: {
     pagination: { pageIndex: number; pageSize: number }
-    sorting: SortingState
-    columnFilters: ColumnFiltersState
+    sorting?: SortingState
+    columnFilters?: ColumnFiltersState
     rowSelection?: Record<string, boolean>
   }
 }
@@ -58,8 +56,6 @@ export function DataTable<TData, TValue = unknown>({
   enableRowSelection = false,
   onRowClick,
   onRowSelectionChange,
-  onSortingChange,
-  onColumnFiltersChange,
   onPaginationChange,
   pageCount,
   state,
@@ -128,39 +124,6 @@ export function DataTable<TData, TValue = unknown>({
       const newPagination =
         typeof updater === 'function' ? updater(state.pagination) : updater
       onPaginationChange?.(newPagination)
-    },
-    // In data-table.tsx, update the onSortingChange handler:
-
-    onSortingChange: (updater) => {
-      const newSorting =
-        typeof updater === 'function' ? updater(state.sorting) : updater
-
-      // Only update sorting if the column exists in our columns
-      const columnIds = new Set(
-        columns
-          .map((col) => {
-            // Handle different column definition shapes
-            if ('id' in col && col.id) return col.id
-            if ('accessorKey' in col && col.accessorKey) return col.accessorKey
-            return null
-          })
-          .filter(Boolean),
-      )
-
-      if (
-        newSorting.length === 0 ||
-        (newSorting[0]?.id && columnIds.has(newSorting[0].id))
-      ) {
-        onSortingChange?.(newSorting)
-      } else {
-        // If the column doesn't exist, reset to no sorting
-        onSortingChange?.([])
-      }
-    },
-    onColumnFiltersChange: (updater) => {
-      const newFilters =
-        typeof updater === 'function' ? updater(state.columnFilters) : updater
-      onColumnFiltersChange?.(newFilters)
     },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
