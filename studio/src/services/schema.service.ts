@@ -78,3 +78,30 @@ export const getTables = createServerFn({ method: 'POST' })
       handleApiError(error)
     }
   })
+
+export interface DeleteTableParams {
+  schema: string
+  table: string
+  cascade: boolean
+}
+
+export const deleteTable = createServerFn({ method: 'POST' })
+  .inputValidator((data: DeleteTableParams) => {
+    if (!data?.schema || !data?.table) {
+      throw new Error('Schema and table names are required')
+    }
+    return data
+  })
+  .handler(async ({ data }) => {
+    try {
+      const { schema, table, cascade } = data
+      const cascadeClause = cascade ? ' CASCADE' : ''
+      const query = `DROP TABLE IF EXISTS \"${schema}\".\"${table}\"${cascadeClause}`
+      
+      await apiClient.post('/meta/query', { query })
+      return { success: true }
+    } catch (error) {
+      console.error('Error deleting table:', error)
+      handleApiError(error)
+    }
+  })

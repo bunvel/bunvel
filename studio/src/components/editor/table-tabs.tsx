@@ -3,7 +3,6 @@ import { X } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { Button } from '../ui/button'
 
 interface SearchParams {
   schema?: string
@@ -13,8 +12,8 @@ interface SearchParams {
 export function TableTabs() {
   const navigate = useNavigate()
   const { schema, table } = useSearch({ strict: false }) as SearchParams
-  const [selectedTables, setSelectedTables] = useState<string[]>(() => 
-    schema && table ? [`${schema}.${table}`] : []
+  const [selectedTables, setSelectedTables] = useState<string[]>(() =>
+    schema && table ? [`${schema}.${table}`] : [],
   )
 
   const handleTabChange = (value: string) => {
@@ -29,7 +28,11 @@ export function TableTabs() {
 
     if (tableKey === `${schema}.${table}`) {
       const [newSchema, newTable] = newTables[0]?.split('.') || []
-      navigate(newTable ? { search: { schema: newSchema, table: newTable } as any } : { search: {} as any })
+      navigate(
+        newTable
+          ? { search: { schema: newSchema, table: newTable } as any }
+          : { search: {} as any },
+      )
     }
   }
 
@@ -37,9 +40,12 @@ export function TableTabs() {
   useEffect(() => {
     if (schema && table) {
       const tableKey = `${schema}.${table}`
-      setSelectedTables(prev => 
-        prev.includes(tableKey) ? prev : 
-        prev.length >= 5 ? [...prev.slice(0, 4), tableKey] : [...prev, tableKey]
+      setSelectedTables((prev) =>
+        prev.includes(tableKey)
+          ? prev
+          : prev.length >= 5
+            ? [...prev.slice(0, 4), tableKey]
+            : [...prev, tableKey],
       )
     }
   }, [schema, table])
@@ -64,16 +70,27 @@ export function TableTabs() {
               }`}
             >
               <div className="flex items-center">
-                <span className="text-xs text-muted-foreground mx-1">{tabSchema}</span>
-                <span>{tabTable}</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <span>
+                  <span className="text-xs text-muted-foreground">
+                    {tabSchema}.
+                  </span>
+                  {tabTable}
+                </span>
+                <div
+                  role="button"
+                  tabIndex={0}
                   onClick={(e) => handleTabClose(e, tableKey)}
-                  className="ml-1 h-5 w-5 p-0.5 opacity-0 group-hover:opacity-100 hover:bg-muted/50"
+                  onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                      e.preventDefault()
+                      handleTabClose(e as any, tableKey)
+                    }
+                  }}
+                  className="ml-1 flex h-5 w-5 items-center justify-center rounded-sm p-0.5 opacity-0 hover:bg-muted/50 group-hover:opacity-100"
+                  aria-label={`Close ${tabTable} tab`}
                 >
                   <HugeiconsIcon icon={X} className="h-3.5 w-3.5" />
-                </Button>
+                </div>
               </div>
             </TabsTrigger>
           )

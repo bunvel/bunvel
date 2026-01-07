@@ -4,15 +4,15 @@ import { useTables } from '@/hooks/queries/useTables'
 import { Table } from '@/services/schema.service'
 import {
   EyeFreeIcons,
-  MaterialAndTextureFreeIcons,
-  MoreVertical,
   Plus,
-  TableIcon
+  PropertyViewFreeIcons,
+  TableIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { Activity, useMemo, useState } from 'react'
 import { Input } from '../ui/input'
+import { TableListAction } from './table-list-action'
 
 interface SearchParams {
   schema?: string
@@ -29,10 +29,7 @@ export function TableList() {
   const filteredTables = useMemo(() => {
     if (!searchQuery) return tables
     const query = searchQuery.toLowerCase()
-    return tables.filter(
-      (table) =>
-        table.name.toLowerCase().includes(query)
-    )
+    return tables.filter((table) => table.name.toLowerCase().includes(query))
   }, [tables, searchQuery])
 
   const handleTableClick = (table: Table) => {
@@ -142,34 +139,40 @@ export function TableList() {
           </div>
         ) : (
           filteredTables.map((table) => {
-            const isActive =
-              search.table === table.name 
+            const isActive = search.table === table.name
             const tableKey = `${table.name}`
+            const isTable = table.kind === 'TABLE'
             const isView = table.kind === 'VIEW'
             const isMaterializedView = table.kind === 'MATERIALIZED VIEW'
 
             return (
-              <Button
-                key={tableKey}
-                variant={isActive ? 'default' : 'ghost'}
-                className="w-full justify-start"
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleTableClick(table)
-                }}
-              >
-                <HugeiconsIcon
-                  icon={isView ? EyeFreeIcons : isMaterializedView ? MaterialAndTextureFreeIcons : TableIcon}
-                  className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
-                />
-                <span className="truncate">{table.name}</span>
-                <Activity mode={isActive ? 'visible' : 'hidden'}>
+              <div key={tableKey} className="group relative">
+                <Button
+                  variant={isActive ? 'default' : 'ghost'}
+                  className="w-full justify-start group-hover:pr-8"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleTableClick(table)
+                  }}
+                >
                   <HugeiconsIcon
-                    icon={MoreVertical}
-                    className="ml-auto h-4 w-4 shrink-0"
+                    icon={
+                      isView
+                        ? EyeFreeIcons
+                        : isMaterializedView
+                          ? PropertyViewFreeIcons
+                          : TableIcon
+                    }
+                    className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
                   />
-                </Activity>
-              </Button>
+                  <span className="truncate">{table.name}</span>
+                  <Activity mode={isTable ? 'visible' : 'hidden'}>
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100">
+                      <TableListAction schema={schema} table={table.name} />
+                    </div>
+                  </Activity>
+                </Button>
+              </div>
             )
           })
         )}
