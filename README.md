@@ -15,6 +15,8 @@ Bunvel is a unified Backend-as-a-Service (BaaS) platform that combines authentic
 - 🎨 **Studio** - Beautiful admin dashboard built with TanStack Start
 - 🚀 **Single Service** - Everything runs in one unified application for maximum performance
 
+![Bunvel Dashboard](./dashboard.png)
+
 ## 🏗️ Architecture
 
 Bunvel consists of two main components:
