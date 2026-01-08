@@ -18,3 +18,56 @@ export const getEnv = createServerFn().handler(async () => {
 })
 
 export const Env = await getEnv()
+
+export function escapeIdentifier(identifier: string): string {
+  return identifier.replace(/"/g, '""')
+}
+
+export function formatDefaultValue(value: string, type: string): string {
+  const lowerType = type.toLowerCase()
+
+  // Define exact type matches
+  const stringTypes = new Set([
+    'char',
+    'varchar',
+    'text',
+    'character varying',
+    'date',
+    'time',
+    'timestamp',
+    'timestamptz',
+    'timetz',
+  ])
+
+  // Check if type is in the string types set or contains known patterns
+  const isStringLike =
+    stringTypes.has(lowerType) ||
+    /^(var)?char\(\d+\)$/.test(lowerType) ||
+    lowerType.startsWith('timestamp') ||
+    lowerType.startsWith('time')
+
+  // For string types, wrap in single quotes and escape existing single quotes
+  if (isStringLike) {
+    return `'${escapeIdentifier(value)}'`
+  }
+
+  // For boolean values, convert to lowercase
+  if (lowerType === 'boolean') {
+    const normalized = value.toLowerCase().trim()
+    const truthyValues = ['true', '1', 'yes', 'on', 't', 'y']
+    return truthyValues.includes(normalized) ? 'TRUE' : 'FALSE'
+  }
+
+  // For JSON/JSONB, validate it's valid JSON
+  if (lowerType === 'json' || lowerType === 'jsonb') {
+    try {
+      JSON.parse(value)
+      return `'${escapeIdentifier(value)}'::${lowerType}`
+    } catch (e) {
+      throw new Error(`Invalid JSON value for ${lowerType} column`)
+    }
+  }
+
+  // For numeric types, return as is
+  return value
+}

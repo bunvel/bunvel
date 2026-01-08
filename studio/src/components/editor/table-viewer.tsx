@@ -9,9 +9,7 @@ import {
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
-import {
-  ColumnDef
-} from '@tanstack/react-table'
+import { ColumnDef } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 import { TableTabs } from './table-tabs'
 import { TableToolbar } from './table-toolbar'
@@ -22,7 +20,6 @@ interface SearchParams {
 }
 
 type TableRow = Record<string, unknown>
-
 
 export function TableViewer() {
   const { schema, table } = useSearch({ strict: false }) as SearchParams
