@@ -5,45 +5,52 @@ import {
   EditButton,
   ExportButton,
   FilterButton,
+  GenerateDataButton,
   InsertButton,
-  SortButton
+  SortButton,
 } from './toolbar-buttons'
 
 export interface TableToolbarProps {
   selectedRows: any[]
   schema: string
   table: string
+  kind: string
 }
+
 export function TableToolbar({
   selectedRows,
   schema,
   table,
+  kind,
 }: TableToolbarProps) {
   const hasSelection = selectedRows.length > 0
   const isReadOnly = isReadonlySchema(schema)
 
   return (
     <div className="bg-muted/50 px-4 py-2 border-b">
-      <div className="flex items-center space-x-2">
-        {hasSelection ? (
-          <>
-            <DeleteButton selectRows={selectedRows}  disabled={isReadOnly} />
-            <EditButton selectRows={selectedRows}  disabled={isReadOnly} />
-            <CopyButton selectedRows={selectedRows} table={table} />
-            <ExportButton
-              selectedRows={selectedRows}
-              table={table}
-              schema={schema}
-            />
-          </>
-        ) : (
-          <>
+      {hasSelection ? (
+        <>
+          <DeleteButton selectRows={selectedRows} disabled={isReadOnly} />
+          <EditButton selectRows={selectedRows} disabled={isReadOnly} />
+          <CopyButton selectedRows={selectedRows} table={table} />
+          <ExportButton
+            selectedRows={selectedRows}
+            table={table}
+            schema={schema}
+          />
+        </>
+      ) : (
+        <div className="flex items-center justify-between space-x-2">
+          <div className="flex items-center space-x-2">
             <InsertButton disabled={isReadOnly} />
             <FilterButton />
             <SortButton />
-          </>
-        )}
-      </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <GenerateDataButton schema={schema} table={table} kind={kind} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

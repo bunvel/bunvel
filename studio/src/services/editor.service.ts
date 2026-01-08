@@ -27,6 +27,7 @@ export interface TableMetadata {
     foreign_table_name: string
     foreign_column_name: string
   }>
+  table_type: 'r' | 'v' | 'm' 
 }
 
 export interface TableDataResult {
@@ -37,22 +38,11 @@ export interface TableDataResult {
   totalPages: number
 }
 
-// Define possible filter value types
-type FilterValue = string | number | boolean | null | undefined
-
-// Define the filters type with string keys and FilterValue values
-type Filters = Record<string, FilterValue>
-
-export type SortDirection = 'asc' | 'desc'
-
 export interface TableDataParams {
   schema: string
   table: string
   page: number
   pageSize: number
-  sortBy?: string
-  sortDirection?: SortDirection
-  filters?: Filters
   primaryKeys?: string[]
   firstColumnName?: string
 }
@@ -71,33 +61,39 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     try {
       // Single API call to get all metadata
-      const metadataResponse = await apiClient.post<Array<{
-        column_name: string
-        data_type: string
-        is_nullable: boolean
-        column_default: string | null
-        is_identity: boolean
-        is_updatable: boolean
-        is_primary_key: boolean
-        is_foreign_key: boolean
-        foreign_table_schema?: string
-        foreign_table_name?: string
-        foreign_column_name?: string
-        constraint_name?: string
-      }>>('/meta/query/parameterized', {
+      const metadataResponse = await apiClient.post<
+        Array<{
+          column_name: string
+          data_type: string
+          is_nullable: boolean
+          column_default: string | null
+          is_identity: boolean
+          is_updatable: boolean
+          table_type: 'r' | 'v' | 'm'
+          is_primary_key: boolean
+          is_foreign_key: boolean
+          foreign_table_schema?: string
+          foreign_table_name?: string
+          foreign_column_name?: string
+          constraint_name?: string
+        }>
+      >('/meta/query/parameterized', {
         query: SQL_QUERIES.GET_TABLE_METADATA,
         params: [data.schema, data.table],
       })
 
       const columns: ColumnMetadata[] = []
       const primaryKeys = new Set<string>()
-      const foreignKeysMap = new Map<string, {
-        constraint_name: string
-        column_name: string
-        foreign_table_schema: string
-        foreign_table_name: string
-        foreign_column_name: string
-      }>()
+      const foreignKeysMap = new Map<
+        string,
+        {
+          constraint_name: string
+          column_name: string
+          foreign_table_schema: string
+          foreign_table_name: string
+          foreign_column_name: string
+        }
+      >()
 
       // Process all data in a single pass
       metadataResponse.data.forEach((column) => {
@@ -122,11 +118,13 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
         }
 
         // Track foreign keys
-        if (column.is_foreign_key && 
-            column.foreign_table_schema && 
-            column.foreign_table_name && 
-            column.foreign_column_name &&
-            column.constraint_name) {
+        if (
+          column.is_foreign_key &&
+          column.foreign_table_schema &&
+          column.foreign_table_name &&
+          column.foreign_column_name &&
+          column.constraint_name
+        ) {
           const fkKey = `${column.constraint_name}_${column.column_name}`
           if (!foreignKeysMap.has(fkKey)) {
             foreignKeysMap.set(fkKey, {
@@ -140,11 +138,14 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
         }
       })
 
+      const tableType = metadataResponse.data[0]?.table_type || 'r'
+      
       return {
         data: {
           columns,
           primary_keys: Array.from(primaryKeys),
           foreign_keys: Array.from(foreignKeysMap.values()),
+          table_type: tableType,
         },
       }
     } catch (error) {

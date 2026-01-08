@@ -98,6 +98,7 @@ export const SQL_QUERIES = {
       c.column_default,
       c.is_identity,
       c.is_updatable,
+      o.relkind AS table_type,
       (pk.column_name IS NOT NULL) AS is_primary_key,
       (fk.column_name IS NOT NULL) AS is_foreign_key,
       fk.foreign_table_schema,
@@ -105,6 +106,7 @@ export const SQL_QUERIES = {
       fk.foreign_column_name
     FROM 
       columns c
+      JOIN object o ON true
       LEFT JOIN primary_keys pk USING (column_name)
       LEFT JOIN foreign_keys fk USING (column_name)
     ORDER BY 

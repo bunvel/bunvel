@@ -106,7 +106,7 @@ export function TableViewer() {
     <div className="h-full flex flex-col">
       <TableTabs />
 
-      <TableToolbar selectedRows={selectedRows} schema={schema} table={table} />
+      <TableToolbar selectedRows={selectedRows} schema={schema} table={table} kind={metadata?.table_type || 'r'} />
 
       <div className="flex-1 overflow-auto">
         <DataTable
