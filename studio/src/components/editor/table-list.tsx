@@ -4,7 +4,6 @@ import { useTables } from '@/hooks/queries/useTables'
 import { Table } from '@/services/schema.service'
 import {
   EyeFreeIcons,
-  Plus,
   PropertyViewFreeIcons,
   TableIcon,
 } from '@hugeicons/core-free-icons'
@@ -12,6 +11,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { Activity, useMemo, useState } from 'react'
 import { Input } from '../ui/input'
+import { TableFormSheet } from './table-form-sheet'
 import { TableListAction } from './table-list-action'
 
 interface SearchParams {
@@ -110,6 +110,9 @@ export function TableList() {
           No tables or views found in schema{' '}
           <span className="font-medium text-foreground">{schema}</span>
         </p>
+        <TableFormSheet schema={schema} children={
+          <Button className="mt-2" size="sm" variant="outline">Create Table</Button>
+        } />
       </div>
     )
   }
@@ -123,9 +126,7 @@ export function TableList() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="flex-1"
         />
-        <Button variant="outline" size="icon">
-          <HugeiconsIcon icon={Plus} className="h-4 w-4" />
-        </Button>
+        <TableFormSheet schema={schema} />
       </div>
       <div className="space-y-1">
         {filteredTables.length === 0 ? (

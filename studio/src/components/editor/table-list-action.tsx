@@ -1,28 +1,28 @@
 import { ConfirmDeleteDialog } from '@/components/common/confirm-delete-dialog'
 import { Button } from '@/components/ui/button'
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useDeleteTable } from '@/hooks/mutations/useDeleteTable'
-import { MoreVertical, Pencil, Trash } from '@hugeicons/core-free-icons'
+import { Edit03Icon, MoreVertical, Trash } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
+
 
 export interface TableListActionProps {
   schema: string
   table: string
 }
 
-export function TableListAction({ schema, table }: TableListActionProps) {
+export function TableListAction({
+  schema,
+  table,
+}: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const { mutate: deleteTable, isPending } = useDeleteTable()
-
-  const handleEdit = () => {
-    console.log('Edit table:', { schema, table })
-  }
 
   const handleDelete = (cascade: boolean) => {
     deleteTable({
@@ -53,12 +53,8 @@ export function TableListAction({ schema, table }: TableListActionProps) {
           )}
         />
         <DropdownMenuContent align="end" className="w-40">
-          <DropdownMenuItem
-            onClick={handleEdit}
-            className="cursor-pointer"
-            disabled={isPending}
-          >
-            <HugeiconsIcon icon={Pencil} className="mr-2 h-4 w-4" />
+          <DropdownMenuItem>
+            <HugeiconsIcon icon={Edit03Icon} className="mr-2 h-4 w-4" />
             <span>Edit</span>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -66,7 +62,6 @@ export function TableListAction({ schema, table }: TableListActionProps) {
               e.stopPropagation()
               setIsDeleteDialogOpen(true)
             }}
-            className="cursor-pointer text-destructive focus:text-destructive"
             disabled={isPending}
           >
             <HugeiconsIcon icon={Trash} className="mr-2 h-4 w-4" />

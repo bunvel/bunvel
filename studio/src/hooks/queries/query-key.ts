@@ -10,8 +10,9 @@ export const queryKeys = {
     metadata: (schema: string, table: string) => ['tableMetadata', schema, table] as const,
     data: (params: { schema: string; table: string; page: number; pageSize: number; sortBy?: string; sortDirection?: 'asc' | 'desc'; filters?: Record<string, any> }) => 
       ['tableData', params] as const,
+    detail: (schema: string, table: string) => 
+      [...queryKeys.tables.list(schema), table] as const,
   },
-  // Add more query keys here as needed
 } as const
 
 export type QueryKeys = typeof queryKeys
