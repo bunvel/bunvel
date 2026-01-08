@@ -7,8 +7,7 @@ import {
 } from '@/components/ui/select'
 import { useSchemas } from '@/hooks/queries/useSchemas'
 import { Schema } from '@/services/schema.service'
-import type { LinkOptions } from '@tanstack/react-router'
-import { useNavigate, useSearch } from '@tanstack/react-router'
+import { useNavigate, useSearch, type NavigateOptions } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
@@ -34,11 +33,11 @@ export function SchemaSelector() {
   useEffect(() => {
     if (defaultSchema && !search.schema) {
       navigate({
-        search: (prev) => ({
+        search: (prev: SearchParams) => ({
           ...prev,
           schema: defaultSchema,
         }),
-      } as LinkOptions)
+      } as NavigateOptions)
     }
   }, [defaultSchema, search.schema, navigate])
 
@@ -71,12 +70,12 @@ export function SchemaSelector() {
 
   const handleSchemaChange = (value: string | null) => {
     navigate({
-      search: (prev) => ({
+      search: (prev: SearchParams) => ({
         ...prev,
         schema: value || defaultSchema,
         table: undefined,
       }),
-    } as LinkOptions)
+    } as NavigateOptions)
   }
 
   return (

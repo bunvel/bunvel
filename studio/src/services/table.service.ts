@@ -103,7 +103,8 @@ export const createTable = createServerFn({ method: 'POST' })
 
     const columnDefs = columns
       .map((col) => {
-        let def = `"${col.name}" ${col.type.toUpperCase()}`
+        const escapedName = escapeIdentifier(col.name)
+        let def = `${escapedName} ${col.type.toUpperCase()}`
         if (col.isPrimaryKey && hasSinglePK) def += ' PRIMARY KEY'
         if (!col.nullable) def += ' NOT NULL'
         if (col.defaultValue !== undefined) {
@@ -116,7 +117,9 @@ export const createTable = createServerFn({ method: 'POST' })
     // Handle primary key constraints for multiple columns
     let primaryKeyConstraint = ''
     if (primaryKeyCols.length > 1) {
-      const pkColumns = primaryKeyCols.map((col) => `"${col.name}"`).join(', ')
+      const pkColumns = primaryKeyCols
+        .map((col) => escapeIdentifier(col.name))
+        .join(', ')
       primaryKeyConstraint = `,\n  PRIMARY KEY (${pkColumns})`
     }
 

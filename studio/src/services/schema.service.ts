@@ -1,3 +1,4 @@
+import { escapeIdentifier } from '@/utils/func'
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
@@ -38,7 +39,7 @@ export const createSchema = createServerFn({ method: 'POST' })
         )
       }
 
-      const query = `CREATE SCHEMA IF NOT EXISTS ${data.replace(/"/g, '""')}`
+      const query = `CREATE SCHEMA IF NOT EXISTS ${escapeIdentifier(data)}`
 
       const response = await apiClient.post('/meta/query', {
         query,
