@@ -61,7 +61,7 @@ services:
       POSTGRES_INITDB_ARGS: --data-checksums
     volumes:
       - postgres_data:/var/lib/postgresql
-      - ./app/src/database/migrations:/docker-entrypoint-initdb.d
+      - ./docker/volumes/db:/docker-entrypoint-initdb.d
     networks:
       - bunvel-network
     healthcheck:

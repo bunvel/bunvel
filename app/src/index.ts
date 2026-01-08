@@ -2,12 +2,11 @@ import { Elysia } from "elysia";
 import { httpExceptionPlugin } from "elysia-http-exception";
 import { rateLimit } from "elysia-rate-limit";
 import { corsPlugin } from "./plugins/cors";
-import { authService } from "./services/auth";
 import { metaService } from "./services/meta";
 import { restService } from "./services/rest";
 import { env } from "./utils/config";
 
-const app = new Elysia()
+new Elysia()
   // CORS configuration
   .use(corsPlugin)
 
@@ -31,5 +30,4 @@ const app = new Elysia()
   // Application routes
   .use(restService)
   .use(metaService)
-  .use(authService)
   .listen(env.PORT || "8000");

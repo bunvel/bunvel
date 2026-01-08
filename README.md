@@ -33,17 +33,25 @@ Bunvel consists of two main components:
 
 ### Development Setup
 
-1. **Clone the repository**
+1. **Get the code**
 
 ```bash
-git clone https://github.com/bunvel/bunvel.git
-cd bunvel
-```
+git clone --depth 1 https://github.com/bunvel/bunvel.git
 
-2. **Start with Docker Compose (Recommended)**
+# Create a new project directory
+mkdir bunvel-project
 
-```bash
-docker-compose up -d
+# Copy the docker files to your project
+cp -rf bunvel/docker/* bunvel-project
+
+# Copy the example environment file
+cp bunvel/docker/.env.example bunvel-project/.env
+
+# Switch to your project directory
+cd bunvel-project
+
+# Start the services
+docker compose up -d
 ```
 
 

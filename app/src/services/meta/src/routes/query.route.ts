@@ -6,7 +6,6 @@ import {
 } from "../../../../utils/constant";
 
 export const queryRoutes = new Elysia({ prefix: "/query" })
-  // Raw query endpoint (multiple statements allowed, no parameters)
   .post(
     "/",
     async ({ body, set }) => {
@@ -55,7 +54,6 @@ export const queryRoutes = new Elysia({ prefix: "/query" })
       }),
     }
   )
-  // Parameterized query endpoint (single statement with parameters)
   .post(
     "/parameterized",
     async ({ body, set }) => {
