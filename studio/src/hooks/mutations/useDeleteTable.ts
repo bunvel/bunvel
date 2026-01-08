@@ -1,4 +1,4 @@
-import { deleteTable } from '@/services/schema.service'
+import { deleteTable } from '@/services/table.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 

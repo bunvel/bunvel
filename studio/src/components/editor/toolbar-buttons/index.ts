@@ -3,7 +3,6 @@ export * from './delete-button';
 export * from './edit-button';
 export * from './export-button';
 export * from './filter-button';
-export * from './generate-data-button';
 export * from './insert-button';
 export * from './sort-button';
 

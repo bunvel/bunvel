@@ -9,9 +9,7 @@ import {
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
-import {
-  ColumnDef
-} from '@tanstack/react-table'
+import { ColumnDef } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 import { TableTabs } from './table-tabs'
 import { TableToolbar } from './table-toolbar'
@@ -22,7 +20,6 @@ interface SearchParams {
 }
 
 type TableRow = Record<string, unknown>
-
 
 export function TableViewer() {
   const { schema, table } = useSearch({ strict: false }) as SearchParams
@@ -106,7 +103,7 @@ export function TableViewer() {
     <div className="h-full flex flex-col">
       <TableTabs />
 
-      <TableToolbar selectedRows={selectedRows} schema={schema} table={table} kind={metadata?.table_type || 'r'} />
+      <TableToolbar selectedRows={selectedRows} schema={schema} table={table} />
 
       <div className="flex-1 overflow-auto">
         <DataTable

@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
-import { Table } from '@/services/schema.service'
+import { Table } from '@/services/table.service'
 import {
   EyeFreeIcons,
   PropertyViewFreeIcons,

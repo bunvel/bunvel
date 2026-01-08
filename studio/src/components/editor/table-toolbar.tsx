@@ -5,7 +5,6 @@ import {
   EditButton,
   ExportButton,
   FilterButton,
-  GenerateDataButton,
   InsertButton,
   SortButton,
 } from './toolbar-buttons'
@@ -14,14 +13,12 @@ export interface TableToolbarProps {
   selectedRows: any[]
   schema: string
   table: string
-  kind: string
 }
 
 export function TableToolbar({
   selectedRows,
   schema,
   table,
-  kind,
 }: TableToolbarProps) {
   const hasSelection = selectedRows.length > 0
   const isReadOnly = isReadonlySchema(schema)
@@ -45,9 +42,6 @@ export function TableToolbar({
             <InsertButton disabled={isReadOnly} />
             <FilterButton />
             <SortButton />
-          </div>
-          <div className="flex items-center space-x-2">
-            <GenerateDataButton schema={schema} table={table} kind={kind} />
           </div>
         </div>
       )}

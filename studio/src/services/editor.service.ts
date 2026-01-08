@@ -27,7 +27,7 @@ export interface TableMetadata {
     foreign_table_name: string
     foreign_column_name: string
   }>
-  table_type: 'r' | 'v' | 'm' 
+  table_type: 'r' | 'v' | 'm'
 }
 
 export interface TableDataResult {
@@ -138,8 +138,13 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
         }
       })
 
+      if (!metadataResponse.data[0]) {
+        console.warn(
+          `No metadata found for ${data.schema}.${data.table}, defaulting to table type 'r'`,
+        )
+      }
       const tableType = metadataResponse.data[0]?.table_type || 'r'
-      
+
       return {
         data: {
           columns,
