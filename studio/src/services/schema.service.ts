@@ -2,13 +2,16 @@ import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
 
+export interface Schema {
+  schema_name: string
+}
+
 export const getSchemas = createServerFn({ method: 'POST' }).handler(
   async () => {
     try {
-      const response = await apiClient.post<Array<{ schema_name: string }>>(
-        '/meta/query',
-        { query: SQL_QUERIES.GET_SCHEMAS },
-      )
+      const response = await apiClient.post<Array<Schema>>('/meta/query', {
+        query: SQL_QUERIES.GET_SCHEMAS,
+      })
 
       if (!Array.isArray(response.data)) {
         throw new Error('Invalid response format: expected an array of rows')
@@ -50,5 +53,3 @@ export const createSchema = createServerFn({ method: 'POST' })
       handleApiError(error)
     }
   })
-
-

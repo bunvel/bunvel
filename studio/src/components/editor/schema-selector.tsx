@@ -6,45 +6,42 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useSchemas } from '@/hooks/queries/useSchemas'
+import { Schema } from '@/services/schema.service'
+import type { LinkOptions } from '@tanstack/react-router'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
 import { CreateSchemaSheet } from './create-schema-sheet'
 
-interface Schema {
-  schema_name: string
-}
-
-interface SearchParams {
+type SearchParams = {
   schema?: string
   table?: string
-  [key: string]: unknown
 }
 
 export function SchemaSelector() {
   const navigate = useNavigate()
   const search = useSearch({ strict: false }) as SearchParams
   const { data: schemas, error, isFetching, refetch } = useSchemas()
-  
+
   // Calculate derived state
   const hasPublicSchema = schemas?.data?.some(
     (s: Schema) => s.schema_name === 'public',
   )
   const defaultSchema = hasPublicSchema ? 'public' : ''
-  
+
   // Handle navigation effect
   useEffect(() => {
     if (defaultSchema && !search.schema) {
       navigate({
-        search: (prev: SearchParams) => ({
+        search: (prev) => ({
           ...prev,
           schema: defaultSchema,
         }),
-      } as any)
+      } as LinkOptions)
     }
   }, [defaultSchema, search.schema, navigate])
-  
+
   // Loading state
   if (isFetching) {
     return (
@@ -65,19 +62,21 @@ export function SchemaSelector() {
     return (
       <div className="text-red-500 p-4">
         Error loading schemas: {error.message}
-        <Button variant="link" onClick={() => refetch()} className="ml-2">Retry</Button>
+        <Button variant="link" onClick={() => refetch()} className="ml-2">
+          Retry
+        </Button>
       </div>
     )
   }
 
   const handleSchemaChange = (value: string | null) => {
     navigate({
-      search: (prev: SearchParams) => ({
+      search: (prev) => ({
         ...prev,
         schema: value || defaultSchema,
         table: undefined,
       }),
-    } as any)
+    } as LinkOptions)
   }
 
   return (

@@ -155,7 +155,7 @@ export const SQL_QUERIES = {
     ORDER BY 
       c.conname, 
       array_position(c.conkey, a.attnum);
-  `
-} as const;
+  `,
+} as const
 
-export type SqlQueryKey = keyof typeof SQL_QUERIES;
+export type SqlQueryKey = keyof typeof SQL_QUERIES

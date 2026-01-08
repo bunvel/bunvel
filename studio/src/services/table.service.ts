@@ -1,4 +1,4 @@
-import { formatDefaultValue } from '@/utils/func'
+import { escapeIdentifier, formatDefaultValue } from '@/utils/func'
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
@@ -73,7 +73,7 @@ export const deleteTable = createServerFn({ method: 'POST' })
     try {
       const { schema, table, cascade } = data
       const cascadeClause = cascade ? ' CASCADE' : ''
-      const query = `DROP TABLE IF EXISTS \"${schema}\".\"${table}\"${cascadeClause}`
+      const query = `DROP TABLE IF EXISTS "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}"${cascadeClause}`
 
       await apiClient.post('/meta/query', { query })
       return { success: true }
@@ -97,10 +97,14 @@ export const createTable = createServerFn({ method: 'POST' })
     const { schema, table, description, columns, foreignKeys = [] } = data
 
     // Create column definitions
+
+    const primaryKeyCols = columns.filter((col) => col.isPrimaryKey)
+    const hasSinglePK = primaryKeyCols.length === 1
+
     const columnDefs = columns
       .map((col) => {
         let def = `"${col.name}" ${col.type.toUpperCase()}`
-        if (col.isPrimaryKey) def += ' PRIMARY KEY'
+        if (col.isPrimaryKey && hasSinglePK) def += ' PRIMARY KEY'
         if (!col.nullable) def += ' NOT NULL'
         if (col.defaultValue !== undefined) {
           def += ` DEFAULT ${formatDefaultValue(col.defaultValue, col.type)}`
@@ -110,7 +114,6 @@ export const createTable = createServerFn({ method: 'POST' })
       .join(',\n  ')
 
     // Handle primary key constraints for multiple columns
-    const primaryKeyCols = columns.filter((col) => col.isPrimaryKey)
     let primaryKeyConstraint = ''
     if (primaryKeyCols.length > 1) {
       const pkColumns = primaryKeyCols.map((col) => `"${col.name}"`).join(', ')
@@ -121,13 +124,13 @@ export const createTable = createServerFn({ method: 'POST' })
     const transaction = [
       // Create the table with IF NOT EXISTS to handle race conditions
       {
-        query: `CREATE TABLE IF NOT EXISTS "${schema}"."${table}" (\n  ${columnDefs}${primaryKeyConstraint}\n)`,
+        query: `CREATE TABLE IF NOT EXISTS "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}" (\n  ${columnDefs}${primaryKeyConstraint}\n)`,
       },
       // Add table comment if description is provided
       ...(description
         ? [
             {
-              query: `COMMENT ON TABLE "${schema}"."${table}" IS '${description.replace(/'/g, "''")}'`,
+              query: `COMMENT ON TABLE "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}" IS '${description.replace(/'/g, "''")}'`,
             },
           ]
         : []),
@@ -136,24 +139,37 @@ export const createTable = createServerFn({ method: 'POST' })
         .filter((fk) => fk.column && fk.referencedTable && fk.referencedColumn)
         .map((fk) => ({
           query: `
-            ALTER TABLE "${schema}"."${table}"
-            ADD CONSTRAINT "fk_${table}_${fk.column}_${fk.referencedTable}"
-            FOREIGN KEY ("${fk.column}")
-            REFERENCES "${schema}"."${fk.referencedTable}" ("${fk.referencedColumn}")
+            ALTER TABLE "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}"
+            ADD CONSTRAINT "fk_${escapeIdentifier(table)}_${escapeIdentifier(fk.column)}_${escapeIdentifier(fk.referencedTable)}"
+            FOREIGN KEY ("${escapeIdentifier(fk.column)}")
+            REFERENCES "${escapeIdentifier(schema)}"."${escapeIdentifier(fk.referencedTable)}" ("${escapeIdentifier(fk.referencedColumn)}")
             ON DELETE ${fk.onDelete}
             ON UPDATE ${fk.onUpdate}`,
         })),
     ]
 
     try {
-      // Execute all queries in a single transaction
+      // Start transaction
+      await apiClient.post('/meta/query', { query: 'BEGIN' })
+
+      // Execute all queries in the transaction
       for (const { query } of transaction) {
         await apiClient.post('/meta/query', { query })
       }
+
+      // Commit the transaction if all queries succeed
+      await apiClient.post('/meta/query', { query: 'COMMIT' })
       return { success: true }
     } catch (error) {
-      console.error('Error creating table:', error)
-      // Re-throw the error to be handled by the mutation
+      console.error('Error in table transaction:', error)
+      // Rollback the transaction on error
+      try {
+        await apiClient.post('/meta/query', { query: 'ROLLBACK' })
+      } catch (rollbackError) {
+        console.error('Error rolling back transaction:', rollbackError)
+        // Continue with original error
+      }
+      // Re-throw the original error to be handled by the mutation
       throw error
     }
   })
