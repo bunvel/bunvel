@@ -82,7 +82,7 @@ export function SchemaSelector() {
     <div className="flex gap-1 px-4 py-2">
       <Select
         onValueChange={handleSchemaChange}
-        value={search.schema || defaultSchema}
+        value={search.schema}
         defaultValue={defaultSchema}
       >
         <SelectTrigger className="w-full">
