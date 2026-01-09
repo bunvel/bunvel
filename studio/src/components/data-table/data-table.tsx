@@ -173,7 +173,7 @@ export function DataTable<TData, TValue = unknown>({
       <div className="flex-1 flex flex-col min-h-0">
         <div className="flex-1 flex flex-col overflow-hidden border">
           <Table className="w-auto">
-            <TableHeader className="sticky top-0 z-10 bg-card">
+            <TableHeader className="sticky top-0 z-10 bg-secondary">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="border-b">
                   {headerGroup.headers.map((header) => (

@@ -23,7 +23,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useCreateTable } from '@/hooks/mutations/useTableMutations'
-import type { ColumnDefinition as BaseColumnDefinition } from '@/services/schema.service'
+import type { ColumnDefinition as BaseColumnDefinition } from '@/services/table.service'
 import {
   DATA_TYPES,
   DEFAULT_COLUMN,
@@ -591,21 +591,20 @@ export function TableFormSheet({ schema, children }: TableFormSheetProps) {
                 </Button>
               </div>
             </div>
-
-            <SheetFooter className="border-t p-4 flex flex-row justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Creating...' : 'Create Table'}
-              </Button>
-            </SheetFooter>
           </div>
+          <SheetFooter className="p-4 border-t flex flex-row justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Creating...' : 'Create Table'}
+            </Button>
+          </SheetFooter>
         </form>
       </SheetContent>
     </Sheet>

@@ -54,23 +54,21 @@ export function TableViewer() {
     return getSortedColumns(metadata.columns).map((column) => ({
       id: column.column_name,
       header: () => (
-        <div className="flex flex-col gap-0.5">
-          <div className="flex items-center gap-1 group">
-            <span>{column.column_name}</span>
-            <div className="flex items-center gap-1">
-              {column.is_primary_key && (
-                <HugeiconsIcon
-                  icon={Key01Icon}
-                  className="h-3.5 w-3.5 text-amber-500"
-                />
-              )}
-              {column.is_foreign_key && (
-                <HugeiconsIcon
-                  icon={Link02Icon}
-                  className="h-3.5 w-3.5 text-blue-500"
-                />
-              )}
-            </div>
+        <div className="flex items-center gap-1 group">
+          <span>{column.column_name}</span>
+          <div className="flex items-center gap-1">
+            {column.is_primary_key && (
+              <HugeiconsIcon
+                icon={Key01Icon}
+                className="h-3.5 w-3.5 text-amber-500"
+              />
+            )}
+            {column.is_foreign_key && (
+              <HugeiconsIcon
+                icon={Link02Icon}
+                className="h-3.5 w-3.5 text-blue-500"
+              />
+            )}
           </div>
           <span className="text-xs text-muted-foreground font-normal">
             {formatDataType(column.data_type)}

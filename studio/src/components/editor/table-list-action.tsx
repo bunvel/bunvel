@@ -10,17 +10,14 @@ import { useDeleteTable } from '@/hooks/mutations/useDeleteTable'
 import { Edit03Icon, MoreVertical, Trash } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
-
+import { toast } from 'sonner'
 
 export interface TableListActionProps {
   schema: string
   table: string
 }
 
-export function TableListAction({
-  schema,
-  table,
-}: TableListActionProps) {
+export function TableListAction({ schema, table }: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const { mutate: deleteTable, isPending } = useDeleteTable()
 
@@ -39,8 +36,7 @@ export function TableListAction({
           render={({ onClick }) => (
             <Button
               variant="ghost"
-              size="icon"
-              className="h-8 w-8 p-0"
+              size="icon-sm"
               aria-label="Table actions"
               onClick={(e) => {
                 e.stopPropagation()
@@ -48,13 +44,21 @@ export function TableListAction({
               }}
               disabled={isPending}
             >
-              <HugeiconsIcon icon={MoreVertical} className="h-4 w-4" />
+              <HugeiconsIcon icon={MoreVertical} />
             </Button>
           )}
         />
-        <DropdownMenuContent align="end" className="w-40">
-          <DropdownMenuItem>
-            <HugeiconsIcon icon={Edit03Icon} className="mr-2 h-4 w-4" />
+        <DropdownMenuContent align="start" className="w-40">
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation()
+              toast.info('Edit functionality not yet implemented', {
+                description:
+                  'Editing tables will be available in a future update',
+              })
+            }}
+          >
+            <HugeiconsIcon icon={Edit03Icon} />
             <span>Edit</span>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -64,7 +68,7 @@ export function TableListAction({
             }}
             disabled={isPending}
           >
-            <HugeiconsIcon icon={Trash} className="mr-2 h-4 w-4" />
+            <HugeiconsIcon icon={Trash} />
             <span>{isPending ? 'Deleting...' : 'Delete'}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>

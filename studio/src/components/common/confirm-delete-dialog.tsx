@@ -3,13 +3,13 @@ import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { useState } from 'react'
+import { Card } from '../ui/card'
 
 export function ConfirmDeleteDialog({
   open,
@@ -43,15 +43,13 @@ export function ConfirmDeleteDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader className="space-y-4">
+      <DialogContent className="sm:max-w-[450px]">
+        <DialogHeader>
           <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            {description}
-          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
+          <h1 className="font-bold">{description}</h1>
           {showCascadeOption && (
             <div className="space-y-4 pt-2">
               <div className="flex items-start space-x-3">
@@ -75,9 +73,11 @@ export function ConfirmDeleteDialog({
                     {cascadeDescription}
                   </p>
                   {cascade && (
-                    <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
-                      {cascadeWarning}
-                    </p>
+                    <Card className="p-4 border-yellow-200 dark:border-yellow-900 bg-yellow-50 dark:bg-yellow-950/50">
+                      <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                        {cascadeWarning}
+                      </p>
+                    </Card>
                   )}
                 </div>
               </div>
@@ -85,22 +85,16 @@ export function ConfirmDeleteDialog({
           )}
         </div>
 
-        <DialogFooter className="pt-4">
-          <div className="flex w-full flex-col-reverse gap-3 sm:flex-row sm:justify-end sm:space-x-2">
+        <DialogFooter>
+          <div className="flex justify-end gap-2 w-full">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="w-full sm:w-auto"
             >
               {cancelText}
             </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleConfirm}
-              className="w-full sm:w-auto"
-            >
+            <Button type="button" variant="destructive" onClick={handleConfirm}>
               {confirmText}
             </Button>
           </div>

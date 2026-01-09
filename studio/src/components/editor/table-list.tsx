@@ -168,7 +168,7 @@ export function TableList() {
                   />
                   <span className="truncate">{table.name}</span>
                   <Activity mode={isTable ? 'visible' : 'hidden'}>
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100">
+                    <div className="absolute right-2 opacity-0 group-hover:opacity-100">
                       <TableListAction schema={schema} table={table.name} />
                     </div>
                   </Activity>
