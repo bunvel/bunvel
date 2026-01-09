@@ -110,14 +110,9 @@ export function TableList() {
           No tables or views found in schema{' '}
           <span className="font-medium text-foreground">{schema}</span>
         </p>
-        <TableFormSheet
-          schema={schema}
-          children={
-            <Button className="mt-2" size="sm" variant="outline">
-              Create Table
-            </Button>
-          }
-        />
+        <TableFormSheet schema={schema} children={
+          <Button className="mt-2" size="sm" variant="outline">Create Table</Button>
+        } />
       </div>
     )
   }
@@ -173,7 +168,7 @@ export function TableList() {
                   />
                   <span className="truncate">{table.name}</span>
                   <Activity mode={isTable ? 'visible' : 'hidden'}>
-                    <div className="absolute right-0 opacity-0 group-hover:opacity-100">
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100">
                       <TableListAction schema={schema} table={table.name} />
                     </div>
                   </Activity>

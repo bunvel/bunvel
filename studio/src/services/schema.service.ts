@@ -39,7 +39,7 @@ export const createSchema = createServerFn({ method: 'POST' })
         )
       }
 
-      const query = `CREATE SCHEMA IF NOT EXISTS "${escapeIdentifier(data)}"`
+      const query = `CREATE SCHEMA IF NOT EXISTS ${escapeIdentifier(data)}`
 
       const response = await apiClient.post('/meta/query', {
         query,

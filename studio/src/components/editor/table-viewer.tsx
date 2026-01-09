@@ -71,10 +71,10 @@ export function TableViewer() {
                 />
               )}
             </div>
+          </div>
           <span className="text-xs text-muted-foreground font-normal">
             {formatDataType(column.data_type)}
           </span>
-          </div>
         </div>
       ),
       accessorKey: column.column_name,
