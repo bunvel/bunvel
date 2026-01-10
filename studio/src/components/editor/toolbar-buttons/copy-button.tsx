@@ -23,7 +23,7 @@ export function CopyButton({ selectedRows, table }: CopyButtonProps) {
   const { copyRows } = useCopy()
 
   const handleCopy = (format: 'json' | 'csv' | 'sql') => {
-    copyRows(selectedRows, format, table)
+    copyRows(selectedRows, { format, tableName: table })
   }
 
   return (

@@ -23,7 +23,7 @@ export function TableList() {
   const navigate = useNavigate()
   const search = useSearch({ strict: false }) as SearchParams
   const { schema } = search
-  const { data: tables = [], isLoading, error } = useTables(schema)
+  const { data: tables = [], isLoading, error, refetch } = useTables(schema)
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredTables = useMemo(() => {
@@ -93,6 +93,9 @@ export function TableList() {
             {error instanceof Error
               ? error.message
               : 'An unknown error occurred'}
+            <Button variant="link" onClick={() => refetch()} className="ml-2">
+              Retry
+            </Button>
           </p>
         </div>
       </div>
@@ -110,9 +113,14 @@ export function TableList() {
           No tables or views found in schema{' '}
           <span className="font-medium text-foreground">{schema}</span>
         </p>
-        <TableFormSheet schema={schema} children={
-          <Button className="mt-2" size="sm" variant="outline">Create Table</Button>
-        } />
+        <TableFormSheet
+          schema={schema}
+          children={
+            <Button className="mt-2" size="sm" variant="outline">
+              Create Table
+            </Button>
+          }
+        />
       </div>
     )
   }

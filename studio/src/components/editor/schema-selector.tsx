@@ -7,7 +7,11 @@ import {
 } from '@/components/ui/select'
 import { useSchemas } from '@/hooks/queries/useSchemas'
 import { Schema } from '@/services/schema.service'
-import { useNavigate, useSearch, type NavigateOptions } from '@tanstack/react-router'
+import {
+  useNavigate,
+  useSearch,
+  type NavigateOptions,
+} from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
@@ -59,11 +63,20 @@ export function SchemaSelector() {
   // Error state
   if (error) {
     return (
-      <div className="text-red-500 p-4">
-        Error loading schemas: {error.message}
-        <Button variant="link" onClick={() => refetch()} className="ml-2">
-          Retry
-        </Button>
+      <div className="p-4 space-y-2">
+        <div className="rounded-md border border-destructive/20 bg-destructive/5 p-4">
+          <h4 className="mb-1 text-sm font-medium text-destructive">
+            Error loading schema
+          </h4>
+          <p className="text-xs text-destructive/80">
+            {error instanceof Error
+              ? error.message
+              : 'An unknown error occurred'}
+            <Button variant="link" onClick={() => refetch()} className="ml-2">
+              Retry
+            </Button>
+          </p>
+        </div>
       </div>
     )
   }

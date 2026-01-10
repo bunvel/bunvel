@@ -29,13 +29,10 @@ export function ExportButton({
   const { exportData } = useExport()
 
   const handleExport = async (format: 'json' | 'csv' | 'sql') => {
-
-    const success = await exportData(
-      selectedRows,
-      `${schema}_${table}`,
+    const success = await exportData(selectedRows, `${schema}_${table}`, {
       format,
-      table,
-    )
+      tableName: table,
+    })
 
     if (success) {
       toast.success(
