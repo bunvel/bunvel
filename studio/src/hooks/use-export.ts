@@ -38,7 +38,6 @@ export function useExport() {
   const exportData = useCallback(
     async <T extends Record<string, unknown>>(
       data: T[],
-      fileName: string,
       options: ExportOptions = {}
     ): Promise<boolean> => {
       try {
@@ -113,7 +112,7 @@ export function useExport() {
         
         try {
           link.href = url
-          link.download = `${fileName}.${fileExtension}`
+          link.download = `${tableName}.${fileExtension}`
           link.style.display = 'none'
           
           document.body.appendChild(link)

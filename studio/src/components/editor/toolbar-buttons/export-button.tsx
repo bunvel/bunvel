@@ -13,7 +13,6 @@ import {
   Database as FileTypeSql,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { toast } from 'sonner'
 
 interface ExportButtonProps {
   selectedRows: any[]
@@ -29,18 +28,10 @@ export function ExportButton({
   const { exportData } = useExport()
 
   const handleExport = async (format: 'json' | 'csv' | 'sql') => {
-    const success = await exportData(selectedRows, `${schema}_${table}`, {
+    await exportData(selectedRows, {
       format,
-      tableName: table,
+      tableName: `${schema}_${table}`,
     })
-
-    if (success) {
-      toast.success(
-        `Exported ${selectedRows.length} rows as ${format.toUpperCase()}`,
-      )
-    } else {
-      toast.error('Export failed. Please try again.')
-    }
   }
 
   return (
