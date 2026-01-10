@@ -11,8 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as mainRouteRouteImport } from './routes/(main)/route'
 import { Route as mainIndexRouteImport } from './routes/(main)/index'
+import { Route as mainDatabaseRouteRouteImport } from './routes/(main)/database/route'
 import { Route as mainSqlIndexRouteImport } from './routes/(main)/sql/index'
 import { Route as mainEditorIndexRouteImport } from './routes/(main)/editor/index'
+import { Route as mainDatabaseTablesIndexRouteImport } from './routes/(main)/database/tables/index'
+import { Route as mainDatabaseIndexesIndexRouteImport } from './routes/(main)/database/indexes/index'
+import { Route as mainDatabaseTablesOidRouteImport } from './routes/(main)/database/tables/$oid'
 
 const mainRouteRoute = mainRouteRouteImport.update({
   id: '/(main)',
@@ -21,6 +25,11 @@ const mainRouteRoute = mainRouteRouteImport.update({
 const mainIndexRoute = mainIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => mainRouteRoute,
+} as any)
+const mainDatabaseRouteRoute = mainDatabaseRouteRouteImport.update({
+  id: '/database',
+  path: '/database',
   getParentRoute: () => mainRouteRoute,
 } as any)
 const mainSqlIndexRoute = mainSqlIndexRouteImport.update({
@@ -33,30 +42,81 @@ const mainEditorIndexRoute = mainEditorIndexRouteImport.update({
   path: '/editor/',
   getParentRoute: () => mainRouteRoute,
 } as any)
+const mainDatabaseTablesIndexRoute = mainDatabaseTablesIndexRouteImport.update({
+  id: '/tables/',
+  path: '/tables/',
+  getParentRoute: () => mainDatabaseRouteRoute,
+} as any)
+const mainDatabaseIndexesIndexRoute =
+  mainDatabaseIndexesIndexRouteImport.update({
+    id: '/indexes/',
+    path: '/indexes/',
+    getParentRoute: () => mainDatabaseRouteRoute,
+  } as any)
+const mainDatabaseTablesOidRoute = mainDatabaseTablesOidRouteImport.update({
+  id: '/tables/$oid',
+  path: '/tables/$oid',
+  getParentRoute: () => mainDatabaseRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/database': typeof mainDatabaseRouteRouteWithChildren
   '/': typeof mainIndexRoute
   '/editor': typeof mainEditorIndexRoute
   '/sql': typeof mainSqlIndexRoute
+  '/database/tables/$oid': typeof mainDatabaseTablesOidRoute
+  '/database/indexes': typeof mainDatabaseIndexesIndexRoute
+  '/database/tables': typeof mainDatabaseTablesIndexRoute
 }
 export interface FileRoutesByTo {
+  '/database': typeof mainDatabaseRouteRouteWithChildren
   '/': typeof mainIndexRoute
   '/editor': typeof mainEditorIndexRoute
   '/sql': typeof mainSqlIndexRoute
+  '/database/tables/$oid': typeof mainDatabaseTablesOidRoute
+  '/database/indexes': typeof mainDatabaseIndexesIndexRoute
+  '/database/tables': typeof mainDatabaseTablesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(main)': typeof mainRouteRouteWithChildren
+  '/(main)/database': typeof mainDatabaseRouteRouteWithChildren
   '/(main)/': typeof mainIndexRoute
   '/(main)/editor/': typeof mainEditorIndexRoute
   '/(main)/sql/': typeof mainSqlIndexRoute
+  '/(main)/database/tables/$oid': typeof mainDatabaseTablesOidRoute
+  '/(main)/database/indexes/': typeof mainDatabaseIndexesIndexRoute
+  '/(main)/database/tables/': typeof mainDatabaseTablesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/editor' | '/sql'
+  fullPaths:
+    | '/database'
+    | '/'
+    | '/editor'
+    | '/sql'
+    | '/database/tables/$oid'
+    | '/database/indexes'
+    | '/database/tables'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/editor' | '/sql'
-  id: '__root__' | '/(main)' | '/(main)/' | '/(main)/editor/' | '/(main)/sql/'
+  to:
+    | '/database'
+    | '/'
+    | '/editor'
+    | '/sql'
+    | '/database/tables/$oid'
+    | '/database/indexes'
+    | '/database/tables'
+  id:
+    | '__root__'
+    | '/(main)'
+    | '/(main)/database'
+    | '/(main)/'
+    | '/(main)/editor/'
+    | '/(main)/sql/'
+    | '/(main)/database/tables/$oid'
+    | '/(main)/database/indexes/'
+    | '/(main)/database/tables/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -79,6 +139,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainIndexRouteImport
       parentRoute: typeof mainRouteRoute
     }
+    '/(main)/database': {
+      id: '/(main)/database'
+      path: '/database'
+      fullPath: '/database'
+      preLoaderRoute: typeof mainDatabaseRouteRouteImport
+      parentRoute: typeof mainRouteRoute
+    }
     '/(main)/sql/': {
       id: '/(main)/sql/'
       path: '/sql'
@@ -93,16 +160,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainEditorIndexRouteImport
       parentRoute: typeof mainRouteRoute
     }
+    '/(main)/database/tables/': {
+      id: '/(main)/database/tables/'
+      path: '/tables'
+      fullPath: '/database/tables'
+      preLoaderRoute: typeof mainDatabaseTablesIndexRouteImport
+      parentRoute: typeof mainDatabaseRouteRoute
+    }
+    '/(main)/database/indexes/': {
+      id: '/(main)/database/indexes/'
+      path: '/indexes'
+      fullPath: '/database/indexes'
+      preLoaderRoute: typeof mainDatabaseIndexesIndexRouteImport
+      parentRoute: typeof mainDatabaseRouteRoute
+    }
+    '/(main)/database/tables/$oid': {
+      id: '/(main)/database/tables/$oid'
+      path: '/tables/$oid'
+      fullPath: '/database/tables/$oid'
+      preLoaderRoute: typeof mainDatabaseTablesOidRouteImport
+      parentRoute: typeof mainDatabaseRouteRoute
+    }
   }
 }
 
+interface mainDatabaseRouteRouteChildren {
+  mainDatabaseTablesOidRoute: typeof mainDatabaseTablesOidRoute
+  mainDatabaseIndexesIndexRoute: typeof mainDatabaseIndexesIndexRoute
+  mainDatabaseTablesIndexRoute: typeof mainDatabaseTablesIndexRoute
+}
+
+const mainDatabaseRouteRouteChildren: mainDatabaseRouteRouteChildren = {
+  mainDatabaseTablesOidRoute: mainDatabaseTablesOidRoute,
+  mainDatabaseIndexesIndexRoute: mainDatabaseIndexesIndexRoute,
+  mainDatabaseTablesIndexRoute: mainDatabaseTablesIndexRoute,
+}
+
+const mainDatabaseRouteRouteWithChildren =
+  mainDatabaseRouteRoute._addFileChildren(mainDatabaseRouteRouteChildren)
+
 interface mainRouteRouteChildren {
+  mainDatabaseRouteRoute: typeof mainDatabaseRouteRouteWithChildren
   mainIndexRoute: typeof mainIndexRoute
   mainEditorIndexRoute: typeof mainEditorIndexRoute
   mainSqlIndexRoute: typeof mainSqlIndexRoute
 }
 
 const mainRouteRouteChildren: mainRouteRouteChildren = {
+  mainDatabaseRouteRoute: mainDatabaseRouteRouteWithChildren,
   mainIndexRoute: mainIndexRoute,
   mainEditorIndexRoute: mainEditorIndexRoute,
   mainSqlIndexRoute: mainSqlIndexRoute,

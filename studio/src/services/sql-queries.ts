@@ -13,7 +13,7 @@ export const SQL_QUERIES = {
       n.nspname;
   `,
 
-  // Get all tables and views in a schema
+  // Get all tables and views in a schema with basic info
   GET_TABLES: `
     SELECT 
       CASE c.relkind
@@ -32,6 +32,75 @@ export const SQL_QUERIES = {
     ORDER BY 
       kind, 
       name;
+  `,
+
+  // Get detailed table information including description, row count, size, and column count
+  GET_DATABASE_TABLES: `
+    SELECT
+      c.oid, 
+      c.relname AS name,
+      obj_description(c.oid) AS description,
+      COALESCE(pg_stat_get_live_tuples(c.oid), 0)::bigint AS row_count,
+      pg_size_pretty(pg_total_relation_size(c.oid)) AS total_size,
+      (
+        SELECT count(*)
+        FROM pg_attribute a
+        WHERE a.attrelid = c.oid
+        AND a.attnum > 0
+        AND NOT a.attisdropped
+      ) AS column_count,
+      CASE c.relkind
+        WHEN 'r' THEN 'TABLE'
+        WHEN 'v' THEN 'VIEW'
+        WHEN 'm' THEN 'MATERIALIZED VIEW'
+      END AS kind
+    FROM 
+      pg_catalog.pg_class c
+      JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+    WHERE 
+      n.nspname = $1
+      AND c.relkind IN ('r', 'v', 'm')
+      AND NOT c.relispartition
+    ORDER BY 
+      c.relname;
+  `,
+
+  GET_TABLE_COLUMNS: `
+  SELECT
+    a.attname AS name,
+    pg_catalog.col_description(c.oid, a.attnum) AS description,
+    pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type,
+    NOT a.attnotnull AS nullable,
+    a.attnum AS position
+  FROM
+    pg_catalog.pg_attribute a
+    JOIN pg_catalog.pg_class c ON c.oid = a.attrelid
+  WHERE
+    c.oid = $1
+    AND a.attnum > 0
+    AND NOT a.attisdropped
+  ORDER BY
+    a.attnum;
+`,
+
+  // Get all indexes by schema
+  GET_TABLE_INDEXES: `
+    SELECT
+      t.relname AS table_name,
+      i.relname AS index_name,
+      a.attname AS column_name,
+      pg_get_indexdef(i.oid) AS index_definition
+    FROM
+      pg_class t
+      JOIN pg_index ix ON t.oid = ix.indrelid
+      JOIN pg_class i ON i.oid = ix.indexrelid
+      JOIN pg_namespace n ON n.oid = t.relnamespace
+      JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(ix.indkey)
+    WHERE
+      n.nspname = $1
+    ORDER BY
+      t.relname,
+      i.relname;
   `,
 
   // Get detailed table metadata including columns, primary keys, and foreign keys

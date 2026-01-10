@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { NavMain } from '@/components/layout/nav-main'
 import { Sidebar, SidebarContent, SidebarFooter } from '@/components/ui/sidebar'
-import { Home01Icon, SqlIcon, TableIcon } from '@hugeicons/core-free-icons'
+import { Database, Home01Icon, SqlIcon, TableIcon } from '@hugeicons/core-free-icons'
 import { NavUser } from './nav-user'
 
 const data = {
@@ -26,6 +26,11 @@ const data = {
       title: 'Table Editor',
       url: '/editor',
       icon: TableIcon,
+    },
+    {
+      title: 'Database',
+      url: '/database/tables',
+      icon: Database,
     },
   ],
 }

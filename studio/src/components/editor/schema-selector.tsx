@@ -22,7 +22,7 @@ type SearchParams = {
   table?: string
 }
 
-export function SchemaSelector() {
+export function SchemaSelector({ hideCreate = true }: { hideCreate: boolean }) {
   const navigate = useNavigate()
   const search = useSearch({ strict: false }) as SearchParams
   const { data: schemas, error, isFetching, refetch } = useSchemas()
@@ -53,9 +53,11 @@ export function SchemaSelector() {
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-4 w-4" />
         </div>
-        <div className="h-8 w-9 rounded-md border border-input flex items-center justify-center">
-          <Skeleton className="h-4 w-4" />
-        </div>
+        {!hideCreate && (
+          <div className="h-8 w-9 rounded-md border border-input flex items-center justify-center">
+            <Skeleton className="h-4 w-4" />
+          </div>
+        )}
       </div>
     )
   }
@@ -109,7 +111,7 @@ export function SchemaSelector() {
           ))}
         </SelectContent>
       </Select>
-      <CreateSchemaSheet />
+      {!hideCreate && <CreateSchemaSheet />}
     </div>
   )
 }

@@ -13,7 +13,7 @@ function RouteComponent() {
     <div className="h-full flex">
       <div className="w-[20%] bg-card border-r flex flex-col h-full overflow-hidden">
         <h1 className="font-semibold px-4 pt-1.5">Table Editor</h1>
-        <SchemaSelector />
+        <SchemaSelector hideCreate={false}/>
         <Separator/>
         <TableList />
       </div>

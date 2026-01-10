@@ -39,6 +39,31 @@ export interface DeleteTableParams {
   cascade: boolean
 }
 
+export interface DatabaseTables {
+  oid: string
+  name: string
+  kind: 'BASE TABLE' | 'VIEW' | 'MATERIALIZED VIEW' | string
+  description: string
+  rows: number
+  size: string
+  columns: number
+}
+
+export interface DatabaseTableColumns {
+  name: string
+  description: string
+  data_type: string
+  nullable: string
+  position: number
+}
+
+export interface DatabaseTableIndexes {
+  table_name: string
+  index_name: string
+  column_name: string
+  index_definition: string
+}
+
 export const getTables = createServerFn({ method: 'POST' })
   .inputValidator((data: { schema: string }) => {
     if (!data?.schema) {
@@ -55,6 +80,72 @@ export const getTables = createServerFn({ method: 'POST' })
       return response.data as Table[]
     } catch (error) {
       console.error('Error fetching tables:', error)
+      handleApiError(error)
+    }
+  })
+
+export const getDatabaseTables = createServerFn({ method: 'POST' })
+  .inputValidator((data: { schema: string }) => {
+    if (!data?.schema) {
+      throw new Error('Schema name is required')
+    }
+    return data
+  })
+  .handler(async ({ data }) => {
+    try {
+      const response = await apiClient.post<DatabaseTables[]>('/meta/query', {
+        query: SQL_QUERIES.GET_DATABASE_TABLES,
+        params: [data.schema],
+      })
+      return response.data as DatabaseTables[]
+    } catch (error) {
+      console.error('Error fetching tables:', error)
+      handleApiError(error)
+    }
+  })
+
+export const getDatabaseTableColumns = createServerFn({ method: 'POST' })
+  .inputValidator((data: { oid: string }) => {
+    if (!data?.oid) {
+      throw new Error('OID is required')
+    }
+    return data
+  })
+  .handler(async ({ data }) => {
+    try {
+      const response = await apiClient.post<DatabaseTableColumns[]>(
+        '/meta/query',
+        {
+          query: SQL_QUERIES.GET_TABLE_COLUMNS,
+          params: [data.oid],
+        },
+      )
+      return response.data as DatabaseTableColumns[]
+    } catch (error) {
+      console.error('Error fetching tables:', error)
+      handleApiError(error)
+    }
+  })
+
+export const getDatabaseTableIndexes = createServerFn({ method: 'POST' })
+  .inputValidator((data: { schema: string }) => {
+    if (!data?.schema) {
+      throw new Error('Schema name is required')
+    }
+    return data
+  })
+  .handler(async ({ data }) => {
+    try {
+      const response = await apiClient.post<DatabaseTableIndexes[]>(
+        '/meta/query',
+        {
+          query: SQL_QUERIES.GET_TABLE_INDEXES,
+          params: [data.schema],
+        },
+      )
+      return response.data as DatabaseTableIndexes[]
+    } catch (error) {
+      console.error('Error fetching table indexes:', error)
       handleApiError(error)
     }
   })

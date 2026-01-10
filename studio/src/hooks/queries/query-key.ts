@@ -4,6 +4,7 @@ export const queryKeys = {
   },
   schemas: {
     all: () => ['schemas'] as const,
+    indexes: (schema: string) => ['schemaIndexes', schema] as const,
   },
   tables: {
     list: (schema: string) => ['tables', schema] as const,
@@ -12,6 +13,7 @@ export const queryKeys = {
       ['tableData', params] as const,
     detail: (schema: string, table: string) => 
       [...queryKeys.tables.list(schema), table] as const,
+    columns: (oid: string) => ['tables', oid] as const,
   },
 } as const
 
