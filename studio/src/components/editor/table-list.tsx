@@ -159,10 +159,7 @@ export function TableList() {
                 <Button
                   variant={isActive ? 'default' : 'ghost'}
                   className="w-full justify-start group-hover:pr-8"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleTableClick(table)
-                  }}
+                  onClick={() => handleTableClick(table)}
                 >
                   <HugeiconsIcon
                     icon={

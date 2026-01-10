@@ -27,7 +27,7 @@ export function SqlQueryForm({
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="h-full rounded-none font-mono text-sm focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none resize-none"
+          className="h-full rounded-none font-mono text-sm focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none focus-visible:ring-transparent focus:ring-0 focus:ring-offset-0 focus:outline-none focus:border-0 resize-none border-0 shadow-none"
           placeholder="Enter your SQL query here..."
         />
       </div>

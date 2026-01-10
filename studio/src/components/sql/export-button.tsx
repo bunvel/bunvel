@@ -37,7 +37,7 @@ export function ExportButton({ selectedRows }: { selectedRows: any[] }) {
       <DropdownMenuTrigger
         render={
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             className="gap-1"
             disabled={selectedRows.length === 0}

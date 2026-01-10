@@ -33,15 +33,11 @@ export function TableListAction({ schema, table }: TableListActionProps) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger
-          render={({ onClick }) => (
+          render={() => (
             <Button
               variant="ghost"
               size="icon-sm"
               aria-label="Table actions"
-              onClick={(e) => {
-                e.stopPropagation()
-                onClick?.(e)
-              }}
               disabled={isPending}
             >
               <HugeiconsIcon icon={MoreVertical} />
@@ -50,8 +46,7 @@ export function TableListAction({ schema, table }: TableListActionProps) {
         />
         <DropdownMenuContent align="start" className="w-40">
           <DropdownMenuItem
-            onClick={(e) => {
-              e.stopPropagation()
+            onClick={() => {
               toast.info('Edit functionality not yet implemented', {
                 description:
                   'Editing tables will be available in a future update',
@@ -61,15 +56,9 @@ export function TableListAction({ schema, table }: TableListActionProps) {
             <HugeiconsIcon icon={Edit03Icon} />
             <span>Edit</span>
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={(e) => {
-              e.stopPropagation()
-              setIsDeleteDialogOpen(true)
-            }}
-            disabled={isPending}
-          >
+          <DropdownMenuItem onSelect={() => setIsDeleteDialogOpen(true)}>
             <HugeiconsIcon icon={Trash} />
-            <span>{isPending ? 'Deleting...' : 'Delete'}</span>
+            <span>Delete</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -81,6 +70,7 @@ export function TableListAction({ schema, table }: TableListActionProps) {
         title="Delete Table"
         description={`Are you sure you want to delete ${schema}.${table}? This action cannot be undone.`}
         confirmText={isPending ? 'Deleting...' : 'Delete Table'}
+        isLoading={isPending}
         showCascadeOption
       />
     </>
