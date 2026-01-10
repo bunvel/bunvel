@@ -48,13 +48,10 @@ export const getTables = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<Table[]>(
-        '/meta/query/parameterized',
-        {
-          query: SQL_QUERIES.GET_TABLES,
-          params: [data.schema],
-        },
-      )
+      const response = await apiClient.post<Table[]>('/meta/query', {
+        query: SQL_QUERIES.GET_TABLES,
+        params: [data.schema],
+      })
       return response.data as Table[]
     } catch (error) {
       console.error('Error fetching tables:', error)
@@ -96,83 +93,63 @@ export const createTable = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const { schema, table, description, columns, foreignKeys = [] } = data
 
-    // Create column definitions
+    // Escape identifiers once
+    const escapedSchema = escapeIdentifier(schema)
+    const escapedTable = escapeIdentifier(table)
+    const fullTableName = `${escapedSchema}.${escapedTable}`
 
+    // Build column definitions
     const primaryKeyCols = columns.filter((col) => col.isPrimaryKey)
     const hasSinglePK = primaryKeyCols.length === 1
 
-    const columnDefs = columns
-      .map((col) => {
-        const escapedName = escapeIdentifier(col.name)
-        let def = `${escapedName} ${col.type.toUpperCase()}`
-        if (col.isPrimaryKey && hasSinglePK) def += ' PRIMARY KEY'
-        if (!col.nullable) def += ' NOT NULL'
-        if (col.defaultValue !== undefined) {
-          def += ` DEFAULT ${formatDefaultValue(col.defaultValue, col.type)}`
-        }
-        return def
-      })
-      .join(',\n  ')
+    const columnDefs = columns.map((col) => {
+      const escapedName = escapeIdentifier(col.name)
+      let def = `${escapedName} ${col.type.toUpperCase()}`
+      if (col.isPrimaryKey && hasSinglePK) def += ' PRIMARY KEY'
+      if (!col.nullable) def += ' NOT NULL'
+      if (col.defaultValue !== undefined) {
+        def += ` DEFAULT ${formatDefaultValue(col.defaultValue, col.type)}`
+      }
+      return def
+    })
 
-    // Handle primary key constraints for multiple columns
-    let primaryKeyConstraint = ''
+    // Add composite primary key if needed
     if (primaryKeyCols.length > 1) {
       const pkColumns = primaryKeyCols
         .map((col) => escapeIdentifier(col.name))
         .join(', ')
-      primaryKeyConstraint = `,\n  PRIMARY KEY (${pkColumns})`
+      columnDefs.push(`PRIMARY KEY (${pkColumns})`)
     }
 
-    // Use a transaction to ensure all operations succeed or fail together
-    const transaction = [
-      // Create the table with IF NOT EXISTS to handle race conditions
-      {
-        query: `CREATE TABLE IF NOT EXISTS "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}" (\n  ${columnDefs}${primaryKeyConstraint}\n)`,
-      },
-      // Add table comment if description is provided
-      ...(description
-        ? [
-            {
-              query: `COMMENT ON TABLE "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}" IS '${description.replace(/'/g, "''")}'`,
-            },
-          ]
-        : []),
-      // Add foreign key constraints
-      ...foreignKeys
-        .filter((fk) => fk.column && fk.referencedTable && fk.referencedColumn)
-        .map((fk) => ({
-          query: `
-            ALTER TABLE "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}"
-            ADD CONSTRAINT "fk_${escapeIdentifier(table)}_${escapeIdentifier(fk.column)}_${escapeIdentifier(fk.referencedTable)}"
-            FOREIGN KEY ("${escapeIdentifier(fk.column)}")
-            REFERENCES "${escapeIdentifier(schema)}"."${escapeIdentifier(fk.referencedTable)}" ("${escapeIdentifier(fk.referencedColumn)}")
-            ON DELETE ${fk.onDelete}
-            ON UPDATE ${fk.onUpdate}`,
-        })),
-    ]
+    // Build the main CREATE TABLE query
+    let query = `CREATE TABLE IF NOT EXISTS ${fullTableName} (\n  ${columnDefs.join(',\n  ')}\n)`
+
+    // Add table comment if description is provided
+    if (description) {
+      query += `;\nCOMMENT ON TABLE ${fullTableName} IS '${description.replace(/'/g, "''")}'`
+    }
+
+    // Add foreign key constraints
+    foreignKeys
+      .filter((fk) => fk.column && fk.referencedTable && fk.referencedColumn)
+      .forEach((fk, index) => {
+        const fkName = `fk_${table}_${fk.column}_${fk.referencedTable}_${index}`
+        query +=
+          `;\nALTER TABLE ${fullTableName} ` +
+          `ADD CONSTRAINT "${fkName}" ` +
+          `FOREIGN KEY ("${escapeIdentifier(fk.column)}") ` +
+          `REFERENCES ${escapedSchema}."${escapeIdentifier(fk.referencedTable)}" ` +
+          `("${escapeIdentifier(fk.referencedColumn)}") ` +
+          `ON DELETE ${fk.onDelete || 'NO ACTION'} ` +
+          `ON UPDATE ${fk.onUpdate || 'NO ACTION'}`
+      })
 
     try {
-      // Start transaction
-      await apiClient.post('/meta/query', { query: 'BEGIN' })
-
-      // Execute all queries in the transaction
-      for (const { query } of transaction) {
-        await apiClient.post('/meta/query', { query })
-      }
-
-      // Commit the transaction if all queries succeed
-      await apiClient.post('/meta/query', { query: 'COMMIT' })
+      // Execute as a single query
+      await apiClient.post('/meta/query', { query })
       return { success: true }
     } catch (error) {
-      console.error('Error in table transaction:', error)
-      // Rollback the transaction on error
-      try {
-        await apiClient.post('/meta/query', { query: 'ROLLBACK' })
-      } catch (rollbackError) {
-        console.error('Error rolling back transaction:', rollbackError)
-        // Continue with original error
-      }
-      // Re-throw the original error to be handled by the mutation
+      console.error('Error creating table:', error)
       throw error
     }
   })

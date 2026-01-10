@@ -77,7 +77,7 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
           foreign_column_name?: string
           constraint_name?: string
         }>
-      >('/meta/query/parameterized', {
+      >('/meta/query', {
         query: SQL_QUERIES.GET_TABLE_METADATA,
         params: [data.schema, data.table],
       })
@@ -177,7 +177,7 @@ export const getTableData = createServerFn({ method: 'POST' })
       // Get total count
       const countQuery = `SELECT COUNT(*) as total FROM ${tableRef}`
       const countResult = await apiClient.post<Array<{ total: number }>>(
-        '/meta/query/parameterized',
+        '/meta/query',
         { query: countQuery, params: [] },
       )
 
@@ -186,7 +186,7 @@ export const getTableData = createServerFn({ method: 'POST' })
       // Get paginated data
       const dataQuery = `SELECT * FROM ${tableRef} LIMIT ${limit} OFFSET ${offset}`
       const result = await apiClient.post<Array<Record<string, any>>>(
-        '/meta/query/parameterized',
+        '/meta/query',
         { query: dataQuery, params: [] },
       )
 
