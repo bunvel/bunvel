@@ -1,19 +1,30 @@
+import {
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@/components/ui/sidebar'
 import { Link, useMatches } from '@tanstack/react-router'
 import { useCallback } from 'react'
-import { Button } from '../ui/button'
 
-const menuItems = [
+type MenuItem = {
+  id: string
+  name: string
+  url: string
+}
+
+const menuItems: MenuItem[] = [
   {
     id: 'tables',
-    label: 'Tables',
-    to: '/database/tables',
+    name: 'Tables',
+    url: '/database/tables',
   },
   {
     id: 'indexes',
-    label: 'Indexes',
-    to: '/database/indexes',
+    name: 'Indexes',
+    url: '/database/indexes',
   },
-] as const
+]
 
 export function DatabaseSidebar() {
   const matches = useMatches()
@@ -26,15 +37,23 @@ export function DatabaseSidebar() {
   )
 
   return (
-    <div className="flex flex-col h-full w-full gap-2 p-4">
-      {menuItems.map((item) => (
-        <Button
-          key={item.id}
-          variant={isActive(item.to) ? 'default' : 'ghost'}
-          className="justify-start"
-          render={<Link to={item.to}>{item.label}</Link>}
-        ></Button>
-      ))}
+    <div className="flex flex-col h-full w-full gap-2">
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+        <SidebarMenu className="mt-2">
+          {menuItems.map((item: MenuItem) => (
+            <SidebarMenuItem key={item.id}>
+              <SidebarMenuButton
+                isActive={isActive(item.url)}
+                render={
+                  <Link to={item.url}>
+                    <span className="ml-2">{item.name}</span>
+                  </Link>
+                }
+              ></SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
     </div>
   )
 }

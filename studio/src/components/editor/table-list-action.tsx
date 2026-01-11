@@ -1,16 +1,22 @@
 import { ConfirmDeleteDialog } from '@/components/common/confirm-delete-dialog'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useDeleteTable } from '@/hooks/mutations/useDeleteTable'
-import { Edit03Icon, MoreVertical, Trash } from '@hugeicons/core-free-icons'
+import {
+  Copy01Icon,
+  Edit03Icon,
+  MoreVertical,
+  Trash2,
+} from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { SidebarMenuAction } from '../ui/sidebar'
 
 export interface TableListActionProps {
   schema: string
@@ -33,18 +39,41 @@ export function TableListAction({ schema, table }: TableListActionProps) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger
-          render={() => (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label="Table actions"
-              disabled={isPending}
-            >
+          render={
+            <SidebarMenuAction showOnHover>
               <HugeiconsIcon icon={MoreVertical} />
-            </Button>
-          )}
-        />
-        <DropdownMenuContent align="start" className="w-40">
+              <span className="sr-only">More</span>
+            </SidebarMenuAction>
+          }
+        ></DropdownMenuTrigger>
+        <DropdownMenuContent className="w-48" side={'right'} align={'start'}>
+          <DropdownMenuItem
+            onClick={() => {
+              toast.info('Copy functionality not yet implemented', {
+                description: 'Copy will be available in a future update',
+              })
+            }}
+          >
+            <HugeiconsIcon
+              icon={Copy01Icon}
+              className="text-muted-foreground"
+            />
+            <span>Copy Name</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              toast.info('Copy functionality not yet implemented', {
+                description: 'Copy will be available in a future update',
+              })
+            }}
+          >
+            <HugeiconsIcon
+              icon={Copy01Icon}
+              className="text-muted-foreground"
+            />
+            <span>Copy Schema</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => {
               toast.info('Edit functionality not yet implemented', {
@@ -53,11 +82,15 @@ export function TableListAction({ schema, table }: TableListActionProps) {
               })
             }}
           >
-            <HugeiconsIcon icon={Edit03Icon} />
+            <HugeiconsIcon
+              icon={Edit03Icon}
+              className="text-muted-foreground"
+            />
             <span>Edit</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setIsDeleteDialogOpen(true)}>
-            <HugeiconsIcon icon={Trash} />
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)}>
+            <HugeiconsIcon icon={Trash2} className="text-muted-foreground" />
             <span>Delete</span>
           </DropdownMenuItem>
         </DropdownMenuContent>

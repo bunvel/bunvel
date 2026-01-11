@@ -1,4 +1,11 @@
 import { Button } from '@/components/ui/button'
+import {
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem
+} from "@/components/ui/sidebar"
+
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
 import { Table } from '@/services/table.service'
@@ -9,7 +16,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { Activity, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Input } from '../ui/input'
 import { TableFormSheet } from './table-form-sheet'
 import { TableListAction } from './table-list-action'
@@ -147,40 +154,37 @@ export function TableList() {
               : 'No tables found'}
           </div>
         ) : (
-          filteredTables.map((table) => {
-            const isActive = search.table === table.name
-            const tableKey = `${table.name}`
-            const isTable = table.kind === 'TABLE'
-            const isView = table.kind === 'VIEW'
-            const isMaterializedView = table.kind === 'MATERIALIZED VIEW'
+          <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+            <SidebarMenu className="mt-2">
+              {filteredTables.map((table) => {
+                const isActive = search.table === table.name
+                const v = table.kind === 'VIEW'
+                const m = table.kind === 'MATERIALIZED VIEW'
 
-            return (
-              <div key={tableKey} className="group relative">
-                <Button
-                  variant={isActive ? 'default' : 'ghost'}
-                  className="w-full justify-start group-hover:pr-8"
-                  onClick={() => handleTableClick(table)}
-                >
-                  <HugeiconsIcon
-                    icon={
-                      isView
-                        ? EyeFreeIcons
-                        : isMaterializedView
-                          ? PropertyViewFreeIcons
-                          : TableIcon
-                    }
-                    className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
-                  />
-                  <span className="truncate">{table.name}</span>
-                  <Activity mode={isTable ? 'visible' : 'hidden'}>
-                    <div className="absolute right-2 opacity-0 group-hover:opacity-100">
-                      <TableListAction schema={schema} table={table.name} />
-                    </div>
-                  </Activity>
-                </Button>
-              </div>
-            )
-          })
+                return (
+                  <SidebarMenuItem key={table.name}>
+                    <SidebarMenuButton
+                      isActive={isActive}
+                      onClick={() => handleTableClick(table)}
+                    >
+                      <HugeiconsIcon
+                        icon={
+                          v
+                            ? EyeFreeIcons
+                            : m
+                              ? PropertyViewFreeIcons
+                              : TableIcon
+                        }
+                        className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
+                      />
+                      {table.name}
+                    </SidebarMenuButton>
+                    <TableListAction schema={schema} table={table.name} />
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroup>
         )}
       </div>
     </div>
