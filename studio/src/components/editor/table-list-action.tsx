@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useDeleteTable } from '@/hooks/mutations/useDeleteTable'
+import { useTruncateTable } from '@/hooks/mutations/useTruncateTable'
 import {
   Copy01Icon,
   Edit03Icon,
@@ -25,13 +26,22 @@ export interface TableListActionProps {
 
 export function TableListAction({ schema, table }: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const { mutate: deleteTable, isPending } = useDeleteTable()
+  const [isTruncateDialogOpen, setIsTruncateDialogOpen] = useState(false)
+  const { mutate: deleteTable, isPending: isDeleting } = useDeleteTable()
+  const { mutate: truncateTable, isPending: isTruncating } = useTruncateTable()
 
   const handleDelete = (cascade: boolean) => {
     deleteTable({
       schema,
       table,
       cascade,
+    })
+  }
+
+  const handleTruncate = () => {
+    truncateTable({
+      schema,
+      table,
     })
   }
 
@@ -89,8 +99,15 @@ export function TableListAction({ schema, table }: TableListActionProps) {
             <span>Edit</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)}>
+<DropdownMenuItem onClick={() => setIsTruncateDialogOpen(true)}>
             <HugeiconsIcon icon={Trash2} className="text-muted-foreground" />
+            <span>Truncate</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem 
+            onClick={() => setIsDeleteDialogOpen(true)} 
+            className="text-destructive focus:text-destructive"
+          >
+            <HugeiconsIcon icon={Trash2} className="text-destructive" />
             <span>Delete</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -102,9 +119,19 @@ export function TableListAction({ schema, table }: TableListActionProps) {
         onConfirm={handleDelete}
         title="Delete Table"
         description={`Are you sure you want to delete ${schema}.${table}? This action cannot be undone.`}
-        confirmText={isPending ? 'Deleting...' : 'Delete Table'}
-        isLoading={isPending}
+        confirmText={isDeleting ? 'Deleting...' : 'Delete Table'}
+        isLoading={isDeleting}
         showCascadeOption
+      />
+      <ConfirmDeleteDialog
+        open={isTruncateDialogOpen}
+        onOpenChange={setIsTruncateDialogOpen}
+        onConfirm={() => handleTruncate()}
+        title="Truncate Table"
+        description={`Are you sure you want to truncate ${schema}.${table}? This will remove all rows from the table but keep the table structure. This action cannot be undone.`}
+        confirmText={isTruncating ? 'Truncating...' : 'Truncate Table'}
+        isLoading={isTruncating}
+        showCascadeOption={false}
       />
     </>
   )

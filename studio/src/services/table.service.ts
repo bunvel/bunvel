@@ -171,6 +171,26 @@ export const deleteTable = createServerFn({ method: 'POST' })
     }
   })
 
+export const truncateTable = createServerFn({ method: 'POST' })
+  .inputValidator((data: Omit<DeleteTableParams, 'cascade'>) => {
+    if (!data?.schema || !data?.table) {
+      throw new Error('Schema and table names are required')
+    }
+    return data
+  })
+  .handler(async ({ data }) => {
+    try {
+      const { schema, table } = data
+      const query = `TRUNCATE TABLE "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}" CASCADE`
+
+      await apiClient.post('/meta/query', { query })
+      return { success: true }
+    } catch (error) {
+      console.error('Error truncating table:', error)
+      handleApiError(error)
+    }
+  })
+
 export const createTable = createServerFn({ method: 'POST' })
   .inputValidator((data: CreateTableParams) => {
     if (!data?.schema || !data?.table) {
