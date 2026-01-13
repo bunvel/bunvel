@@ -9,6 +9,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Check, X } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { useMemo } from 'react'
 
 export interface QueryHistoryItem {
   id: string
@@ -29,6 +30,18 @@ export function QueryHistory({
   onClear,
   className,
 }: QueryHistoryProps) {
+  // Remove duplicates and keep only the latest version of each query
+  const uniqueHistory = useMemo(() => {
+    const uniqueQueries = new Map<string, QueryHistoryItem>()
+    // Process in reverse to keep the latest occurrence of each query
+    ;[...history].reverse().forEach(item => {
+      if (!uniqueQueries.has(item.query)) {
+        uniqueQueries.set(item.query, item)
+      }
+    })
+    return Array.from(uniqueQueries.values()).reverse()
+  }, [history])
+
   return (
     <div className={cn('flex flex-col h-full', className)}>
       <div className="p-3 border-b flex items-center justify-between">
@@ -44,18 +57,18 @@ export function QueryHistory({
           </Button>
         )}
       </div>
-      <ScrollArea className="flex-1">
-        {history.length === 0 ? (
+      <ScrollArea className="flex-1 h-full">
+        {uniqueHistory.length === 0 ? (
           <p className="text-sm text-muted-foreground p-4 text-center">
             No queries in history
           </p>
         ) : (
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarMenu className="space-y-0.5">
-              {history.map((item) => (
+              {uniqueHistory.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
-                    className="w-full justify-start h-auto py-1.5 px-2"
+                    className="w-full justify-start h-auto py-1.5 px-2 hover:bg-accent/50"
                     onClick={() => onSelect(item.query)}
                   >
                     <span
@@ -71,9 +84,6 @@ export function QueryHistory({
                     </span>
                     <span className="truncate flex-1 text-left text-sm font-mono">
                       {item.query}
-                    </span>
-                    <span className="text-xs text-muted-foreground shrink-0 ml-2">
-                      {new Date(item.timestamp).toLocaleTimeString()}
                     </span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
