@@ -3,8 +3,8 @@ import {
   SidebarGroup,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
-} from "@/components/ui/sidebar"
+  SidebarMenuItem,
+} from '@/components/ui/sidebar'
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
@@ -18,6 +18,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 import { Input } from '../ui/input'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { TableFormSheet } from './table-form-sheet'
 import { TableListAction } from './table-list-action'
 
@@ -167,16 +168,21 @@ export function TableList() {
                       isActive={isActive}
                       onClick={() => handleTableClick(table)}
                     >
-                      <HugeiconsIcon
-                        icon={
-                          v
-                            ? EyeFreeIcons
-                            : m
-                              ? PropertyViewFreeIcons
-                              : TableIcon
-                        }
-                        className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
-                      />
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <HugeiconsIcon
+                            icon={
+                              v
+                                ? EyeFreeIcons
+                                : m
+                                  ? PropertyViewFreeIcons
+                                  : TableIcon
+                            }
+                            className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>{table.kind}</TooltipContent>
+                      </Tooltip>
                       {table.name}
                     </SidebarMenuButton>
                     <TableListAction schema={schema} table={table.name} />

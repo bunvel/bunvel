@@ -11,6 +11,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
 import { ColumnDef } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { TableToolbar } from './table-toolbar'
 
 interface SearchParams {
@@ -56,18 +57,44 @@ export function TableViewer() {
         <div className="flex items-center gap-1 group">
           <span>{column.column_name}</span>
           <div className="flex items-center gap-1">
-            {column.is_primary_key && (
-              <HugeiconsIcon
-                icon={Key01Icon}
-                className="h-3.5 w-3.5 text-amber-500"
-              />
-            )}
-            {column.is_foreign_key && (
-              <HugeiconsIcon
-                icon={Link02Icon}
-                className="h-3.5 w-3.5 text-blue-500"
-              />
-            )}
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span>
+                    {column.is_primary_key && (
+                      <HugeiconsIcon
+                        icon={Key01Icon}
+                        className="h-3.5 w-3.5 text-amber-500"
+                      />
+                    )}
+                  </span>
+                }
+              ></TooltipTrigger>
+              {column.is_primary_key && (
+                <TooltipContent>
+                  <p>Primary Key</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span>
+                    {column.is_foreign_key && (
+                      <HugeiconsIcon
+                        icon={Link02Icon}
+                        className="h-3.5 w-3.5 text-blue-500"
+                      />
+                    )}
+                  </span>
+                }
+              ></TooltipTrigger>
+              {column.is_foreign_key && (
+                <TooltipContent>
+                  <p>Foreign Key</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
           </div>
           <span className="text-xs text-muted-foreground font-normal">
             {formatDataType(column.data_type)}
