@@ -14,8 +14,11 @@ import { Route as mainIndexRouteImport } from './routes/(main)/index'
 import { Route as mainDatabaseRouteRouteImport } from './routes/(main)/database/route'
 import { Route as mainSqlIndexRouteImport } from './routes/(main)/sql/index'
 import { Route as mainEditorIndexRouteImport } from './routes/(main)/editor/index'
+import { Route as mainDatabaseTypesIndexRouteImport } from './routes/(main)/database/types/index'
+import { Route as mainDatabaseTriggersIndexRouteImport } from './routes/(main)/database/triggers/index'
 import { Route as mainDatabaseTablesIndexRouteImport } from './routes/(main)/database/tables/index'
 import { Route as mainDatabaseIndexesIndexRouteImport } from './routes/(main)/database/indexes/index'
+import { Route as mainDatabaseFunctionsIndexRouteImport } from './routes/(main)/database/functions/index'
 import { Route as mainDatabaseTablesOidRouteImport } from './routes/(main)/database/tables/$oid'
 
 const mainRouteRoute = mainRouteRouteImport.update({
@@ -42,6 +45,17 @@ const mainEditorIndexRoute = mainEditorIndexRouteImport.update({
   path: '/editor/',
   getParentRoute: () => mainRouteRoute,
 } as any)
+const mainDatabaseTypesIndexRoute = mainDatabaseTypesIndexRouteImport.update({
+  id: '/types/',
+  path: '/types/',
+  getParentRoute: () => mainDatabaseRouteRoute,
+} as any)
+const mainDatabaseTriggersIndexRoute =
+  mainDatabaseTriggersIndexRouteImport.update({
+    id: '/triggers/',
+    path: '/triggers/',
+    getParentRoute: () => mainDatabaseRouteRoute,
+  } as any)
 const mainDatabaseTablesIndexRoute = mainDatabaseTablesIndexRouteImport.update({
   id: '/tables/',
   path: '/tables/',
@@ -51,6 +65,12 @@ const mainDatabaseIndexesIndexRoute =
   mainDatabaseIndexesIndexRouteImport.update({
     id: '/indexes/',
     path: '/indexes/',
+    getParentRoute: () => mainDatabaseRouteRoute,
+  } as any)
+const mainDatabaseFunctionsIndexRoute =
+  mainDatabaseFunctionsIndexRouteImport.update({
+    id: '/functions/',
+    path: '/functions/',
     getParentRoute: () => mainDatabaseRouteRoute,
   } as any)
 const mainDatabaseTablesOidRoute = mainDatabaseTablesOidRouteImport.update({
@@ -65,8 +85,11 @@ export interface FileRoutesByFullPath {
   '/editor': typeof mainEditorIndexRoute
   '/sql': typeof mainSqlIndexRoute
   '/database/tables/$oid': typeof mainDatabaseTablesOidRoute
+  '/database/functions': typeof mainDatabaseFunctionsIndexRoute
   '/database/indexes': typeof mainDatabaseIndexesIndexRoute
   '/database/tables': typeof mainDatabaseTablesIndexRoute
+  '/database/triggers': typeof mainDatabaseTriggersIndexRoute
+  '/database/types': typeof mainDatabaseTypesIndexRoute
 }
 export interface FileRoutesByTo {
   '/database': typeof mainDatabaseRouteRouteWithChildren
@@ -74,8 +97,11 @@ export interface FileRoutesByTo {
   '/editor': typeof mainEditorIndexRoute
   '/sql': typeof mainSqlIndexRoute
   '/database/tables/$oid': typeof mainDatabaseTablesOidRoute
+  '/database/functions': typeof mainDatabaseFunctionsIndexRoute
   '/database/indexes': typeof mainDatabaseIndexesIndexRoute
   '/database/tables': typeof mainDatabaseTablesIndexRoute
+  '/database/triggers': typeof mainDatabaseTriggersIndexRoute
+  '/database/types': typeof mainDatabaseTypesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -85,8 +111,11 @@ export interface FileRoutesById {
   '/(main)/editor/': typeof mainEditorIndexRoute
   '/(main)/sql/': typeof mainSqlIndexRoute
   '/(main)/database/tables/$oid': typeof mainDatabaseTablesOidRoute
+  '/(main)/database/functions/': typeof mainDatabaseFunctionsIndexRoute
   '/(main)/database/indexes/': typeof mainDatabaseIndexesIndexRoute
   '/(main)/database/tables/': typeof mainDatabaseTablesIndexRoute
+  '/(main)/database/triggers/': typeof mainDatabaseTriggersIndexRoute
+  '/(main)/database/types/': typeof mainDatabaseTypesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -96,8 +125,11 @@ export interface FileRouteTypes {
     | '/editor'
     | '/sql'
     | '/database/tables/$oid'
+    | '/database/functions'
     | '/database/indexes'
     | '/database/tables'
+    | '/database/triggers'
+    | '/database/types'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/database'
@@ -105,8 +137,11 @@ export interface FileRouteTypes {
     | '/editor'
     | '/sql'
     | '/database/tables/$oid'
+    | '/database/functions'
     | '/database/indexes'
     | '/database/tables'
+    | '/database/triggers'
+    | '/database/types'
   id:
     | '__root__'
     | '/(main)'
@@ -115,8 +150,11 @@ export interface FileRouteTypes {
     | '/(main)/editor/'
     | '/(main)/sql/'
     | '/(main)/database/tables/$oid'
+    | '/(main)/database/functions/'
     | '/(main)/database/indexes/'
     | '/(main)/database/tables/'
+    | '/(main)/database/triggers/'
+    | '/(main)/database/types/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -160,6 +198,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainEditorIndexRouteImport
       parentRoute: typeof mainRouteRoute
     }
+    '/(main)/database/types/': {
+      id: '/(main)/database/types/'
+      path: '/types'
+      fullPath: '/database/types'
+      preLoaderRoute: typeof mainDatabaseTypesIndexRouteImport
+      parentRoute: typeof mainDatabaseRouteRoute
+    }
+    '/(main)/database/triggers/': {
+      id: '/(main)/database/triggers/'
+      path: '/triggers'
+      fullPath: '/database/triggers'
+      preLoaderRoute: typeof mainDatabaseTriggersIndexRouteImport
+      parentRoute: typeof mainDatabaseRouteRoute
+    }
     '/(main)/database/tables/': {
       id: '/(main)/database/tables/'
       path: '/tables'
@@ -174,6 +226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainDatabaseIndexesIndexRouteImport
       parentRoute: typeof mainDatabaseRouteRoute
     }
+    '/(main)/database/functions/': {
+      id: '/(main)/database/functions/'
+      path: '/functions'
+      fullPath: '/database/functions'
+      preLoaderRoute: typeof mainDatabaseFunctionsIndexRouteImport
+      parentRoute: typeof mainDatabaseRouteRoute
+    }
     '/(main)/database/tables/$oid': {
       id: '/(main)/database/tables/$oid'
       path: '/tables/$oid'
@@ -186,14 +245,20 @@ declare module '@tanstack/react-router' {
 
 interface mainDatabaseRouteRouteChildren {
   mainDatabaseTablesOidRoute: typeof mainDatabaseTablesOidRoute
+  mainDatabaseFunctionsIndexRoute: typeof mainDatabaseFunctionsIndexRoute
   mainDatabaseIndexesIndexRoute: typeof mainDatabaseIndexesIndexRoute
   mainDatabaseTablesIndexRoute: typeof mainDatabaseTablesIndexRoute
+  mainDatabaseTriggersIndexRoute: typeof mainDatabaseTriggersIndexRoute
+  mainDatabaseTypesIndexRoute: typeof mainDatabaseTypesIndexRoute
 }
 
 const mainDatabaseRouteRouteChildren: mainDatabaseRouteRouteChildren = {
   mainDatabaseTablesOidRoute: mainDatabaseTablesOidRoute,
+  mainDatabaseFunctionsIndexRoute: mainDatabaseFunctionsIndexRoute,
   mainDatabaseIndexesIndexRoute: mainDatabaseIndexesIndexRoute,
   mainDatabaseTablesIndexRoute: mainDatabaseTablesIndexRoute,
+  mainDatabaseTriggersIndexRoute: mainDatabaseTriggersIndexRoute,
+  mainDatabaseTypesIndexRoute: mainDatabaseTypesIndexRoute,
 }
 
 const mainDatabaseRouteRouteWithChildren =

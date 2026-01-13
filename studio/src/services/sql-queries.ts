@@ -1,5 +1,79 @@
 // SQL queries for database metadata and operations
 export const SQL_QUERIES = {
+  // Get all triggers for a specific schema
+  GET_TRIGGERS: `
+    SELECT
+      t.tgname AS trigger_name,
+      c.relname AS table_name,
+      p.proname AS function_name,
+      CASE
+        WHEN t.tgtype::integer & 4 > 0 THEN 'INSERT'
+        WHEN t.tgtype::integer & 8 > 0 THEN 'DELETE'
+        WHEN t.tgtype::integer & 16 > 0 THEN 'UPDATE'
+        WHEN t.tgtype::integer & 32 > 0 THEN 'TRUNCATE'
+        ELSE 'UNKNOWN'
+      END AS events,
+      CASE
+        WHEN t.tgtype::integer & 1 > 0 THEN 'ROW'
+        ELSE 'STATEMENT'
+      END AS orientation,
+      CASE
+        WHEN t.tgtype::integer & 2 > 0 THEN 'BEFORE'
+        WHEN t.tgtype::integer & 64 > 0 THEN 'INSTEAD OF'
+        ELSE 'AFTER'
+      END AS timing
+    FROM
+      pg_trigger t
+      JOIN pg_class c ON t.tgrelid = c.oid
+      JOIN pg_proc p ON t.tgfoid = p.oid
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE
+      NOT t.tgisinternal
+      AND n.nspname = $1
+    ORDER BY
+      c.relname,
+      t.tgname;
+  `,
+  // Get all functions for a specific schema
+  GET_FUNCTIONS: `
+    SELECT
+      p.proname AS function_name,
+      pg_catalog.pg_get_function_result(p.oid) AS return_type,
+      pg_catalog.pg_get_function_arguments(p.oid) AS arguments,
+      CASE p.prosecdef
+        WHEN true THEN 'SECURITY DEFINER'
+        ELSE 'SECURITY INVOKER'
+      END AS security_type,
+      pg_catalog.obj_description(p.oid, 'pg_proc') AS description
+    FROM
+      pg_catalog.pg_proc p
+      JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+      LEFT JOIN pg_catalog.pg_depend d ON p.oid = d.objid AND d.deptype = 'e'
+    WHERE
+      n.nspname = $1
+      AND d.objid IS NULL  -- Exclude functions from extensions
+      AND n.nspname NOT IN ('pg_catalog', 'information_schema')
+      AND n.nspname NOT LIKE 'pg_%'
+    ORDER BY
+      p.proname;
+  `,
+
+  // Get all enum types and their values
+  GET_ENUMS: `
+    SELECT
+      t.typname AS enum_name,
+      n.nspname AS schema_name,
+      e.enumlabel AS enum_value
+    FROM
+      pg_type t
+      JOIN pg_enum e ON t.oid = e.enumtypid  
+      JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+    WHERE
+      n.nspname = $1
+    ORDER BY
+      t.typname,
+      e.enumsortorder;
+  `,
   // Get all non-system schemas
   GET_SCHEMAS: `
     SELECT 

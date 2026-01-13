@@ -64,6 +64,29 @@ export interface DatabaseTableIndexes {
   index_definition: string
 }
 
+export interface DatabaseEnum {
+  enum_name: string
+  schema_name: string
+  enum_value: string
+}
+
+export interface DatabaseFunction {
+  function_name: string
+  return_type: string
+  arguments: string
+  security_type: 'SECURITY DEFINER' | 'SECURITY INVOKER'
+  description: string | null
+}
+
+export interface DatabaseTrigger {
+  trigger_name: string
+  table_name: string
+  function_name: string
+  events: string
+  orientation: 'ROW' | 'STATEMENT'
+  timing: 'BEFORE' | 'AFTER' | 'INSTEAD OF'
+}
+
 export const getTables = createServerFn({ method: 'POST' })
   .inputValidator((data: { schema: string }) => {
     if (!data?.schema) {
@@ -146,6 +169,60 @@ export const getDatabaseTableIndexes = createServerFn({ method: 'POST' })
       return response.data as DatabaseTableIndexes[]
     } catch (error) {
       console.error('Error fetching table indexes:', error)
+      handleApiError(error)
+    }
+  })
+
+export const getDatabaseEnums = createServerFn({ method: 'POST' })
+  .inputValidator((data: { schema: string }) => {
+    if (!data?.schema) {
+      throw new Error('Schema name is required')
+    }
+    return data
+  })
+  .handler(async ({ data }) => {
+    try {
+      const response = await apiClient.post<DatabaseEnum[]>('/meta/query', {
+        query: SQL_QUERIES.GET_ENUMS,
+        params: [data.schema],
+      })
+      return response.data as DatabaseEnum[]
+    } catch (error) {
+      console.error('Error fetching enums:', error)
+      handleApiError(error)
+    }
+  })
+
+export const getDatabaseTriggers = createServerFn({ method: 'POST' })
+  .inputValidator((data: { schema: string }) => ({
+    schema: data.schema || 'public',
+  }))
+  .handler(async ({ data }) => {
+    try {
+      const response = await apiClient.post<DatabaseTrigger[]>('/meta/query', {
+        query: SQL_QUERIES.GET_TRIGGERS,
+        params: [data.schema],
+      })
+      return response.data as DatabaseTrigger[]
+    } catch (error) {
+      console.error('Error fetching triggers:', error)
+      handleApiError(error)
+    }
+  })
+
+export const getDatabaseFunctions = createServerFn({ method: 'POST' })
+  .inputValidator((data: { schema: string }) => ({
+    schema: data.schema || 'public',
+  }))
+  .handler(async ({ data }) => {
+    try {
+      const response = await apiClient.post<DatabaseFunction[]>('/meta/query', {
+        query: SQL_QUERIES.GET_FUNCTIONS,
+        params: [data.schema],
+      })
+      return response.data as DatabaseFunction[]
+    } catch (error) {
+      console.error('Error fetching functions:', error)
       handleApiError(error)
     }
   })

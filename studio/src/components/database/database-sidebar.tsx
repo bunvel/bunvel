@@ -24,6 +24,21 @@ const menuItems: MenuItem[] = [
     name: 'Indexes',
     url: '/database/indexes',
   },
+  {
+    id: 'functions',
+    name: 'Functions',
+    url: '/database/functions',
+  },
+  {
+    id: 'triggers',
+    name: 'Triggers',
+    url: '/database/triggers',
+  },
+  {
+    id: 'types',
+    name: 'Enumerated Types',
+    url: '/database/types',
+  },
 ]
 
 export function DatabaseSidebar() {
