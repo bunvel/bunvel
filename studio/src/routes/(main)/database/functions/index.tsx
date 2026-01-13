@@ -30,7 +30,7 @@ const columns: TableColumn[] = [
   { key: 'arguments', header: 'Arguments' },
   { key: 'return_type', header: 'Return Type' },
   { key: 'security_type', header: 'Security' },
-  { key: 'actions', header: 'Actions' },
+  { key: 'actions', header: '' },
 ]
 
 function RouteComponent() {
@@ -49,11 +49,7 @@ function RouteComponent() {
   const headerRow = (cols: TableColumn[]) => (
     <TableRow>
       {cols.map((column) => (
-        <TableHead
-          key={column.key}
-          style={{ width: column.width || 'auto' }}
-          hidden={column.key === 'actions'}
-        >
+        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
           {column.header}
         </TableHead>
       ))}

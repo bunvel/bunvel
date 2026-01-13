@@ -25,28 +25,28 @@ export const Route = createFileRoute('/(main)/database/tables/')({
 
 // Define the table columns
 const columns: TableColumn[] = [
-  { key: 'name', header: 'NAME' },
-  { key: 'description', header: 'DESCRIPTION' },
-  { key: 'row_count', header: 'ROWS (ESTIMATED)' },
-  { key: 'total_size', header: 'SIZE (ESTIMATED)' },
-  { key: 'column_count', header: 'COLUMNS' },
+  { key: 'name', header: 'Name' },
+  { key: 'description', header: 'Description' },
+  { key: 'row_count', header: 'Rows' },
+  { key: 'total_size', header: 'Size' },
+  { key: 'column_count', header: '' },
 ]
 
 function RouteComponent() {
   const search = useSearch({ strict: false }) as SearchParams
   const { schema } = search
 
-  const { data: tables = [], isLoading, error } = useDatabaseTables(schema)
+  const {
+    data: tables = [],
+    isLoading,
+    error,
+  } = useDatabaseTables(schema || 'public')
 
   // Custom header row
   const headerRow = (cols: TableColumn[]) => (
     <TableRow>
       {cols.map((column) => (
-        <TableHead
-          key={column.key}
-          style={{ width: column.width || 'auto' }}
-          hidden={column.key === 'column_count'}
-        >
+        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
           {column.header}
         </TableHead>
       ))}
@@ -62,7 +62,6 @@ function RouteComponent() {
       <TableRow key={index}>
         <TableCell className="font-medium">
           <p className="flex">
-            {' '}
             <HugeiconsIcon
               icon={
                 isView

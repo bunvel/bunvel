@@ -31,7 +31,7 @@ const columns: TableColumn[] = [
   { key: 'function_name', header: 'Function' },
   { key: 'timing_events', header: 'Events' },
   { key: 'orientation', header: 'Orientation' },
-  { key: 'actions', header: 'Actions' },
+  { key: 'actions', header: '' },
 ]
 
 function RouteComponent() {
@@ -52,7 +52,6 @@ function RouteComponent() {
         <TableHead
           key={column.key}
           style={{ width: column.width || 'auto' }}
-          hidden={column.key === 'actions'}
         >
           {column.header}
         </TableHead>

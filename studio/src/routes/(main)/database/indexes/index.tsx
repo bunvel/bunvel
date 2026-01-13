@@ -30,25 +30,26 @@ const columns: TableColumn[] = [
   { key: 'table_name', header: 'Table' },
   { key: 'column_name', header: 'Column' },
   { key: 'index_name', header: 'Index' },
-  { key: 'index_definition', header: 'Definition' },
+  { key: 'index_definition', header: '' },
 ]
 
 function RouteComponent() {
-  const [selectedIndex, setSelectedIndex] = useState<DatabaseTableIndexes | null>(null)
+  const [selectedIndex, setSelectedIndex] =
+    useState<DatabaseTableIndexes | null>(null)
   const search = useSearch({ strict: false }) as SearchParams
   const { schema } = search
 
-  const { data: tables = [], isLoading, error } = useDatabaseIndexes(schema)
+  const {
+    data: tables = [],
+    isLoading,
+    error,
+  } = useDatabaseIndexes(schema || 'public')
 
   // Custom header row
   const headerRow = (cols: TableColumn[]) => (
     <TableRow>
       {cols.map((column) => (
-        <TableHead
-          key={column.key}
-          style={{ width: column.width || 'auto' }}
-          hidden={column.key === 'index_definition'}
-        >
+        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
           {column.header}
         </TableHead>
       ))}
@@ -101,7 +102,7 @@ function RouteComponent() {
         data={tables}
         searchable={true}
         searchFields={['table_name', 'column_name', 'index_name']}
-        searchPlaceholder='Search for an index'
+        searchPlaceholder="Search for an index"
         headerRow={headerRow}
         bodyRow={bodyRow}
         isLoading={isLoading}

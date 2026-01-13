@@ -28,7 +28,7 @@ const columns: TableColumn[] = [
   { key: 'schema_name', header: 'Schema' },
   { key: 'enum_name', header: 'Name' },
   { key: 'enum_values', header: 'Values' },
-  { key: 'actions', header: 'Actions' },
+  { key: 'actions', header: '' },
 ]
 
 function RouteComponent() {
@@ -70,7 +70,6 @@ function RouteComponent() {
         <TableHead
           key={column.key}
           style={{ width: column.width || 'auto' }}
-          hidden={column.key === 'actions'}
         >
           {column.header}
         </TableHead>

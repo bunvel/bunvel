@@ -30,7 +30,6 @@ function RouteComponent() {
         <TableHead
           key={column.key}
           style={{ width: column.width || 'auto' }}
-          hidden={column.key === 'column_count'}
         >
           {column.header}
         </TableHead>

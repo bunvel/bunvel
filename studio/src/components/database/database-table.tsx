@@ -152,7 +152,7 @@ export function DatabaseTable<T = TableData>({
       </div>
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
+          <TableHeader className='bg-secondary'>
             {typeof renderHeaderRow === 'function' ? renderHeaderRow(columns) : defaultHeaderRow(columns)}
           </TableHeader>
           <TableBody>
