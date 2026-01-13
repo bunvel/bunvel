@@ -12,14 +12,16 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
     if (!body.query || body.query.length > MAX_QUERY_LENGTH) {
       set.status = 400;
       return Response.json({
-        message: `Query too long. Maximum length is ${MAX_QUERY_LENGTH} characters.`,
+        message: `Query exceeds maximum allowed length of ${MAX_QUERY_LENGTH} characters. Please shorten your query and try again.`,
       });
     }
 
     const query = body.query.trim();
     if (!query) {
       set.status = 400;
-      return Response.json({ message: "Empty query" });
+      return Response.json({
+        message: "Query cannot be empty. Please provide a valid SQL query.",
+      });
     }
 
     // Validate parameters if provided
@@ -27,27 +29,34 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
       if (JSON.stringify(body.params).length > MAX_PARAMS_LENGTH) {
         set.status = 400;
         return Response.json({
-          message: `Parameters too large. Maximum size is ${MAX_PARAMS_LENGTH} characters.`,
+          message: `Query parameters exceed maximum allowed size of ${MAX_PARAMS_LENGTH} characters. Please reduce the size of your parameters.`,
         });
       }
     }
 
     try {
       // Execute query with or without parameters
-      const result = body.params
-        ? await db.unsafe(query, body.params)
-        : await db.unsafe(query);
+      const result = await db.begin(async (tx) => {
+        return body.params
+          ? await tx.unsafe(query, body.params)
+          : await tx.unsafe(query);
+      });
 
-      // Normalize response
-      if (Array.isArray(result)) {
-        return Response.json(result);
+      // Handle empty result set
+      if (
+        Array.isArray(result) &&
+        Array.isArray(result[0]) &&
+        result[0].length === 0
+      ) {
+        return Response.json([]);
       }
-      return Response.json(
-        result === undefined || result === null ? [] : [result]
-      );
+
+      return Response.json(result);
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Query execution failed";
+        error instanceof Error
+          ? `Query execution failed: ${error.message}`
+          : "An unexpected error occurred while executing the query";
       set.status = 400;
       return Response.json({ message });
     }
@@ -60,7 +69,7 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
         maxLength: MAX_QUERY_LENGTH,
       }),
       params: t.Optional(
-        t.Array(t.Unknown(), {
+        t.Array(t.Union([t.String(), t.Number(), t.Boolean(), t.Null()]), {
           description:
             "Optional array of parameter values to be safely interpolated into the query",
         })
