@@ -124,7 +124,7 @@ export function TableViewer() {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <>
       <TableToolbar selectedRows={selectedRows} schema={schema} table={table} />
 
       <div className="flex-1 overflow-auto">
@@ -143,6 +143,6 @@ export function TableViewer() {
           }}
         />
       </div>
-    </div>
+    </>
   )
 }
