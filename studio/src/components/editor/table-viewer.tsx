@@ -11,7 +11,6 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
 import { ColumnDef } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
-import { TableTabs } from './table-tabs'
 import { TableToolbar } from './table-toolbar'
 
 interface SearchParams {
@@ -99,8 +98,6 @@ export function TableViewer() {
 
   return (
     <div className="h-full flex flex-col">
-      <TableTabs />
-
       <TableToolbar selectedRows={selectedRows} schema={schema} table={table} />
 
       <div className="flex-1 overflow-auto">

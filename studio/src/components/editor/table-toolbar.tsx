@@ -1,12 +1,12 @@
 import { isReadonlySchema } from '@/utils/func'
 import {
-  CopyButton,
-  DeleteButton,
-  EditButton,
-  ExportButton,
-  FilterButton,
-  InsertButton,
-  SortButton,
+    CopyButton,
+    DeleteButton,
+    EditButton,
+    ExportButton,
+    FilterButton,
+    InsertButton,
+    SortButton,
 } from './toolbar-buttons'
 
 export interface TableToolbarProps {
