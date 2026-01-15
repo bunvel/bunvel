@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   SidebarGroup,
   SidebarMenu,
@@ -51,7 +52,7 @@ export function TableList() {
 
   if (!schema) {
     return (
-      <div className="p-4 flex flex-col items-center justify-center text-center">
+      <div className="p-4 flex-1 flex flex-col items-center justify-center text-center">
         <HugeiconsIcon
           icon={TableIcon}
           className="mb-2 h-8 w-8 text-muted-foreground/50"
@@ -92,7 +93,7 @@ export function TableList() {
 
   if (error) {
     return (
-      <div className="p-4 space-y-2">
+      <div className="p-4 space-y-2 h-full flex flex-col">
         <div className="rounded-md border border-destructive/20 bg-destructive/5 p-4">
           <h4 className="mb-1 text-sm font-medium text-destructive">
             Error loading tables
@@ -112,7 +113,7 @@ export function TableList() {
 
   if (tables.length === 0) {
     return (
-      <div className="p-4 flex flex-col items-center justify-center text-center">
+      <div className="p-4 flex-1 flex flex-col items-center justify-center text-center">
         <HugeiconsIcon
           icon={TableIcon}
           className="mb-2 h-8 w-8 text-muted-foreground/50"
@@ -134,17 +135,20 @@ export function TableList() {
   }
 
   return (
-    <div className="space-y-4 w-full p-4">
-      <div className="flex gap-1">
-        <Input
-          placeholder="Search tables & views..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1"
-        />
-        <TableFormSheet schema={schema} />
+    <div className="flex flex-col h-full">
+      <div className="shrink-0 p-4 pb-2">
+        <div className="flex gap-1">
+          <Input
+            placeholder="Search tables & views..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1"
+          />
+          <TableFormSheet schema={schema} />
+        </div>
       </div>
-      <div className="space-y-1">
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full w-full px-4">
         {filteredTables.length === 0 ? (
           <div
             key="no-results"
@@ -155,43 +159,46 @@ export function TableList() {
               : 'No tables found'}
           </div>
         ) : (
-          <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-            <SidebarMenu className="mt-2">
-              {filteredTables.map((table) => {
-                const isActive = search.table === table.name
-                const v = table.kind === 'VIEW'
-                const m = table.kind === 'MATERIALIZED VIEW'
+          <div className="h-full">
+            <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+              <SidebarMenu className="space-y-1">
+                {filteredTables.map((table) => {
+                  const isActive = search.table === table.name
+                  const v = table.kind === 'VIEW'
+                  const m = table.kind === 'MATERIALIZED VIEW'
 
-                return (
-                  <SidebarMenuItem key={table.name}>
-                    <SidebarMenuButton
-                      isActive={isActive}
-                      onClick={() => handleTableClick(table)}
-                    >
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <HugeiconsIcon
-                            icon={
-                              v
-                                ? EyeFreeIcons
-                                : m
-                                  ? PropertyViewFreeIcons
-                                  : TableIcon
-                            }
-                            className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
-                          />
-                        </TooltipTrigger>
-                        <TooltipContent>{table.kind}</TooltipContent>
-                      </Tooltip>
-                      {table.name}
-                    </SidebarMenuButton>
-                    <TableListAction schema={schema} table={table.name} />
-                  </SidebarMenuItem>
-                )
-              })}
-            </SidebarMenu>
-          </SidebarGroup>
+                  return (
+                    <SidebarMenuItem key={table.name}>
+                      <SidebarMenuButton
+                        isActive={isActive}
+                        onClick={() => handleTableClick(table)}
+                      >
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <HugeiconsIcon
+                              icon={
+                                v
+                                  ? EyeFreeIcons
+                                  : m
+                                    ? PropertyViewFreeIcons
+                                    : TableIcon
+                              }
+                              className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent>{table.kind}</TooltipContent>
+                        </Tooltip>
+                        {table.name}
+                      </SidebarMenuButton>
+                      <TableListAction schema={schema} table={table.name} />
+                    </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroup>
+          </div>
         )}
+        </ScrollArea>
       </div>
     </div>
   )

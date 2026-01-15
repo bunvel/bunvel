@@ -14,7 +14,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { queryKeys } from './query-key'
 
-export function useTables(schema: string) {
+export function useTables(schema: string = "public") {
   return useQuery<Table[]>({
     queryKey: schema ? queryKeys.tables.list(schema) : ['tables', null],
     queryFn: async () => getTables({ data: { schema } }),

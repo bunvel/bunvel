@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
-    SidebarGroup,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 import { Check, X } from '@hugeicons/core-free-icons'
@@ -57,7 +57,7 @@ export function QueryHistory({
           </Button>
         )}
       </div>
-      <ScrollArea className="flex-1 h-full">
+      <ScrollArea className="flex-1 h-full overflow-y-auto">
         {uniqueHistory.length === 0 ? (
           <p className="text-sm text-muted-foreground p-4 text-center">
             No queries in history
