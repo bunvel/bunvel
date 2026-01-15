@@ -2,9 +2,8 @@ import { DataTable } from '@/components/data-table/data-table'
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
 import {
-  formatCellValue,
-  formatDataType,
-  getSortedColumns,
+    formatCellValue,
+    formatDataType,
 } from '@/utils/format'
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -51,7 +50,7 @@ export function TableViewer() {
   const columns = useMemo<ColumnDef<TableRow>[]>(() => {
     if (!metadata?.columns) return []
 
-    return getSortedColumns(metadata.columns).map((column) => ({
+    return metadata.columns.map((column) => ({
       id: column.column_name,
       header: () => (
         <div className="flex items-center gap-1 group">
