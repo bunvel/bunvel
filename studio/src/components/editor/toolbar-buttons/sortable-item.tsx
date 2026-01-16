@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Sorting05Icon, X } from '@hugeicons/core-free-icons'
+import { Sorting05Icon, UnfoldMoreIcon, X } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
 interface SortableItemProps {
@@ -33,7 +33,7 @@ export function SortableItem({ id, children, onRemove, onToggleDirection }: Sort
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-2 p-2 bg-background rounded-md border"
+      className="flex items-center gap-2"
     >
       <button
         type="button"
@@ -41,7 +41,7 @@ export function SortableItem({ id, children, onRemove, onToggleDirection }: Sort
         {...listeners}
         className="cursor-grab active:cursor-grabbing"
       >
-        <HugeiconsIcon icon={GripVertical} className="h-4 w-4 text-muted-foreground" />
+        <HugeiconsIcon icon={UnfoldMoreIcon} className="h-4 w-4 text-muted-foreground" />
       </button>
       
       <div className="flex-1">

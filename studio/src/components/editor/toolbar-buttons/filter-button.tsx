@@ -6,6 +6,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -158,12 +159,12 @@ export function FilterButton({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="w-[500px] p-4"
+        className="w-[500px]"
         align="start"
         autoFocus={false}
       >
         <DropdownMenuGroup>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between px-2 py-1.5">
             <DropdownMenuLabel className="p-0 text-base">
               Filter Columns
             </DropdownMenuLabel>
@@ -276,7 +277,7 @@ export function FilterButton({
 
                           {filter.operator !== 'is_null' &&
                             filter.operator !== 'not_null' && (
-                              <input
+                              <Input
                                 type="text"
                                 value={filter.value ?? ''}
                                 onChange={(e) => {
@@ -288,7 +289,6 @@ export function FilterButton({
                                   )
                                 }}
                                 onKeyDown={(e) => e.stopPropagation()}
-                                className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                                 placeholder="Value"
                               />
                             )}
@@ -302,12 +302,11 @@ export function FilterButton({
           </div>
 
           {/* Add New Filter Button */}
-          <div className="mt-2">
+          <div className="flex items-center justify-between border-t px-2 py-2">
             <Button
               type="button"
               variant="outline"
               size="sm"
-              className="w-full"
               onClick={() => {
                 if (availableColumns.length > 0) {
                   const newFilter: FilterConfig = {
@@ -324,26 +323,26 @@ export function FilterButton({
               <HugeiconsIcon icon={Plus} className="mr-2 h-4 w-4" />
               Add Filter
             </Button>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="mt-4 flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleCancel}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleApplyFilters}
-              disabled={!hasChanges}
-            >
-              Apply
-            </Button>
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleApplyFilters}
+                disabled={!hasChanges}
+              >
+                Apply
+              </Button>
+            </div>
           </div>
         </DropdownMenuGroup>
       </DropdownMenuContent>
