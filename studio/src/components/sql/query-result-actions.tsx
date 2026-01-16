@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { LoaderCircle } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
+import { Spinner } from '../ui/spinner'
 import { ExportButton } from './export-button'
 
 interface QueryResultActionsProps {
@@ -26,9 +25,7 @@ export function QueryResultActions({
       <div className="flex items-center space-x-1">
         <h1 className="mr-2">Result</h1>
         {result?.data && result.data.length > 0 && (
-          <>
-            <ExportButton selectedRows={result.data} />
-          </>
+          <ExportButton selectedRows={result.data} />
         )}
       </div>
 
@@ -41,10 +38,7 @@ export function QueryResultActions({
         >
           {isExecuting ? (
             <>
-              <HugeiconsIcon
-                icon={LoaderCircle}
-                className="animate-spin h-4 w-4 mr-2"
-              />
+              <Spinner />
               Executing...
             </>
           ) : (

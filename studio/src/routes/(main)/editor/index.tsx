@@ -42,7 +42,7 @@ function RouteComponent() {
         )}
       >
         <div className="h-full flex flex-col">
-          <div className="flex items-center border-b h-9">
+          <div className="flex items-center">
             <button
               onClick={handleToggleSidebar}
               className="h-8 w-8 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-sm"

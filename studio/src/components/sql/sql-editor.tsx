@@ -6,11 +6,11 @@ import {
   Check,
   Info,
   PanelLeft,
-  PanelLeftClose,
-  Refresh04FreeIcons
+  PanelLeftClose
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
+import { Spinner } from '../ui/spinner'
 import { QueryResultActions } from './query-result-actions'
 import { QueryResultTable } from './query-result-table'
 import { SqlQueryForm } from './sql-query-form'
@@ -100,7 +100,7 @@ export function SqlEditor({
             </p>
           ) : isExecuting ? (
             <div className="flex items-center gap-2 p-4 text-muted-foreground bg-secondary">
-              <HugeiconsIcon icon={Refresh04FreeIcons} className="h-4 w-4 mr-1" />
+              <Spinner/>
               <span>Executing query...</span>
             </div>
           ) : error ? (

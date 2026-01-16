@@ -158,7 +158,7 @@ export function DataTable<TData, TValue = unknown>({
         <div className="flex-1 flex flex-col overflow-hidden border">
           {table.getRowModel().rows.length === 0 ? (
             <>
-              <Table>
+              <Table className="w-auto">
                 <DataTableHeader table={table} />
               </Table>
               <div className="flex-1 flex items-center justify-center p-8">
