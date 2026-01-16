@@ -158,6 +158,7 @@ export function TableViewer() {
         onFilterChange={handleFilterChange}
       />
 
+      <div className="flex-1 overflow-auto">
         <DataTable
           columns={columns}
           data={tableData?.data || []}
@@ -172,6 +173,7 @@ export function TableViewer() {
             rowSelection: {},
           }}
         />
+      </div>
     </>
   )
 }
