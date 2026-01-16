@@ -1,15 +1,15 @@
 import { DataTable } from '@/components/data-table/data-table'
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
-import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
+import { DEFAULT_PAGE_SIZE, FilterOperator } from '@/utils/constant'
 import {
-    formatCellValue,
-    formatDataType,
+  formatCellValue,
+  formatDataType,
 } from '@/utils/format'
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
 import { ColumnDef } from '@tanstack/react-table'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { TableToolbar } from './table-toolbar'
 
@@ -27,6 +27,28 @@ export function TableViewer() {
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE,
   })
+  const [sorts, setSorts] = useState<Array<{ column: string; direction: 'asc' | 'desc' }>>([])
+  const [filters, setFilters] = useState<Array<{
+    column: string
+    operator: FilterOperator
+    value: string
+  }>>([])
+  
+  const handleSortChange = useCallback((newSorts: Array<{ column: string; direction: 'asc' | 'desc' }>) => {
+    setSorts(newSorts)
+    // Reset to first page when sort changes
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
+  }, [])
+  
+  const handleFilterChange = useCallback((newFilters: Array<{
+    column: string
+    operator: FilterOperator
+    value: string
+  }>) => {
+    setFilters(newFilters)
+    // Reset to first page when filters change
+    setPagination(prev => ({ ...prev, pageIndex: 0 }))
+  }, [])
 
   // Get table metadata for columns
   const { data: metadata, isLoading: isMetadataLoading } = useTableMetadata(
@@ -43,6 +65,8 @@ export function TableViewer() {
     page: pagination.pageIndex + 1, // +1 because backend is 1-indexed
     pageSize: pagination.pageSize,
     primaryKeys: metadata?.primary_keys || [],
+    sorts,
+    filters: filters.length > 0 ? filters : undefined,
   })
 
   const isLoading = isMetadataLoading || isTableDataLoading
@@ -124,9 +148,16 @@ export function TableViewer() {
 
   return (
     <>
-      <TableToolbar selectedRows={selectedRows} schema={schema} table={table} />
+      <TableToolbar 
+        selectedRows={selectedRows} 
+        schema={schema} 
+        table={table}
+        sorts={sorts}
+        onSortChange={handleSortChange}
+        filters={filters}
+        onFilterChange={handleFilterChange}
+      />
 
-      <div className="flex-1 overflow-auto">
         <DataTable
           columns={columns}
           data={tableData?.data || []}
@@ -141,7 +172,6 @@ export function TableViewer() {
             rowSelection: {},
           }}
         />
-      </div>
     </>
   )
 }

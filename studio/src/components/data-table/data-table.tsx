@@ -16,6 +16,7 @@ import * as React from 'react'
 
 import { Checkbox } from '@/components/ui/checkbox'
 import { formatCellValue } from '@/utils/format'
+import { ScrollArea } from '../ui/scroll-area'
 import {
   Table,
   TableBody,
@@ -169,15 +170,22 @@ export function DataTable<TData, TValue = unknown>({
   }
 
   return (
-    <div className="bg-card flex flex-col h-full">
-      <div className="flex-1 flex flex-col min-h-0">
-        <div className="flex-1 flex flex-col overflow-hidden border">
-          <Table className="w-auto">
+    <div className="bg-card flex flex-col h-full overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 border overflow-hidden">
+        <div className="overflow-hidden">
+          <Table>
             <TableHeader className="sticky top-0 z-10 bg-secondary">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="border-b">
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id} className="border-r">
+                    <TableHead 
+                      key={header.id} 
+                      className="border-r"
+                      style={{
+                        width: header.getSize() !== 150 ? header.getSize() : undefined,
+                        minWidth: header.getSize()
+                      }}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -189,69 +197,75 @@ export function DataTable<TData, TValue = unknown>({
                 </TableRow>
               ))}
             </TableHeader>
-
-            <TableBody className="overflow-y-auto">
-              {error ? (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="p-0">
-                    <pre className="text-destructive p-4 bg-destructive/10 overflow-auto">
-                      {error && typeof error === 'object' && 'message' in error
-                        ? String(error.message)
-                        : 'An error occurred'}
-                    </pre>
-                  </TableCell>
-                </TableRow>
-              ) : table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() ? 'selected' : undefined}
-                    className={`border-b ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} ${
-                      enableRowSelection && row.getIsSelected()
-                        ? 'bg-muted/30'
-                        : ''
-                    }`}
-                    onClick={() => onRowClick?.(row.original)}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className="border p-2"
-                        style={{
-                          width:
-                            cell.column.getSize() !== 150
-                              ? cell.column.getSize()
-                              : undefined,
-                          minWidth: cell.column.getSize(),
-                        }}
-                      >
-                        <div className="text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                          {cell.column.id === 'select' ? (
-                            <Checkbox
-                              checked={cell.row.getIsSelected()}
-                              disabled={!cell.row.getCanSelect()}
-                              onCheckedChange={cell.row.getToggleSelectedHandler()}
-                              aria-label={`Select row ${cell.row.id}`}
-                              className="h-4 w-4 shrink-0"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          ) : (
-                            formatCellValue(cell.getValue())
-                          )}
-                        </div>
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="bg-secondary">
-                    <div className="text-sm">No results</div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
           </Table>
+        </div>
+
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <Table>
+              <TableBody className="[&_tr:last-child]:border-0">
+                {error ? (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="p-0">
+                      <pre className="text-destructive p-4 bg-destructive/10 overflow-auto">
+                        {error && typeof error === 'object' && 'message' in error
+                          ? String(error.message)
+                          : 'An error occurred'}
+                      </pre>
+                    </TableCell>
+                  </TableRow>
+                ) : table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() ? 'selected' : undefined}
+                      className={`border-b ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} ${
+                        enableRowSelection && row.getIsSelected()
+                          ? 'bg-muted/30'
+                          : ''
+                      }`}
+                      onClick={() => onRowClick?.(row.original)}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          className="border p-2"
+                          style={{
+                            width:
+                              cell.column.getSize() !== 150
+                                ? cell.column.getSize()
+                                : undefined,
+                            minWidth: cell.column.getSize(),
+                          }}
+                        >
+                          <div className="text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                            {cell.column.id === 'select' ? (
+                              <Checkbox
+                                checked={cell.row.getIsSelected()}
+                                disabled={!cell.row.getCanSelect()}
+                                onCheckedChange={cell.row.getToggleSelectedHandler()}
+                                aria-label={`Select row ${cell.row.id}`}
+                                className="h-4 w-4 shrink-0"
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            ) : (
+                              formatCellValue(cell.getValue())
+                            )}
+                          </div>
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="bg-secondary">
+                      <div className="text-sm">No results</div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </ScrollArea>
         </div>
         <div className="border-t bg-background">
           <DataTablePagination table={table} />

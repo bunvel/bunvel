@@ -38,11 +38,26 @@ export interface TableDataResult {
   totalPages: number
 }
 
+export interface SortConfig {
+  column: string
+  direction: 'asc' | 'desc'
+}
+
+import { FilterOperator } from '@/utils/constant'
+
+export interface FilterConfig {
+  column: string
+  operator: FilterOperator
+  value: string
+}
+
 export interface TableDataParams {
   schema: string
   table: string
   page: number
   pageSize: number
+  sorts?: SortConfig[]
+  filters?: FilterConfig[]
   primaryKeys?: string[]
   firstColumnName?: string
 }
@@ -174,20 +189,84 @@ export const getTableData = createServerFn({ method: 'POST' })
 
       const tableRef = `"${schema}"."${table}"`
 
-      // Get total count
-      const countQuery = `SELECT COUNT(*) as total FROM ${tableRef}`
+      // Build WHERE clause for filtering
+      const whereClauses: string[] = []
+      const params: any[] = []
+
+      if (data.filters?.length) {
+        data.filters.forEach((filter) => {
+          const paramIndex = params.length + 1
+          const columnRef = `"${filter.column}"`
+
+          switch (filter.operator) {
+            case 'eq':
+              whereClauses.push(`${columnRef} = $${paramIndex}`)
+              params.push(filter.value)
+              break
+            case 'neq':
+              whereClauses.push(`${columnRef} != $${paramIndex}`)
+              params.push(filter.value)
+              break
+            case 'gt':
+              whereClauses.push(`${columnRef} > $${paramIndex}`)
+              params.push(filter.value)
+              break
+            case 'gte':
+              whereClauses.push(`${columnRef} >= $${paramIndex}`)
+              params.push(filter.value)
+              break
+            case 'lt':
+              whereClauses.push(`${columnRef} < $${paramIndex}`)
+              params.push(filter.value)
+              break
+            case 'lte':
+              whereClauses.push(`${columnRef} <= $${paramIndex}`)
+              params.push(filter.value)
+              break
+            case 'like':
+              whereClauses.push(`${columnRef} LIKE $${paramIndex}`)
+              params.push(`%${filter.value}%`)
+              break
+            case 'ilike':
+              whereClauses.push(`${columnRef} ILIKE $${paramIndex}`)
+              params.push(`%${filter.value}%`)
+              break
+            case 'is_null':
+              whereClauses.push(`${columnRef} IS NULL`)
+              break
+            case 'not_null':
+              whereClauses.push(`${columnRef} IS NOT NULL`)
+              break
+          }
+        })
+      }
+
+      const whereClause = whereClauses.length
+        ? `WHERE ${whereClauses.join(' AND ')}`
+        : ''
+
+      // Get total count with filters
+      const countQuery = `SELECT COUNT(*) as total FROM ${tableRef} ${whereClause}`
       const countResult = await apiClient.post<Array<{ total: number }>>(
         '/meta/query',
-        { query: countQuery, params: [] },
+        { query: countQuery, params },
       )
 
       const total = countResult.data?.[0]?.total || 0
 
-      // Get paginated data
-      const dataQuery = `SELECT * FROM ${tableRef} LIMIT ${limit} OFFSET ${offset}`
+      // Build ORDER BY clause for sorting
+      const orderByClause = data.sorts?.length
+        ? `ORDER BY ${data.sorts
+            .map((sort) => `"${sort.column}" ${sort.direction.toUpperCase()}`)
+            .join(', ')}`
+        : ''
+
+      // Get paginated data with filtering and sorting
+      const dataQuery = `SELECT * FROM ${tableRef} ${whereClause} ${orderByClause} LIMIT ${limit} OFFSET ${offset}`
+
       const result = await apiClient.post<Array<Record<string, any>>>(
         '/meta/query',
-        { query: dataQuery, params: [] },
+        { query: dataQuery, params },
       )
 
       return {

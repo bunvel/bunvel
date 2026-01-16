@@ -16,6 +16,41 @@ export const DEFAULT_CURRENT_PAGE = 1
 
 export const READONLY_SCHEMAS: readonly string[] = ['auth']
 
+export const FilterOperators = {
+  EQUALS: 'eq',
+  NOT_EQUALS: 'neq',
+  GREATER_THAN: 'gt',
+  GREATER_THAN_OR_EQUAL: 'gte',
+  LESS_THAN: 'lt',
+  LESS_THAN_OR_EQUAL: 'lte',
+  LIKE: 'like',
+  ILIKE: 'ilike',
+  IS_NULL: 'is_null',
+  IS_NOT_NULL: 'not_null',
+} as const
+
+export type FilterOperator = typeof FilterOperators[keyof typeof FilterOperators]
+
+export const FilterOperatorLabels: Record<FilterOperator, string> = {
+  [FilterOperators.EQUALS]: '=',
+  [FilterOperators.NOT_EQUALS]: '≠',
+  [FilterOperators.GREATER_THAN]: '>',
+  [FilterOperators.GREATER_THAN_OR_EQUAL]: '≥',
+  [FilterOperators.LESS_THAN]: '<',
+  [FilterOperators.LESS_THAN_OR_EQUAL]: '≤',
+  [FilterOperators.LIKE]: 'contains',
+  [FilterOperators.ILIKE]: 'contains (case-insensitive)',
+  [FilterOperators.IS_NULL]: 'is null',
+  [FilterOperators.IS_NOT_NULL]: 'is not null',
+}
+
+export const FilterOperatorTypes = {
+  TEXT: [FilterOperators.EQUALS, FilterOperators.NOT_EQUALS, FilterOperators.LIKE, FilterOperators.ILIKE, FilterOperators.IS_NULL, FilterOperators.IS_NOT_NULL],
+  NUMBER: [FilterOperators.EQUALS, FilterOperators.NOT_EQUALS, FilterOperators.GREATER_THAN, FilterOperators.GREATER_THAN_OR_EQUAL, FilterOperators.LESS_THAN, FilterOperators.LESS_THAN_OR_EQUAL, FilterOperators.IS_NULL, FilterOperators.IS_NOT_NULL],
+  DATE: [FilterOperators.EQUALS, FilterOperators.NOT_EQUALS, FilterOperators.GREATER_THAN, FilterOperators.GREATER_THAN_OR_EQUAL, FilterOperators.LESS_THAN, FilterOperators.LESS_THAN_OR_EQUAL, FilterOperators.IS_NULL, FilterOperators.IS_NOT_NULL],
+  BOOLEAN: [FilterOperators.EQUALS, FilterOperators.NOT_EQUALS, FilterOperators.IS_NULL, FilterOperators.IS_NOT_NULL],
+} as const
+
 export const DATA_TYPES = [
   // String Types
   { value: 'varchar', label: 'VARCHAR' },

@@ -1,4 +1,5 @@
 import { getTableData, getTableMetadata } from '@/services/editor.service'
+import { FilterOperator } from '@/utils/constant'
 import { useQuery } from '@tanstack/react-query'
 import { queryKeys } from './query-key'
 
@@ -24,8 +25,18 @@ export function useTableData(
   options: {
     page: number
     pageSize: number
+    sorts?: Array<{ column: string; direction: 'asc' | 'desc' }>
+    filters?: Array<{
+      column: string
+      operator: FilterOperator
+      value: string
+    }>
     primaryKeys?: string[]
-  } = { page: 1, pageSize: 50 },
+  } = { 
+    page: 1, 
+    pageSize: 50,
+    filters: []
+  },
 ) {
   const { data: metadata } = useTableMetadata(schema, table)
 
@@ -37,6 +48,8 @@ export function useTableData(
             table,
             page: options.page,
             pageSize: options.pageSize,
+            sorts: options.sorts,
+            filters: options.filters, // Include filters in queryKey
           })
         : ['tableData', schema, table, options],
     queryFn: async () => {
@@ -50,6 +63,8 @@ export function useTableData(
           table,
           page: options.page,
           pageSize: options.pageSize,
+          sorts: options.sorts,
+          filters: options.filters,
           primaryKeys: options.primaryKeys || metadata?.primary_keys || [],
         },
       })

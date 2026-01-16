@@ -1,17 +1,352 @@
 import { Button } from '@/components/ui/button'
-import { Filter } from '@hugeicons/core-free-icons'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useTableMetadata } from '@/hooks/queries/useTableData'
+import { FilterOperator } from '@/utils/constant'
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { Filter, Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { toast } from 'sonner'
+import { useEffect, useState } from 'react'
+import { SortableItem } from './sortable-item'
 
-export function FilterButton() {
-  const onClick = () => {
-    toast.info('Filter functionality not yet implemented', { description: 'Filtering rows will be available in a future update' })
+export interface FilterConfig {
+  id: string
+  column: string
+  operator: FilterOperator
+  value: string
+}
+
+interface FilterButtonProps {
+  schema: string
+  table: string
+  onFilterChange?: (filters: Omit<FilterConfig, 'id'>[]) => void
+  initialFilters?: Omit<FilterConfig, 'id'>[]
+}
+
+export function FilterButton({
+  schema,
+  table,
+  onFilterChange,
+  initialFilters = [],
+}: FilterButtonProps) {
+  const [filters, setFilters] = useState<FilterConfig[]>(
+    () =>
+      initialFilters?.map((f) => ({
+        ...f,
+        id: `${f.column}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      })) || [],
+  )
+  const [pendingFilters, setPendingFilters] = useState<FilterConfig[]>(
+    () =>
+      initialFilters?.map((f) => ({
+        ...f,
+        id: `${f.column}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      })) || [],
+  )
+  const [open, setOpen] = useState(false)
+
+  const { data: tableMetadata } = useTableMetadata(schema, table)
+  const columns = tableMetadata?.columns || []
+  const availableColumns = columns.filter(
+    (col) =>
+      !pendingFilters.some((filter) => filter.column === col.column_name),
+  )
+
+  // Sync pending filters when dropdown opens
+  useEffect(() => {
+    if (open) {
+      setPendingFilters(filters)
+    }
+  }, [open, filters])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  )
+
+  // Removed handleAddFilter as it's no longer needed
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      setPendingFilters((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id)
+        const newIndex = items.findIndex((item) => item.id === over.id)
+
+        if (oldIndex === -1 || newIndex === -1) return items
+
+        const newItems = [...items]
+        const [movedItem] = newItems.splice(oldIndex, 1)
+        newItems.splice(newIndex, 0, movedItem)
+
+        return newItems
+      })
+    }
   }
 
+  const handleRemoveFilter = (id: string) => {
+    setPendingFilters((prev) => prev.filter((filter) => filter.id !== id))
+  }
+
+  const handleUpdateFilter = (id: string, updates: Partial<FilterConfig>) => {
+    setPendingFilters((prev) =>
+      prev.map((filter) =>
+        filter.id === id ? { ...filter, ...updates } : filter,
+      ),
+    )
+  }
+
+  const handleApplyFilters = () => {
+    const newFilters = [...pendingFilters]
+    setFilters(newFilters)
+    // Strip the id before passing to parent
+    onFilterChange?.(newFilters.map(({ id, ...rest }) => rest))
+    setOpen(false)
+  }
+
+  const handleCancel = () => {
+    setPendingFilters(filters)
+    setOpen(false)
+  }
+
+  const handleClearAll = () => {
+    setPendingFilters([])
+  }
+
+  const hasChanges = JSON.stringify(filters) !== JSON.stringify(pendingFilters)
+
   return (
-    <Button variant="outline" size="sm" onClick={onClick} className="gap-1">
-      <HugeiconsIcon icon={Filter} className="h-4 w-4" />
-      <span>Filter</span>
-    </Button>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenuTrigger>
+        <Button variant="outline" size="sm" className="gap-2">
+          <HugeiconsIcon icon={Filter} size={16} />
+          Filter
+          {filters.length > 0 && (
+            <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
+              {filters.length}
+            </span>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        className="w-[500px] p-4"
+        align="start"
+        autoFocus={false}
+      >
+        <DropdownMenuGroup>
+          <div className="flex items-center justify-between mb-4">
+            <DropdownMenuLabel className="p-0 text-base">
+              Filter Columns
+            </DropdownMenuLabel>
+            {pendingFilters.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearAll}
+                className="h-auto px-2 py-1 text-xs"
+              >
+                Clear all
+              </Button>
+            )}
+          </div>
+
+          {/* Existing Filters */}
+          <div className="max-h-[300px] space-y-2 overflow-y-auto mb-4">
+            {pendingFilters.length === 0 ? (
+              <div className="py-4 text-center text-sm text-muted-foreground">
+                No filters applied
+              </div>
+            ) : (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={pendingFilters.map((filter) => filter.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {pendingFilters.map((filter) => (
+                    <SortableItem
+                      key={filter.id}
+                      id={filter.id}
+                      onRemove={() => handleRemoveFilter(filter.id)}
+                    >
+                      <div className="flex items-center gap-2 w-full">
+                        <div className="flex-1 grid grid-cols-3 gap-2">
+                          <Select
+                            value={filter.column}
+                            onValueChange={(value: string | null) => {
+                              if (value !== null) {
+                                handleUpdateFilter(filter.id, { column: value })
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="h-8 w-full">
+                              <SelectValue title="Column" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {availableColumns.map((col) => (
+                                <SelectItem
+                                  key={col.column_name}
+                                  value={col.column_name}
+                                >
+                                  {col.column_name}
+                                </SelectItem>
+                              ))}
+                              {availableColumns.length === 0 && (
+                                <div className="text-sm text-muted-foreground px-2 py-1.5">
+                                  No columns available
+                                </div>
+                              )}
+                            </SelectContent>
+                          </Select>
+
+                          <Select
+                            value={filter.operator}
+                            onValueChange={(value: FilterOperator | null) => {
+                              if (value !== null) {
+                                handleUpdateFilter(filter.id, {
+                                  operator: value,
+                                })
+                              } else {
+                                handleUpdateFilter(filter.id, {
+                                  operator: 'eq',
+                                })
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="h-8 w-full">
+                              <SelectValue title="Operator" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="eq">= (equals)</SelectItem>
+                              <SelectItem value="neq">
+                                ≠ (not equals)
+                              </SelectItem>
+                              <SelectItem value="gt">
+                                › (greater than)
+                              </SelectItem>
+                              <SelectItem value="gte">
+                                ≥ (greater than or equal)
+                              </SelectItem>
+                              <SelectItem value="lt">‹ (less than)</SelectItem>
+                              <SelectItem value="lte">
+                                ≤ (less than or equal)
+                              </SelectItem>
+                              <SelectItem value="like">contains</SelectItem>
+                              <SelectItem value="ilike">
+                                contains (case-insensitive)
+                              </SelectItem>
+                              <SelectItem value="is_null">is null</SelectItem>
+                              <SelectItem value="not_null">
+                                is not null
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+
+                          {filter.operator !== 'is_null' &&
+                            filter.operator !== 'not_null' && (
+                              <input
+                                type="text"
+                                value={filter.value ?? ''}
+                                onChange={(e) => {
+                                  const value = e.target.value
+                                  setPendingFilters((prev) =>
+                                    prev.map((f) =>
+                                      f.id === filter.id ? { ...f, value } : f,
+                                    ),
+                                  )
+                                }}
+                                onKeyDown={(e) => e.stopPropagation()}
+                                className="flex h-8 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                placeholder="Value"
+                              />
+                            )}
+                        </div>
+                      </div>
+                    </SortableItem>
+                  ))}
+                </SortableContext>
+              </DndContext>
+            )}
+          </div>
+
+          {/* Add New Filter Button */}
+          <div className="mt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={() => {
+                if (availableColumns.length > 0) {
+                  const newFilter: FilterConfig = {
+                    id: `new-${Date.now()}`,
+                    column: availableColumns[0].column_name,
+                    operator: 'eq',
+                    value: '',
+                  }
+                  setPendingFilters((prev) => [...prev, newFilter])
+                }
+              }}
+              disabled={availableColumns.length === 0}
+            >
+              <HugeiconsIcon icon={Plus} className="mr-2 h-4 w-4" />
+              Add Filter
+            </Button>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="mt-4 flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCancel}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleApplyFilters}
+              disabled={!hasChanges}
+            >
+              Apply
+            </Button>
+          </div>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
