@@ -1,5 +1,4 @@
 import {
-  flexRender,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
@@ -16,14 +15,8 @@ import * as React from 'react'
 
 import { Checkbox } from '@/components/ui/checkbox'
 import { formatCellValue } from '@/utils/format'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../ui/table'
+import { Table, TableBody, TableCell, TableRow } from '../ui/table'
+import { DataTableHeader } from './data-table-header'
 import { DataTablePagination } from './data-table-pagination'
 import { DataTableSkeleton } from './data-table-skeleton'
 
@@ -165,33 +158,8 @@ export function DataTable<TData, TValue = unknown>({
         <div className="flex-1 flex flex-col overflow-hidden border">
           {table.getRowModel().rows.length === 0 ? (
             <>
-              <Table className="w-auto">
-                <TableHeader className="sticky top-0 z-10 bg-secondary">
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id} className="border-b">
-                      {headerGroup.headers.map((header) => (
-                        <TableHead
-                          key={header.id}
-                          className="border-r"
-                          style={{
-                            width:
-                              header.column.getSize() !== 150
-                                ? header.column.getSize()
-                                : undefined,
-                            minWidth: header.column.getSize(),
-                          }}
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
+              <Table>
+                <DataTableHeader table={table} />
               </Table>
               <div className="flex-1 flex items-center justify-center p-8">
                 <div className="text-sm text-muted-foreground">
@@ -201,22 +169,7 @@ export function DataTable<TData, TValue = unknown>({
             </>
           ) : (
             <Table className="w-auto">
-              <TableHeader className="sticky top-0 z-10 bg-secondary">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="border-b">
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} className="border-r">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
+              <DataTableHeader table={table} />
 
               <TableBody className="overflow-y-auto">
                 {table.getRowModel().rows.map((row) => (
@@ -235,11 +188,9 @@ export function DataTable<TData, TValue = unknown>({
                         key={cell.id}
                         className="border p-2"
                         style={{
-                          width:
-                            cell.column.getSize() !== 150
-                              ? cell.column.getSize()
-                              : undefined,
+                          width: cell.column.getSize(),
                           minWidth: cell.column.getSize(),
+                          maxWidth: '350px',
                         }}
                       >
                         <div className="text-sm whitespace-nowrap overflow-hidden text-ellipsis">
