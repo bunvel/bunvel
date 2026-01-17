@@ -4,13 +4,13 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(main)')({
-  component: DashboardLayout,
+  component: MainLayout,
 })
 
-function DashboardLayout() {
+function MainLayout() {
   return (
     <div className="[--header-height:calc(--spacing(14))] h-screen flex flex-col overflow-hidden">
-      <SidebarProvider className="flex flex-col h-full" defaultOpen={false}>
+      <SidebarProvider className="flex flex-col h-full" open={false}>
         <SiteHeader />
         <div className="flex flex-1 overflow-hidden">
           <AppSidebar />
