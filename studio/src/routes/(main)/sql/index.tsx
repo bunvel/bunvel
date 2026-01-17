@@ -29,7 +29,7 @@ function RouteComponent() {
     setHistory((prev) =>
       [
         {
-          id: crypto.randomUUID(),
+          id: Date.now().toString(),
           query,
           timestamp: Date.now(),
           success,
