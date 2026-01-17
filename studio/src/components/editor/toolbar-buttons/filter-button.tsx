@@ -146,17 +146,19 @@ export function FilterButton({
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger>
-        <Button variant="outline" size="sm" className="gap-2">
-          <HugeiconsIcon icon={Filter} size={16} />
-          Filter
-          {filters.length > 0 && (
-            <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
-              {filters.length}
-            </span>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={
+          <Button variant="outline" size="sm" className="gap-2">
+            <HugeiconsIcon icon={Filter} size={16} />
+            Filter
+            {filters.length > 0 && (
+              <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
+                {filters.length}
+              </span>
+            )}
+          </Button>
+        }
+      ></DropdownMenuTrigger>
 
       <DropdownMenuContent
         className="w-[500px]"

@@ -44,7 +44,7 @@ function RouteComponent() {
     data: enums = [],
     isLoading,
     error,
-  } = useDatabaseEnums(schema || "public")
+  } = useDatabaseEnums(schema || 'public')
 
   // Group enum values by enum name
   const groupedEnums = enums.reduce<Record<string, string[]>>((acc, item) => {
@@ -67,10 +67,7 @@ function RouteComponent() {
   const headerRow = (cols: TableColumn[]) => (
     <TableRow>
       {cols.map((column) => (
-        <TableHead
-          key={column.key}
-          style={{ width: column.width || 'auto' }}
-        >
+        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
           {column.header}
         </TableHead>
       ))}
@@ -98,11 +95,13 @@ function RouteComponent() {
                 : setSelectedEnum(null)
             }
           >
-            <SheetTrigger>
-              <Button variant="outline" size="sm">
-                View Values
-              </Button>
-            </SheetTrigger>
+            <SheetTrigger
+              render={
+                <Button variant="outline" size="sm">
+                  View Values
+                </Button>
+              }
+            ></SheetTrigger>
             <SheetContent
               side="right"
               className="bg-card min-w-2xl flex flex-col"

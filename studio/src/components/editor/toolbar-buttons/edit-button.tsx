@@ -40,12 +40,10 @@ export function EditButton({ selectRows, disabled = false }: EditButtonProps) {
 
   return (
     <Tooltip>
-      <TooltipTrigger>
-        <span className="inline-flex">{button}</span>
-      </TooltipTrigger>
-      <TooltipContent>
-        Select a single row to enable editing.
-      </TooltipContent>
+      <TooltipTrigger
+        render={<span className="inline-flex">{button}</span>}
+      ></TooltipTrigger>
+      <TooltipContent>Select a single row to enable editing.</TooltipContent>
     </Tooltip>
   )
 }

@@ -35,7 +35,8 @@ const columns: TableColumn[] = [
 ]
 
 function RouteComponent() {
-  const [selectedTrigger, setSelectedTrigger] = useState<DatabaseTrigger | null>(null)
+  const [selectedTrigger, setSelectedTrigger] =
+    useState<DatabaseTrigger | null>(null)
   const search = useSearch({ strict: false }) as SearchParams
   const { schema } = search
 
@@ -49,10 +50,7 @@ function RouteComponent() {
   const headerRow = (cols: TableColumn[]) => (
     <TableRow>
       {cols.map((column) => (
-        <TableHead
-          key={column.key}
-          style={{ width: column.width || 'auto' }}
-        >
+        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
           {column.header}
         </TableHead>
       ))}
@@ -78,17 +76,21 @@ function RouteComponent() {
               open ? setSelectedTrigger(trigger) : setSelectedTrigger(null)
             }
           >
-            <SheetTrigger>
-              <Button variant="outline" size="sm">
-                View Details
-              </Button>
-            </SheetTrigger>
+            <SheetTrigger
+              render={
+                <Button variant="outline" size="sm">
+                  View Details
+                </Button>
+              }
+            ></SheetTrigger>
             <SheetContent
               side="right"
               className="bg-card min-w-2xl flex flex-col"
             >
               <SheetHeader className="border-b p-4">
-                <SheetTitle>Trigger: {selectedTrigger?.trigger_name}</SheetTitle>
+                <SheetTitle>
+                  Trigger: {selectedTrigger?.trigger_name}
+                </SheetTitle>
               </SheetHeader>
               <div className="flex-1 p-4 overflow-auto space-y-4">
                 <div>
@@ -135,7 +137,13 @@ function RouteComponent() {
         columns={columns}
         data={triggers}
         searchable={true}
-        searchFields={['trigger_name', 'table_name', 'function_name', 'events', 'timing']}
+        searchFields={[
+          'trigger_name',
+          'table_name',
+          'function_name',
+          'events',
+          'timing',
+        ]}
         searchPlaceholder="Search triggers..."
         headerRow={headerRow}
         bodyRow={bodyRow}

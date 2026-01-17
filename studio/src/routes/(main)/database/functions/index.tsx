@@ -76,11 +76,13 @@ function RouteComponent() {
               open ? setSelectedFunction(func) : setSelectedFunction(null)
             }
           >
-            <SheetTrigger>
-              <Button variant="outline" size="sm">
-                View Details
-              </Button>
-            </SheetTrigger>
+            <SheetTrigger
+              render={
+                <Button variant="outline" size="sm">
+                  View Details
+                </Button>
+              }
+            ></SheetTrigger>
             <SheetContent
               side="right"
               className="bg-card min-w-2xl flex flex-col"

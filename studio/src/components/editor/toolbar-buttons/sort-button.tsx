@@ -147,17 +147,19 @@ export function SortButton({
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger>
-        <Button variant="outline" size="sm" className="gap-2">
-          <HugeiconsIcon icon={Sort} size={16} />
-          Sort
-          {sorts.length > 0 && (
-            <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
-              {sorts.length}
-            </span>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={
+          <Button variant="outline" size="sm" className="gap-2">
+            <HugeiconsIcon icon={Sort} size={16} />
+            Sort
+            {sorts.length > 0 && (
+              <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
+                {sorts.length}
+              </span>
+            )}
+          </Button>
+        }
+      ></DropdownMenuTrigger>
 
       <DropdownMenuContent
         className="w-[400px]"

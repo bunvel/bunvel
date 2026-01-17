@@ -23,7 +23,8 @@ export function QueryResultActions({
   return (
     <div className="bg-card h-10 px-2 flex items-center justify-between w-full border-b">
       <div className="flex items-center space-x-1">
-        <h1 className="mr-2">Result</h1>
+        <h1 className="mr-2 text-sm">Result</h1>
+        <span className='text-muted'>|</span>
         {result?.data && result.data.length > 0 && (
           <ExportButton selectedRows={result.data} />
         )}

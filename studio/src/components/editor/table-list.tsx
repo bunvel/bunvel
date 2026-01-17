@@ -149,55 +149,57 @@ export function TableList() {
       </div>
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full w-full px-4">
-        {filteredTables.length === 0 ? (
-          <div
-            key="no-results"
-            className="py-4 text-center text-sm text-muted-foreground"
-          >
-            {searchQuery
-              ? `No tables found matching "${searchQuery}"`
-              : 'No tables found'}
-          </div>
-        ) : (
-          <div className="h-full">
-            <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-              <SidebarMenu className="space-y-1">
-                {filteredTables.map((table) => {
-                  const isActive = search.table === table.name
-                  const v = table.kind === 'VIEW'
-                  const m = table.kind === 'MATERIALIZED VIEW'
+          {filteredTables.length === 0 ? (
+            <div
+              key="no-results"
+              className="py-4 text-center text-sm text-muted-foreground"
+            >
+              {searchQuery
+                ? `No tables found matching "${searchQuery}"`
+                : 'No tables found'}
+            </div>
+          ) : (
+            <div className="h-full">
+              <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+                <SidebarMenu className="space-y-1">
+                  {filteredTables.map((table) => {
+                    const isActive = search.table === table.name
+                    const isView = table.kind === 'VIEW'
+                    const isMaterializedView = table.kind === 'MATERIALIZED VIEW'
 
-                  return (
-                    <SidebarMenuItem key={table.name}>
-                      <SidebarMenuButton
-                        isActive={isActive}
-                        onClick={() => handleTableClick(table)}
-                      >
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <HugeiconsIcon
-                              icon={
-                                v
-                                  ? EyeFreeIcons
-                                  : m
-                                    ? PropertyViewFreeIcons
-                                    : TableIcon
+                    return (
+                      <SidebarMenuItem key={`${schema}.${table.name}`}>
+                        <SidebarMenuButton
+                          isActive={isActive}
+                          onClick={() => handleTableClick(table)}
+                        >
+                          <Tooltip>
+                            <TooltipTrigger
+                              render={
+                                <HugeiconsIcon
+                                  icon={
+                                    isView
+                                      ? EyeFreeIcons
+                                      : isMaterializedView
+                                        ? PropertyViewFreeIcons
+                                        : TableIcon
+                                  }
+                                  className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
+                                />
                               }
-                              className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent>{table.kind}</TooltipContent>
-                        </Tooltip>
-                        {table.name}
-                      </SidebarMenuButton>
-                      <TableListAction schema={schema} table={table.name} />
-                    </SidebarMenuItem>
-                  )
-                })}
-              </SidebarMenu>
-            </SidebarGroup>
-          </div>
-        )}
+                            ></TooltipTrigger>
+                            <TooltipContent>{table.kind}</TooltipContent>
+                          </Tooltip>
+                          {table.name}
+                        </SidebarMenuButton>
+                        <TableListAction schema={schema} table={table.name} />
+                      </SidebarMenuItem>
+                    )
+                  })}
+                </SidebarMenu>
+              </SidebarGroup>
+            </div>
+          )}
         </ScrollArea>
       </div>
     </div>

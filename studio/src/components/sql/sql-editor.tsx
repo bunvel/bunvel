@@ -62,7 +62,7 @@ export function SqlEditor({
 
   return (
     <div className={cn('h-full flex flex-col', className)}>
-      <div className="flex items-center justify-between p-2 border-b">
+      <div className="flex items-center gap-2 p-2 border-b">
         <Button
           variant="ghost"
           size="sm"
@@ -76,9 +76,10 @@ export function SqlEditor({
           )}
           <span className="sr-only">Toggle Sidebar</span>
         </Button>
+        <h1>SQL Editor</h1>
       </div>
       <div className="flex-1 min-h-0 flex flex-col">
-        <div className="h-[350px] border-b overflow-y-auto">
+        <div className="h-[300px] border-b overflow-y-auto">
           <SqlQueryForm
             query={query}
             onQueryChange={handleQueryChange}
