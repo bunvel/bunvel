@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useDeleteTable } from '@/hooks/mutations/useDeleteTable'
 import { useTruncateTable } from '@/hooks/mutations/useTruncateTable'
+import { useCopyToClipboard } from '@/hooks/use-clipboard'
 import {
   Copy01Icon,
   Edit03Icon,
@@ -29,6 +30,7 @@ export function TableListAction({ schema, table }: TableListActionProps) {
   const [isTruncateDialogOpen, setIsTruncateDialogOpen] = useState(false)
   const { mutate: deleteTable, isPending: isDeleting } = useDeleteTable()
   const { mutate: truncateTable, isPending: isTruncating } = useTruncateTable()
+  const [, copyToClipboard] = useCopyToClipboard()
 
   const handleDelete = (cascade: boolean) => {
     deleteTable({
@@ -58,10 +60,11 @@ export function TableListAction({ schema, table }: TableListActionProps) {
         ></DropdownMenuTrigger>
         <DropdownMenuContent className="w-48" side={'right'} align={'start'}>
           <DropdownMenuItem
-            onClick={() => {
-              toast.info('Copy functionality not yet implemented', {
-                description: 'Copy will be available in a future update',
-              })
+            onClick={async () => {
+              const success = await copyToClipboard(table)
+              if (success) {
+                toast.success('Table name copied')
+              }
             }}
           >
             <HugeiconsIcon
@@ -69,19 +72,6 @@ export function TableListAction({ schema, table }: TableListActionProps) {
               className="text-muted-foreground"
             />
             <span>Copy Name</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              toast.info('Copy functionality not yet implemented', {
-                description: 'Copy will be available in a future update',
-              })
-            }}
-          >
-            <HugeiconsIcon
-              icon={Copy01Icon}
-              className="text-muted-foreground"
-            />
-            <span>Copy Schema</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
