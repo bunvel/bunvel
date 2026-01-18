@@ -3,6 +3,8 @@ import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
 
+export type TableKind = 'TABLE' | 'VIEW' | 'MATERIALIZED VIEW' | string
+
 export interface ColumnDefinition {
   name: string
   type: string
@@ -13,7 +15,7 @@ export interface ColumnDefinition {
 
 export interface Table {
   name: string
-  kind: 'BASE TABLE' | 'VIEW' | 'MATERIALIZED VIEW' | string
+  kind: TableKind
   columns?: ColumnDefinition[]
 }
 
@@ -42,7 +44,7 @@ export interface DeleteTableParams {
 export interface DatabaseTables {
   oid: string
   name: string
-  kind: 'BASE TABLE' | 'VIEW' | 'MATERIALIZED VIEW' | string
+  kind: TableKind
   description: string
   rows: number
   size: string

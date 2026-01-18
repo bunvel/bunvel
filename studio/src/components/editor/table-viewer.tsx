@@ -1,10 +1,9 @@
 import { DataTable } from '@/components/data-table/data-table'
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
+import { useTables } from '@/hooks/queries/useTables'
+import { TableKind } from '@/services/table.service'
 import { DEFAULT_PAGE_SIZE, FilterOperator } from '@/utils/constant'
-import {
-  formatCellValue,
-  formatDataType,
-} from '@/utils/format'
+import { formatCellValue, formatDataType } from '@/utils/format'
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
@@ -27,28 +26,40 @@ export function TableViewer() {
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE,
   })
-  const [sorts, setSorts] = useState<Array<{ column: string; direction: 'asc' | 'desc' }>>([])
-  const [filters, setFilters] = useState<Array<{
-    column: string
-    operator: FilterOperator
-    value: string
-  }>>([])
-  
-  const handleSortChange = useCallback((newSorts: Array<{ column: string; direction: 'asc' | 'desc' }>) => {
-    setSorts(newSorts)
-    // Reset to first page when sort changes
-    setPagination(prev => ({ ...prev, pageIndex: 0 }))
-  }, [])
-  
-  const handleFilterChange = useCallback((newFilters: Array<{
-    column: string
-    operator: FilterOperator
-    value: string
-  }>) => {
-    setFilters(newFilters)
-    // Reset to first page when filters change
-    setPagination(prev => ({ ...prev, pageIndex: 0 }))
-  }, [])
+  const [sorts, setSorts] = useState<
+    Array<{ column: string; direction: 'asc' | 'desc' }>
+  >([])
+  const [filters, setFilters] = useState<
+    Array<{
+      column: string
+      operator: FilterOperator
+      value: string
+    }>
+  >([])
+
+  const handleSortChange = useCallback(
+    (newSorts: Array<{ column: string; direction: 'asc' | 'desc' }>) => {
+      setSorts(newSorts)
+      // Reset to first page when sort changes
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+    },
+    [],
+  )
+
+  const handleFilterChange = useCallback(
+    (
+      newFilters: Array<{
+        column: string
+        operator: FilterOperator
+        value: string
+      }>,
+    ) => {
+      setFilters(newFilters)
+      // Reset to first page when filters change
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+    },
+    [],
+  )
 
   // Get table metadata for columns
   const { data: metadata, isLoading: isMetadataLoading } = useTableMetadata(
@@ -68,6 +79,12 @@ export function TableViewer() {
     sorts,
     filters: filters.length > 0 ? filters : undefined,
   })
+
+  const { data: tables } = useTables()
+
+  const kind: TableKind | undefined = tables?.find(
+    (t) => t.name === table,
+  )?.kind
 
   const isLoading = isMetadataLoading || isTableDataLoading
 
@@ -148,10 +165,11 @@ export function TableViewer() {
 
   return (
     <>
-      <TableToolbar 
-        selectedRows={selectedRows} 
-        schema={schema} 
+      <TableToolbar
+        selectedRows={selectedRows}
+        schema={schema}
         table={table}
+        kind={kind}
         sorts={sorts}
         onSortChange={handleSortChange}
         filters={filters}
