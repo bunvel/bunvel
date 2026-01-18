@@ -82,14 +82,14 @@ const mainDatabaseTablesOidRoute = mainDatabaseTablesOidRouteImport.update({
 export interface FileRoutesByFullPath {
   '/database': typeof mainDatabaseRouteRouteWithChildren
   '/': typeof mainIndexRoute
-  '/editor': typeof mainEditorIndexRoute
-  '/sql': typeof mainSqlIndexRoute
+  '/editor/': typeof mainEditorIndexRoute
+  '/sql/': typeof mainSqlIndexRoute
   '/database/tables/$oid': typeof mainDatabaseTablesOidRoute
-  '/database/functions': typeof mainDatabaseFunctionsIndexRoute
-  '/database/indexes': typeof mainDatabaseIndexesIndexRoute
-  '/database/tables': typeof mainDatabaseTablesIndexRoute
-  '/database/triggers': typeof mainDatabaseTriggersIndexRoute
-  '/database/types': typeof mainDatabaseTypesIndexRoute
+  '/database/functions/': typeof mainDatabaseFunctionsIndexRoute
+  '/database/indexes/': typeof mainDatabaseIndexesIndexRoute
+  '/database/tables/': typeof mainDatabaseTablesIndexRoute
+  '/database/triggers/': typeof mainDatabaseTriggersIndexRoute
+  '/database/types/': typeof mainDatabaseTypesIndexRoute
 }
 export interface FileRoutesByTo {
   '/database': typeof mainDatabaseRouteRouteWithChildren
@@ -122,14 +122,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/database'
     | '/'
-    | '/editor'
-    | '/sql'
+    | '/editor/'
+    | '/sql/'
     | '/database/tables/$oid'
-    | '/database/functions'
-    | '/database/indexes'
-    | '/database/tables'
-    | '/database/triggers'
-    | '/database/types'
+    | '/database/functions/'
+    | '/database/indexes/'
+    | '/database/tables/'
+    | '/database/triggers/'
+    | '/database/types/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/database'
@@ -187,49 +187,49 @@ declare module '@tanstack/react-router' {
     '/(main)/sql/': {
       id: '/(main)/sql/'
       path: '/sql'
-      fullPath: '/sql'
+      fullPath: '/sql/'
       preLoaderRoute: typeof mainSqlIndexRouteImport
       parentRoute: typeof mainRouteRoute
     }
     '/(main)/editor/': {
       id: '/(main)/editor/'
       path: '/editor'
-      fullPath: '/editor'
+      fullPath: '/editor/'
       preLoaderRoute: typeof mainEditorIndexRouteImport
       parentRoute: typeof mainRouteRoute
     }
     '/(main)/database/types/': {
       id: '/(main)/database/types/'
       path: '/types'
-      fullPath: '/database/types'
+      fullPath: '/database/types/'
       preLoaderRoute: typeof mainDatabaseTypesIndexRouteImport
       parentRoute: typeof mainDatabaseRouteRoute
     }
     '/(main)/database/triggers/': {
       id: '/(main)/database/triggers/'
       path: '/triggers'
-      fullPath: '/database/triggers'
+      fullPath: '/database/triggers/'
       preLoaderRoute: typeof mainDatabaseTriggersIndexRouteImport
       parentRoute: typeof mainDatabaseRouteRoute
     }
     '/(main)/database/tables/': {
       id: '/(main)/database/tables/'
       path: '/tables'
-      fullPath: '/database/tables'
+      fullPath: '/database/tables/'
       preLoaderRoute: typeof mainDatabaseTablesIndexRouteImport
       parentRoute: typeof mainDatabaseRouteRoute
     }
     '/(main)/database/indexes/': {
       id: '/(main)/database/indexes/'
       path: '/indexes'
-      fullPath: '/database/indexes'
+      fullPath: '/database/indexes/'
       preLoaderRoute: typeof mainDatabaseIndexesIndexRouteImport
       parentRoute: typeof mainDatabaseRouteRoute
     }
     '/(main)/database/functions/': {
       id: '/(main)/database/functions/'
       path: '/functions'
-      fullPath: '/database/functions'
+      fullPath: '/database/functions/'
       preLoaderRoute: typeof mainDatabaseFunctionsIndexRouteImport
       parentRoute: typeof mainDatabaseRouteRoute
     }

@@ -1,5 +1,8 @@
-import { cn } from "@/lib/utils"
-import { QueryHistory, QueryHistoryItem } from "./query-history"
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { useState } from 'react'
+import { QueryHistory, QueryHistoryItem } from './query-history'
+import { SqlTemplates } from './sql-templates'
 
 interface SqlSidebarProps {
   isOpen: boolean
@@ -16,20 +19,47 @@ export function SqlSidebar({
   onClear,
   className,
 }: SqlSidebarProps) {
+  const [activeTab, setActiveTab] = useState<'history' | 'templates'>('history')
+
   return (
     <div
       className={cn(
-        "w-[20%] border-r transition-all duration-200 overflow-hidden bg-card",
-        !isOpen && "w-0 opacity-0",
-        className
+        'w-[20%] border-r transition-all duration-200 overflow-hidden bg-card flex flex-col',
+        !isOpen && 'w-0 opacity-0',
+        className,
       )}
     >
-      <QueryHistory
-        history={history}
-        onSelect={onSelect}
-        onClear={onClear}
-        className="h-full"
-      />
+      <div className="flex border-b">
+        <Button
+          variant={activeTab === 'history' ? 'default' : 'ghost'}
+          size="sm"
+          className="flex-1 rounded-none border-0"
+          onClick={() => setActiveTab('history')}
+        >
+          History
+        </Button>
+        <Button
+          variant={activeTab === 'templates' ? 'default' : 'ghost'}
+          size="sm"
+          className="flex-1 rounded-none border-0"
+          onClick={() => setActiveTab('templates')}
+        >
+          Templates
+        </Button>
+      </div>
+
+      <div className="flex-1 overflow-hidden">
+        {activeTab === 'history' ? (
+          <QueryHistory
+            history={history}
+            onSelect={onSelect}
+            onClear={onClear}
+            className="h-full"
+          />
+        ) : (
+          <SqlTemplates onSelect={onSelect} className="h-full" />
+        )}
+      </div>
     </div>
   )
 }
