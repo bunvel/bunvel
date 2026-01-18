@@ -72,10 +72,38 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
   const [open, setOpen] = useState(false)
   const { mutate: createTable, isPending: isSubmitting } = useCreateTable()
 
+  const getDefaultColumns = () => [
+    {
+      name: 'id',
+      type: 'bigint',
+      nullable: false,
+      isPrimaryKey: true,
+      unique: false,
+      defaultValue: undefined,
+    },
+    {
+      name: 'created_at',
+      type: 'timestamptz',
+      nullable: false,
+      isPrimaryKey: false,
+      unique: false,
+      defaultValue: 'now()',
+    },
+  ]
+
+  const resetForm = () => {
+    setFormValues({
+      name: '',
+      description: '',
+      columns: getDefaultColumns(),
+      foreignKeys: [],
+    })
+  }
+
   const [formValues, setFormValues] = useState<FormValues>({
     name: '',
     description: '',
-    columns: [{ ...DEFAULT_COLUMN }],
+    columns: getDefaultColumns(),
     foreignKeys: [],
   })
 
@@ -153,7 +181,15 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
   }
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet
+      open={open}
+      onOpenChange={(newOpen) => {
+        setOpen(newOpen)
+        if (newOpen) {
+          resetForm()
+        }
+      }}
+    >
       <SheetTrigger
         render={
           <Button size="icon" variant="outline">

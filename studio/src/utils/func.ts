@@ -25,6 +25,23 @@ export function escapeIdentifier(identifier: string): string {
 
 export function formatDefaultValue(value: string, type: string): string {
   const lowerType = type.toLowerCase()
+  const lowerValue = value.toLowerCase().trim()
+
+  // Handle common PostgreSQL functions that shouldn't be quoted
+  const postgresqlFunctions = new Set([
+    'now()',
+    'current_timestamp',
+    'current_date',
+    'current_time',
+    'uuid_generate_v4()',
+    'gen_random_uuid()',
+    'uuidv7()',
+    'uuidv4()',
+  ])
+
+  if (postgresqlFunctions.has(lowerValue)) {
+    return value
+  }
 
   // Define exact type matches
   const stringTypes = new Set([

@@ -6,8 +6,9 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
-import { FileText, Users } from '@hugeicons/core-free-icons'
+import { Database, FileText, Users } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { SQL_TEMPLATE_QUERIES } from './sql-template-queries'
 
 export interface SqlTemplate {
   id: string
@@ -24,57 +25,15 @@ const sqlTemplates: SqlTemplate[] = [
     name: 'Todo - Complete Setup',
     description: 'Create table, insert sample data, and add indexes',
     category: 'Todo',
-    query: `-- Create todos table
-CREATE TABLE todos (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  description TEXT,
-  completed BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Insert sample data
-INSERT INTO todos (title, description, completed) VALUES
-  ('Buy groceries', 'Milk, eggs, bread, and vegetables', FALSE),
-  ('Finish project', 'Complete the SQL template feature', TRUE),
-  ('Call mom', 'Remember to call mom this weekend', FALSE),
-  ('Workout', 'Go to the gym for 30 minutes', FALSE);
-
--- Create indexes for performance
-CREATE INDEX idx_todos_title ON todos(title);
-CREATE INDEX idx_todos_completed ON todos(completed);
-CREATE INDEX idx_todos_created_at ON todos(created_at);`,
+    query: SQL_TEMPLATE_QUERIES.todoComplete,
     icon: FileText,
   },
   {
-    id: 'users-complete',
-    name: 'Users - Complete Setup',
-    description: 'Create table, insert sample data, and add indexes',
+    id: 'users-uuid-complete',
+    name: 'Users - UUID Setup',
+    description: 'Create table with UUID primary key, sample data, and indexes',
     category: 'User Management',
-    query: `-- Create users table
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  username VARCHAR(50) UNIQUE NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  first_name VARCHAR(100),
-  last_name VARCHAR(100),
-  is_active BOOLEAN DEFAULT TRUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Insert sample data
-INSERT INTO users (username, email, password_hash, first_name, last_name) VALUES
-  ('john_doe', 'john@example.com', 'hashed_password_1', 'John', 'Doe'),
-  ('jane_smith', 'jane@example.com', 'hashed_password_2', 'Jane', 'Smith'),
-  ('bob_wilson', 'bob@example.com', 'hashed_password_3', 'Bob', 'Wilson');
-
--- Create indexes for performance
-CREATE INDEX idx_users_username ON users(username);
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_active ON users(is_active);`,
+    query: SQL_TEMPLATE_QUERIES.usersUuidComplete,
     icon: Users,
   },
   {
@@ -82,31 +41,17 @@ CREATE INDEX idx_users_active ON users(is_active);`,
     name: 'Posts - Complete Setup',
     description: 'Create table, insert sample data, and add indexes',
     category: 'Posts',
-    query: `-- Create posts table
-CREATE TABLE posts (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  content TEXT,
-  author_id INTEGER REFERENCES users(id),
-  status VARCHAR(20) DEFAULT 'draft',
-  published_at TIMESTAMP,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Insert sample data
-INSERT INTO posts (title, content, author_id, status, published_at) VALUES
-  ('My First Blog Post', 'This is the content of my very first blog post. I''m excited to start writing!', 1, 'published', CURRENT_TIMESTAMP),
-  ('SQL Tips and Tricks', 'Learn some amazing SQL techniques that will make your life easier.', 2, 'published', CURRENT_TIMESTAMP - INTERVAL '1 day'),
-  ('Draft Article', 'This is still a work in progress...', 1, 'draft', NULL),
-  ('Database Design Best Practices', 'A comprehensive guide to designing efficient databases.', 3, 'published', CURRENT_TIMESTAMP - INTERVAL '2 days');
-
--- Create indexes for performance
-CREATE INDEX idx_posts_title ON posts(title);
-CREATE INDEX idx_posts_author_id ON posts(author_id);
-CREATE INDEX idx_posts_status ON posts(status);
-CREATE INDEX idx_posts_published_at ON posts(published_at);`,
+    query: SQL_TEMPLATE_QUERIES.postsComplete,
     icon: FileText,
+  },
+  {
+    id: 'uuid-complete',
+    name: 'UUID - Complete Schema',
+    description:
+      'Full UUID-based schema with users, profiles, posts, and comments',
+    category: 'UUID',
+    query: SQL_TEMPLATE_QUERIES.uuidComplete,
+    icon: Database,
   },
 ]
 
