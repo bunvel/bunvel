@@ -2,15 +2,26 @@ import { deleteTable } from '@/services/table.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-export function useDeleteTable() {
+interface UseDeleteTableOptions {
+  onTableDeleted?: (schema: string, table: string) => void
+}
+
+export function useDeleteTable(options: UseDeleteTableOptions = {}) {
+  const { onTableDeleted } = options
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (params: { schema: string; table: string; cascade: boolean }) =>
       deleteTable({data: params}),
-    onSuccess: (_, { schema }) => {
+    onSuccess: (_, { schema, table }) => {
       // Invalidate and refetch tables query
       queryClient.invalidateQueries({ queryKey: ['tables', schema] })
+      
+      // Call custom callback for tab cleanup
+      if (onTableDeleted) {
+        onTableDeleted(schema, table)
+      }
+      
       toast.success('Table deleted successfully')
     },
     onError: (error: unknown) => {

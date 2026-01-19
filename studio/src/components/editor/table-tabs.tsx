@@ -1,100 +1,25 @@
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { X } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
-import { useNavigate, useSearch } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
-
-interface SearchParams {
-  schema?: string
-  table?: string
-}
+import { BunvelTab } from '@/components/common/bunvel-tab'
+import { Tabs, TabsList } from '@/components/ui/tabs'
+import { useTableTabs } from '@/hooks/use-table-tabs'
 
 export function TableTabs() {
-  const navigate = useNavigate()
-  const { schema, table } = useSearch({ strict: false }) as SearchParams
-  const [selectedTables, setSelectedTables] = useState<string[]>(() =>
-    schema && table ? [`${schema}.${table}`] : [],
-  )
-
-  const handleTabChange = (value: string) => {
-    const [schema, table] = value.split('.')
-    navigate({ search: { schema, table } as any })
-  }
-
-  const handleTabClose = (e: React.MouseEvent, tableKey: string) => {
-    e.stopPropagation()
-    const newTables = selectedTables.filter((t) => t !== tableKey)
-    setSelectedTables(newTables)
-
-    if (tableKey === `${schema}.${table}`) {
-      const [newSchema, newTable] = newTables[0]?.split('.') || []
-      navigate(
-        newTable
-          ? { search: { schema: newSchema, table: newTable } as any }
-          : { search: {} as any },
-      )
-    }
-  }
-
-  // Update selected tables when URL changes
-  useEffect(() => {
-    if (schema && table) {
-      const tableKey = `${schema}.${table}`
-      setSelectedTables((prev) =>
-        prev.includes(tableKey)
-          ? prev
-          : prev.length >= 5
-            ? [...prev.slice(0, 4), tableKey]
-            : [...prev, tableKey],
-      )
-    }
-  }, [schema, table])
+  const { selectedTables, activeTable, handleTabChange, handleTabClose } =
+    useTableTabs()
 
   if (!selectedTables.length) return null
 
   return (
-    <Tabs value={`${schema}.${table}`} onValueChange={handleTabChange}>
+    <Tabs value={activeTable} onValueChange={handleTabChange}>
       <TabsList className="inline-flex justify-start rounded-none bg-card p-0">
-        {selectedTables.map((tableKey) => {
-          const [tabSchema, tabTable] = tableKey.split('.')
-          const isActive = schema === tabSchema && table === tabTable
-
-          return (
-            <TabsTrigger
-              key={tableKey}
-              value={tableKey}
-              className={`group relative border-none rounded-none px-4 text-sm font-medium transition-colors hover:bg-muted/50 shrink-0 ${
-                isActive
-                  ? 'text-foreground bg-muted/30'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/10'
-              }`}
-            >
-              <div className="flex items-center">
-                <span>
-                  <span className="text-xs text-muted-foreground">
-                    {tabSchema}.
-                  </span>
-                  {tabTable}
-                </span>
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={(e) => handleTabClose(e, tableKey)}
-                  onKeyDown={(e) => {
-                    if (e.key === ' ' || e.key === 'Enter') {
-                      e.preventDefault()
-                      handleTabClose(e as any, tableKey)
-                    }
-                  }}
-                  className="ml-1 flex h-5 w-5 items-center justify-center rounded-sm p-0.5 opacity-0 hover:bg-muted/50 group-hover:opacity-100"
-                  aria-label={`Close ${tabTable} tab`}
-                >
-                  <HugeiconsIcon icon={X} className="h-3.5 w-3.5" />
-                </div>
-              </div>
-            </TabsTrigger>
-          )
-        })}
+        {selectedTables.map((tableKey) => (
+          <BunvelTab
+            key={tableKey}
+            value={tableKey}
+            title={tableKey}
+            isActive={activeTable === tableKey}
+            onClose={handleTabClose}
+          />
+        ))}
       </TabsList>
     </Tabs>
   )

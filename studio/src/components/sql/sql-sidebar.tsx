@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import type { SqlTab } from '@/contexts/sql-tabs-context'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import { QueryHistory, QueryHistoryItem } from './query-history'
@@ -9,6 +10,7 @@ interface SqlSidebarProps {
   history: QueryHistoryItem[]
   onSelect: (query: string) => void
   onClear: () => void
+  onOpenInTab?: (tab: SqlTab) => void
   className?: string
 }
 
@@ -17,9 +19,38 @@ export function SqlSidebar({
   history,
   onSelect,
   onClear,
+  onOpenInTab,
   className,
 }: SqlSidebarProps) {
   const [activeTab, setActiveTab] = useState<'history' | 'templates'>('history')
+
+  const handleSelectFromHistory = (query: string, title?: string) => {
+    if (onOpenInTab) {
+      const tab: SqlTab = {
+        id: `history-${Date.now()}`,
+        title: title || 'New Query',
+        query,
+        isModified: false,
+      }
+      onOpenInTab(tab)
+    } else {
+      onSelect(query)
+    }
+  }
+
+  const handleSelectFromTemplate = (query: string, title: string) => {
+    if (onOpenInTab) {
+      const tab: SqlTab = {
+        id: `template-${Date.now()}`,
+        title: title || 'New Query',
+        query,
+        isModified: false,
+      }
+      onOpenInTab(tab)
+    } else {
+      onSelect(query)
+    }
+  }
 
   return (
     <div
@@ -52,12 +83,23 @@ export function SqlSidebar({
         {activeTab === 'history' ? (
           <QueryHistory
             history={history}
-            onSelect={onSelect}
+            onSelect={(query) => handleSelectFromHistory(query)}
+            onOpenInTab={(query, title) =>
+              handleSelectFromHistory(query, title)
+            }
             onClear={onClear}
             className="h-full"
           />
         ) : (
-          <SqlTemplates onSelect={onSelect} className="h-full" />
+          <SqlTemplates
+            onSelect={(query) =>
+              handleSelectFromTemplate(query, 'Template Query')
+            }
+            onOpenInTab={(query, title) =>
+              handleSelectFromTemplate(query, title)
+            }
+            className="h-full"
+          />
         )}
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   SidebarGroup,
@@ -6,7 +7,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
-import { Database, FileText, Users } from '@hugeicons/core-free-icons'
+import { Database, FileText, Plus, Users } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { SQL_TEMPLATE_QUERIES } from './sql-template-queries'
 
@@ -57,10 +58,15 @@ const sqlTemplates: SqlTemplate[] = [
 
 interface SqlTemplatesProps {
   onSelect: (query: string) => void
+  onOpenInTab?: (query: string, title: string) => void
   className?: string
 }
 
-export function SqlTemplates({ onSelect, className }: SqlTemplatesProps) {
+export function SqlTemplates({
+  onSelect,
+  onOpenInTab,
+  className,
+}: SqlTemplatesProps) {
   const groupedTemplates = sqlTemplates.reduce(
     (acc, template) => {
       if (!acc[template.category]) {
@@ -89,25 +95,40 @@ export function SqlTemplates({ onSelect, className }: SqlTemplatesProps) {
               <SidebarMenu className="space-y-0.5">
                 {templates.map((template) => (
                   <SidebarMenuItem key={template.id}>
-                    <SidebarMenuButton
-                      className="w-full justify-start h-auto py-1.5 px-2 hover:bg-accent/50"
-                      onClick={() => onSelect(template.query)}
-                    >
-                      <span className="mr-2 shrink-0 text-blue-500">
-                        <HugeiconsIcon
-                          icon={template.icon}
-                          className="h-3.5 w-3.5"
-                        />
-                      </span>
-                      <div className="flex-1 text-left">
-                        <div className="text-sm font-medium">
-                          {template.name}
+                    <div className="flex w-full">
+                      <SidebarMenuButton
+                        className="flex-1 justify-start h-auto py-1.5 px-2 hover:bg-accent/50"
+                        onClick={() => onSelect(template.query)}
+                      >
+                        <span className="mr-2 shrink-0 text-blue-500">
+                          <HugeiconsIcon
+                            icon={template.icon}
+                            className="h-3.5 w-3.5"
+                          />
+                        </span>
+                        <div className="flex-1 text-left">
+                          <div className="text-sm font-medium">
+                            {template.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {template.description}
+                          </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {template.description}
-                        </div>
-                      </div>
-                    </SidebarMenuButton>
+                      </SidebarMenuButton>
+                      {onOpenInTab && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
+                          onClick={() =>
+                            onOpenInTab(template.query, template.name)
+                          }
+                          title="Open in new tab"
+                        >
+                          <HugeiconsIcon icon={Plus} className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
