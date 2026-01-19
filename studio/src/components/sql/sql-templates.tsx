@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   SidebarGroup,
@@ -7,7 +6,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
-import { FileText, Plus, Users } from '@hugeicons/core-free-icons'
+import { FileText, Users } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { SQL_TEMPLATE_QUERIES } from './sql-template-queries'
 
@@ -48,15 +47,10 @@ const sqlTemplates: SqlTemplate[] = [
 
 interface SqlTemplatesProps {
   onSelect: (query: string, title: string) => void
-  onOpenInTab?: (query: string, title: string) => void
   className?: string
 }
 
-export function SqlTemplates({
-  onSelect,
-  onOpenInTab,
-  className,
-}: SqlTemplatesProps) {
+export function SqlTemplates({ onSelect, className }: SqlTemplatesProps) {
   return (
     <div className={cn('flex flex-col h-full', className)}>
       <div className="p-3 border-b">
@@ -83,20 +77,6 @@ export function SqlTemplates({
                       {template.description}
                     </div>
                   </div>
-                  {onOpenInTab && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 ml-auto"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onOpenInTab(template.query, template.name)
-                      }}
-                      title="Open in new tab"
-                    >
-                      <HugeiconsIcon icon={Plus} className="h-3 w-3" />
-                    </Button>
-                  )}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}

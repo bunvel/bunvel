@@ -84,18 +84,12 @@ export function SqlSidebar({
           <QueryHistory
             history={history}
             onSelect={(query) => handleSelectFromHistory(query)}
-            onOpenInTab={(query, title) =>
-              handleSelectFromHistory(query, title)
-            }
             onClear={onClear}
             className="h-full"
           />
         ) : (
           <SqlTemplates
             onSelect={(query, title) => handleSelectFromTemplate(query, title)}
-            onOpenInTab={(query, title) =>
-              handleSelectFromTemplate(query, title)
-            }
             className="h-full"
           />
         )}

@@ -21,10 +21,10 @@ export function QueryResultActions({
   query,
 }: QueryResultActionsProps) {
   return (
-    <div className="bg-card h-10 px-2 flex items-center justify-between w-full border-b">
+    <div className="bg-card px-4 py-2 flex items-center justify-between w-full border-b">
       <div className="flex items-center space-x-1">
         <h1 className="mr-2 text-sm">Result</h1>
-        <span className='text-muted'>|</span>
+        <span className="text-muted">|</span>
         {result?.data && result.data.length > 0 && (
           <ExportButton selectedRows={result.data} />
         )}
