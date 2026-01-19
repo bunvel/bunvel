@@ -92,9 +92,7 @@ export function SqlSidebar({
           />
         ) : (
           <SqlTemplates
-            onSelect={(query) =>
-              handleSelectFromTemplate(query, 'Template Query')
-            }
+            onSelect={(query, title) => handleSelectFromTemplate(query, title)}
             onOpenInTab={(query, title) =>
               handleSelectFromTemplate(query, title)
             }
