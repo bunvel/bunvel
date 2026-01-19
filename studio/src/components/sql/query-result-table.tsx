@@ -38,25 +38,15 @@ export function QueryResultTable({
     }))
   }, [result?.columns])
 
-  // Table state with required properties
-  const [tableState, setTableState] = useState<{
-    pagination: { pageIndex: number; pageSize: number }
-    sorting: any[]
-    columnFilters: any[]
-    rowSelection: Record<string, boolean>
-  }>({
-    pagination: { pageIndex: 0, pageSize: Number.MAX_SAFE_INTEGER },
-    sorting: [] as any[],
-    columnFilters: [] as any[],
-    rowSelection: {},
+  // Table state with pagination only
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: Number.MAX_SAFE_INTEGER,
   })
 
   const handlePaginationChange = useCallback(
-    (pagination: { pageIndex: number; pageSize: number }) => {
-      setTableState((prev) => ({
-        ...prev,
-        pagination,
-      }))
+    (newPagination: { pageIndex: number; pageSize: number }) => {
+      setPagination(newPagination)
     },
     [],
   )
@@ -71,19 +61,13 @@ export function QueryResultTable({
       isLoading={isExecuting}
       error={error}
       state={{
-        ...tableState,
-        rowSelection: Object.entries(tableState.rowSelection)
-          .filter(([_, selected]) => selected)
-          .reduce(
-            (acc, [index]) => ({
-              ...acc,
-              [index]: true,
-            }),
-            {},
-          ),
+        pagination,
+        sorting: [],
+        columnFilters: [],
+        rowSelection: {},
       }}
       onPaginationChange={handlePaginationChange}
-      pageCount={Math.ceil(displayData.length / tableState.pagination.pageSize)}
+      pageCount={Math.ceil(displayData.length / pagination.pageSize)}
     />
   )
 }

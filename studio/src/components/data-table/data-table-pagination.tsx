@@ -18,16 +18,24 @@ import {
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
+  enableRowSelection?: boolean
 }
 
 export function DataTablePagination<TData>({
   table,
+  enableRowSelection = true,
 }: DataTablePaginationProps<TData>) {
   return (
     <div className="bg-secondary h-10 flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
-        {table.getFilteredSelectedRowModel().rows.length} of{' '}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
+        {enableRowSelection ? (
+          <>
+            {table.getFilteredSelectedRowModel().rows.length} of{' '}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </>
+        ) : (
+          <>{table.getFilteredRowModel().rows.length} row(s) total.</>
+        )}
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">

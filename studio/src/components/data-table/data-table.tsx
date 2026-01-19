@@ -216,7 +216,10 @@ export function DataTable<TData, TValue = unknown>({
           )}
         </div>
         <div className="border-t bg-background">
-          <DataTablePagination table={table} />
+          <DataTablePagination
+            table={table}
+            enableRowSelection={enableRowSelection}
+          />
         </div>
       </div>
     </div>

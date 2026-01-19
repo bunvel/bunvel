@@ -101,7 +101,7 @@ export function SqlEditor({
         <SqlTabs />
       </div>
       <div className="flex-1 min-h-0 flex flex-col">
-        <div className="h-[300px] border-b overflow-y-auto">
+        <div className="h-[350px] border-b overflow-y-auto">
           <SqlQueryForm
             query={query}
             onQueryChange={handleQueryChange}
