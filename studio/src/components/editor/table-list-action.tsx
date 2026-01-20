@@ -6,10 +6,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useTableTabsContext } from '@/contexts/table-tabs-context'
 import { useDeleteTable } from '@/hooks/mutations/useDeleteTable'
 import { useTruncateTable } from '@/hooks/mutations/useTruncateTable'
 import { useCopyToClipboard } from '@/hooks/use-clipboard'
+import { useTableTabs } from '@/hooks/use-table-tabs'
 import {
   Copy01Icon,
   Edit03Icon,
@@ -29,7 +29,7 @@ export interface TableListActionProps {
 export function TableListAction({ schema, table }: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isTruncateDialogOpen, setIsTruncateDialogOpen] = useState(false)
-  const { removeTableBySchema } = useTableTabsContext()
+  const { removeTableBySchema } = useTableTabs()
   const { mutate: deleteTable, isPending: isDeleting } = useDeleteTable({
     onTableDeleted: (deletedSchema, deletedTable) => {
       removeTableBySchema(deletedSchema, deletedTable)

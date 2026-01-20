@@ -29,7 +29,6 @@ export function useTableTabs(options: UseTableTabsOptions = {}): UseTableTabsRet
     selectedTables, 
     addTable: contextAddTable, 
     removeTable: contextRemoveTable, 
-    removeTableBySchema, 
   } = useTableTabsContext()
 
   const activeTable = schema && table ? `${schema}.${table}` : undefined
@@ -52,6 +51,11 @@ export function useTableTabs(options: UseTableTabsOptions = {}): UseTableTabsRet
       )
     }
   }, [contextRemoveTable, selectedTables, activeTable, navigate])
+
+  const removeTableBySchema = useCallback((schema: string, table: string) => {
+    const tableKey = `${schema}.${table}`
+    removeTable(tableKey)
+  }, [removeTable])
 
   const handleTabClose = useCallback((e: React.MouseEvent, tableKey: string) => {
     e.stopPropagation()
