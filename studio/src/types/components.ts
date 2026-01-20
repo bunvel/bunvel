@@ -6,7 +6,7 @@ export interface TableColumn {
 }
 
 export interface TableData {
-  [key: string]: string | number | boolean | null
+  [key: string]: unknown
 }
 
 export interface SqlTemplate {

@@ -77,38 +77,46 @@ export function DatabaseTable<T = TableData>({
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }
-  // Default header row implementation
-  const defaultHeaderRow = (cols: TableColumn[]) => (
-    <TableRow>
-      {cols.map((column) => (
-        <TableHead
-          key={column.key}
-          style={{ width: column.width || 'auto' }}
-          className={cn(column.className)}
-        >
-          {column.header}
-        </TableHead>
-      ))}
-    </TableRow>
+
+  // Memoize default implementations
+  const defaultHeaderRow = React.useCallback(
+    (cols: TableColumn[]) => (
+      <TableRow>
+        {cols.map((column) => (
+          <TableHead
+            key={column.key}
+            style={{ width: column.width || 'auto' }}
+            className={cn(column.className)}
+          >
+            {column.header}
+          </TableHead>
+        ))}
+      </TableRow>
+    ),
+    [],
   )
-  // Default body row implementation
-  const defaultBodyRow = (item: any, index: number) => (
-    <TableRow key={index}>
-      {columns.map((column) => (
-        <TableCell key={`${index}-${column.key}`}>
-          {String(item[column.key] ?? '-')}
-        </TableCell>
-      ))}
-    </TableRow>
+
+  const defaultBodyRow = React.useCallback(
+    (item: any, index: number) => (
+      <TableRow key={index}>
+        {columns.map((column) => (
+          <TableCell key={`${index}-${column.key}`}>
+            {String(item[column.key] ?? '-')}
+          </TableCell>
+        ))}
+      </TableRow>
+    ),
+    [columns],
   )
+
   const renderHeaderRow = React.useMemo(
     () => headerRow || defaultHeaderRow,
-    [headerRow],
+    [headerRow, defaultHeaderRow],
   )
 
   const renderBodyRow = React.useMemo(
     () => bodyRow || defaultBodyRow,
-    [bodyRow],
+    [bodyRow, defaultBodyRow],
   )
 
   return (
@@ -145,9 +153,7 @@ export function DatabaseTable<T = TableData>({
       <div className="rounded-md border">
         <Table>
           <TableHeader className="bg-secondary">
-            {typeof renderHeaderRow === 'function'
-              ? renderHeaderRow(columns)
-              : defaultHeaderRow(columns)}
+            {renderHeaderRow(columns)}
           </TableHeader>
           <TableBody>
             {isLoading ? (

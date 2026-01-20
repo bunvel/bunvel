@@ -31,7 +31,7 @@ const columns: TableColumn[] = [
 function RouteComponent() {
   const [selectedFunction, setSelectedFunction] =
     useState<DatabaseFunction | null>(null)
-  const search = useSearch({ strict: false }) as SchemaTable
+  const search = useSearch({ strict: false }) as Partial<SchemaTable>
   const { schema } = search
 
   const {

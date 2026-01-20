@@ -6,60 +6,90 @@ import { useCallback } from 'react'
 interface UseSqlTabsReturn {
   tabs: SqlTab[]
   activeTab: SqlTab | undefined
-  activeTabId: string | undefined
+  activeTabId: string | null
   handleTabChange: (tabId: string) => void
   handleTabClose: (e: React.MouseEvent, tabId: string) => void
   removeTab: (tabId: string) => void
   addTab: (tab: SqlTab) => void
   updateTabQuery: (tabId: string, query: string) => void
-  updateTabExecution: (tabId: string, result: any, error: any, isExecuting: boolean, lastExecutedQuery: string) => void
+  updateTabExecution: (
+    tabId: string,
+    result: any,
+    error: any,
+    isExecuting: boolean,
+    lastExecutedQuery: string,
+  ) => void
   createNewQueryTab: () => void
 }
 
 export function useSqlTabs(): UseSqlTabsReturn {
-  const { 
-    tabs, 
-    activeTabId, 
-    addTab: contextAddTab, 
-    removeTab: contextRemoveTab, 
-    setActiveTab, 
+  const {
+    tabs,
+    activeTabId,
+    addTab: contextAddTab,
+    removeTab: contextRemoveTab,
+    setActiveTab,
     updateTabQuery: contextUpdateTabQuery,
     updateTabExecution: contextUpdateTabExecution,
     createNewQueryTab: contextCreateNewQueryTab,
   } = useSqlTabsContext()
 
-  const activeTab = tabs.find(tab => tab.id === activeTabId)
+  const activeTab = tabs.find((tab) => tab.id === activeTabId)
 
-  const handleTabChange = useCallback((tabId: string) => {
-    setActiveTab(tabId)
-  }, [setActiveTab])
+  const handleTabChange = useCallback(
+    (tabId: string) => {
+      setActiveTab(tabId)
+    },
+    [setActiveTab],
+  )
 
-  const removeTab = useCallback((tabId: string) => {
-    contextRemoveTab(tabId)
-  }, [contextRemoveTab])
+  const removeTab = useCallback(
+    (tabId: string) => {
+      contextRemoveTab(tabId)
+    },
+    [contextRemoveTab],
+  )
 
-  const handleTabClose = useCallback((e: React.MouseEvent, tabId: string) => {
-    e.stopPropagation()
-    removeTab(tabId)
-  }, [removeTab])
+  const handleTabClose = useCallback(
+    (e: React.MouseEvent, tabId: string) => {
+      e.stopPropagation()
+      removeTab(tabId)
+    },
+    [removeTab],
+  )
 
-  const addTab = useCallback((tab: SqlTab) => {
-    contextAddTab(tab, MAX_TABLE_TABS)
-  }, [contextAddTab, MAX_TABLE_TABS])
+  const addTab = useCallback(
+    (tab: SqlTab) => {
+      contextAddTab(tab, MAX_TABLE_TABS)
+    },
+    [contextAddTab],
+  )
 
-  const updateTabQuery = useCallback((tabId: string, query: string) => {
-    contextUpdateTabQuery(tabId, query)
-  }, [contextUpdateTabQuery])
+  const updateTabQuery = useCallback(
+    (tabId: string, query: string) => {
+      contextUpdateTabQuery(tabId, query)
+    },
+    [contextUpdateTabQuery],
+  )
 
-  const updateTabExecution = useCallback((
-    tabId: string, 
-    result: any, 
-    error: any, 
-    isExecuting: boolean, 
-    lastExecutedQuery: string
-  ) => {
-    contextUpdateTabExecution(tabId, result, error, isExecuting, lastExecutedQuery)
-  }, [contextUpdateTabExecution])
+  const updateTabExecution = useCallback(
+    (
+      tabId: string,
+      result: any,
+      error: any,
+      isExecuting: boolean,
+      lastExecutedQuery: string,
+    ) => {
+      contextUpdateTabExecution(
+        tabId,
+        result,
+        error,
+        isExecuting,
+        lastExecutedQuery,
+      )
+    },
+    [contextUpdateTabExecution],
+  )
 
   const createNewQueryTab = useCallback(() => {
     contextCreateNewQueryTab()

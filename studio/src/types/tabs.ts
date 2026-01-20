@@ -23,7 +23,7 @@ export interface TableTabsContextType {
 
 export interface SqlTabsContextType {
   tabs: SqlTab[]
-  activeTabId: string | undefined
+  activeTabId: string | null
   addTab: (tab: SqlTab, maxTabs?: number) => void
   removeTab: (tabId: string) => void
   setActiveTab: (tabId: string) => void

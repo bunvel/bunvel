@@ -1,14 +1,16 @@
-import type {
-  ColumnMetadata, TableDataParams
-} from '@/types'
-import { SchemaTable } from '@/types'
+import type { ColumnMetadata, SchemaTable, TableDataParams } from '@/types'
 import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
 
 export const getTableMetadata = createServerFn({ method: 'POST' })
-  .inputValidator((d: SchemaTable) => d)
+  .inputValidator((d: SchemaTable) => {
+    if (!d.table) {
+      throw new Error('table is required for getTableMetadata')
+    }
+    return d as Required<SchemaTable>
+  })
   .handler(async ({ data }) => {
     try {
       // Single API call to get all metadata

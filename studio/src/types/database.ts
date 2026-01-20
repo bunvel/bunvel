@@ -1,4 +1,4 @@
-export type TableKind = 'TABLE' | 'VIEW' | 'MATERIALIZED VIEW' | string
+export type TableKind = 'TABLE' | 'VIEW' | 'MATERIALIZED VIEW' | (string & {})
 
 export interface ColumnDefinition {
   name: string

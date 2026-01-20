@@ -1,17 +1,17 @@
 import {
-    getDatabaseEnums,
-    getDatabaseFunctions,
-    getDatabaseTableColumns,
-    getDatabaseTableIndexes,
-    getDatabaseTables,
-    getDatabaseTriggers,
-    getTables,
+  getDatabaseEnums,
+  getDatabaseFunctions,
+  getDatabaseTableColumns,
+  getDatabaseTableIndexes,
+  getDatabaseTables,
+  getDatabaseTriggers,
+  getTables,
 } from '@/services/table.service'
 import type {
-    DatabaseTableColumns,
-    DatabaseTableIndexes,
-    DatabaseTables,
-    Table
+  DatabaseTableColumns,
+  DatabaseTableIndexes,
+  DatabaseTables,
+  Table
 } from '@/types'
 import { useQuery } from '@tanstack/react-query'
 import { queryKeys } from './query-key'
@@ -42,7 +42,7 @@ export function useDatabaseTableColumns(oid: string) {
 
 export function useDatabaseIndexes(schema: string) {
   return useQuery<DatabaseTableIndexes[]>({
-    queryKey: schema ? queryKeys.tables.list(schema) : ['tables', null],
+    queryKey: queryKeys.indexes.list(schema),
     queryFn: async () => getDatabaseTableIndexes({ data: { schema } }),
     enabled: !!schema,
   })
@@ -50,7 +50,7 @@ export function useDatabaseIndexes(schema: string) {
 
 export const useDatabaseEnums = (schema: string) => {
   return useQuery({
-    queryKey: ['enums', schema],
+    queryKey: queryKeys.enums.list(schema),
     queryFn: () => getDatabaseEnums({ data: { schema } }),
     enabled: !!schema,
   })
@@ -58,7 +58,7 @@ export const useDatabaseEnums = (schema: string) => {
 
 export const useDatabaseFunctions = (schema: string) => {
   return useQuery({
-    queryKey: ['functions', schema],
+    queryKey: queryKeys.functions.list(schema),
     queryFn: () => getDatabaseFunctions({ data: { schema } }),
     enabled: !!schema,
   })
@@ -66,7 +66,7 @@ export const useDatabaseFunctions = (schema: string) => {
 
 export const useDatabaseTriggers = (schema: string) => {
   return useQuery({
-    queryKey: ['triggers', schema],
+    queryKey: queryKeys.triggers.list(schema),
     queryFn: () => getDatabaseTriggers({ data: { schema } }),
     enabled: !!schema,
   })

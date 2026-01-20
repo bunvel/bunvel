@@ -5,7 +5,7 @@ export type TableRow = Record<string, unknown>
 export interface FilterConfig {
   column: string
   operator: FilterOperator
-  value: string
+  value: string | number | boolean | null
 }
 
 export interface SortConfig {

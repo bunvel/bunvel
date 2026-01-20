@@ -9,8 +9,7 @@ import {
 } from '@/components/ui/sheet'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseIndexes } from '@/hooks/queries/useTables'
-import type { TableColumn } from '@/types'
-import { DatabaseTableIndexes, SchemaTable } from '@/types'
+import type { DatabaseTableIndexes, SchemaTable, TableColumn } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
@@ -30,7 +29,7 @@ const columns: TableColumn[] = [
 function RouteComponent() {
   const [selectedIndex, setSelectedIndex] =
     useState<DatabaseTableIndexes | null>(null)
-  const search = useSearch({ strict: false }) as SchemaTable
+  const search = useSearch({ strict: false }) as Partial<SchemaTable>
   const { schema } = search
 
   const {

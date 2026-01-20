@@ -32,7 +32,7 @@ const columns: TableColumn[] = [
 function RouteComponent() {
   const [selectedTrigger, setSelectedTrigger] =
     useState<DatabaseTrigger | null>(null)
-  const search = useSearch({ strict: false }) as SchemaTable
+  const search = useSearch({ strict: false }) as Partial<SchemaTable>
   const { schema } = search
 
   const {

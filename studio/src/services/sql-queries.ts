@@ -300,6 +300,3 @@ export const SQL_QUERIES = {
       array_position(c.conkey, a.attnum);
   `,
 } as const
-
-import type { SqlQueryKey } from '@/types'
-export { SqlQueryKey }
