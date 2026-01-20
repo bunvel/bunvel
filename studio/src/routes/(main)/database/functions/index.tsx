@@ -88,7 +88,7 @@ function RouteComponent() {
                 <SheetTitle>{selectedFunction?.function_name}</SheetTitle>
               </SheetHeader>
               <div className="flex-1 p-4 overflow-auto">
-                <p>Defination detail not yet implemented</p>
+                <p>Definition detail not yet implemented</p>
               </div>
             </SheetContent>
           </Sheet>

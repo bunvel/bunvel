@@ -1,84 +1,35 @@
-import { QueryHistoryItem } from '@/components/sql/query-history'
 import { SqlEditor } from '@/components/sql/sql-editor'
 import { SqlSidebar } from '@/components/sql/sql-sidebar'
 import { SqlTabsProvider, useSqlTabsContext } from '@/contexts/sql-tabs-context'
-import { useLocalStorage } from '@/hooks/use-local-storage'
+import { useQueryHistory } from '@/hooks/use-query-history'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import type { SqlTab } from '@/contexts/sql-tabs-context'
+import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/(main)/sql/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const [showSidebar, setShowSidebar] = useState(true)
-  const [history, setHistory] = useLocalStorage<QueryHistoryItem[]>(
-    'sql-query-history',
-    [],
-  )
-  const [selectedQuery, setSelectedQuery] = useState('')
-
-  const handleToggleSidebar = () => {
-    setShowSidebar(!showSidebar)
-  }
-
-  const handleClearHistory = () => {
-    setHistory([])
-  }
-
-  const handleAddToHistory = (query: string, success: boolean) => {
-    setHistory((prev) =>
-      [
-        {
-          id: Date.now().toString(),
-          query,
-          timestamp: Date.now(),
-          success,
-        },
-        ...prev,
-      ].slice(0, 50),
-    )
-  }
-
-  const handleSelectFromHistory = (selectedQuery: string) => {
-    setSelectedQuery(selectedQuery)
-  }
-
   return (
     <SqlTabsProvider>
-      <SqlRouteContent
-        showSidebar={showSidebar}
-        history={history}
-        selectedQuery={selectedQuery}
-        onToggleSidebar={handleToggleSidebar}
-        onClearHistory={handleClearHistory}
-        onAddToHistory={handleAddToHistory}
-        onSelectFromHistory={handleSelectFromHistory}
-      />
+      <SqlRouteContent />
     </SqlTabsProvider>
   )
 }
 
-function SqlRouteContent({
-  showSidebar,
-  history,
-  selectedQuery,
-  onToggleSidebar,
-  onClearHistory,
-  onAddToHistory,
-  onSelectFromHistory,
-}: {
-  showSidebar: boolean
-  history: QueryHistoryItem[]
-  selectedQuery: string
-  onToggleSidebar: () => void
-  onClearHistory: () => void
-  onAddToHistory: (query: string, success: boolean) => void
-  onSelectFromHistory: (query: string) => void
-}) {
+function SqlRouteContent() {
+  const [showSidebar, setShowSidebar] = useState(true)
   const { addTab } = useSqlTabsContext()
+  const [selectedQuery, setSelectedQuery] = useState('')
+  const { history, addToHistory, clearHistory, selectFromHistory } =
+    useQueryHistory(setSelectedQuery)
+
+  const handleToggleSidebar = () => {
+    setShowSidebar(!showSidebar)
+  }
 
   const handleOpenInTab = (tab: SqlTab) => {
     addTab(tab)
@@ -89,9 +40,9 @@ function SqlRouteContent({
       <SqlSidebar
         isOpen={showSidebar}
         history={history}
-        onSelect={onSelectFromHistory}
+        onSelect={selectFromHistory}
         onOpenInTab={handleOpenInTab}
-        onClear={onClearHistory}
+        onClear={clearHistory}
       />
       <div
         className={cn(
@@ -101,16 +52,12 @@ function SqlRouteContent({
       >
         <SqlEditor
           showSidebar={showSidebar}
-          onToggleSidebar={onToggleSidebar}
-          onAddToHistory={onAddToHistory}
+          onToggleSidebar={handleToggleSidebar}
+          onAddToHistory={addToHistory}
           initialQuery={selectedQuery}
           className="h-full"
         />
       </div>
     </div>
   )
-}
-
-function cn(...classes: (string | undefined)[]) {
-  return classes.filter(Boolean).join(' ')
 }
