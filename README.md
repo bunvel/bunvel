@@ -54,7 +54,6 @@ cd bunvel-project
 docker compose up -d
 ```
 
-
 The backend will be available at `http://localhost:8000` and the studio at `http://localhost:3000`.
 
 ## 📚 Documentation
@@ -82,8 +81,8 @@ Bunvel is inspired by [Supabase](https://supabase.com) but takes a different arc
 ## 💬 Community
 
 - [GitHub Discussions](https://github.com/bunvel/bunvel/discussions)
-- [Discord](https://discord.gg/bunvel) *(coming soon)*
-- [Twitter](https://twitter.com/bunvel) *(coming soon)*
+- [Discord](https://discord.gg/YKa9jqbh)
+- [Twitter](https://twitter.com/bunvelhq)
 
 ---
 
