@@ -1,19 +1,5 @@
+import type { ApiError, ApiResponse, HttpMethod } from '@/types'
 import { API_URL } from '@/utils/constant'
-
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
-
-export interface ApiResponse<T = any> {
-  data: T
-  status: number
-  statusText: string
-  headers: Headers
-}
-
-export interface ApiError extends Error {
-  status?: number
-  code?: string
-  details?: any
-}
 
 class ApiClient {
   private baseUrl: string

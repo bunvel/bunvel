@@ -10,6 +10,7 @@ import { useDeleteTable } from '@/hooks/mutations/useDeleteTable'
 import { useTruncateTable } from '@/hooks/mutations/useTruncateTable'
 import { useCopyToClipboard } from '@/hooks/use-clipboard'
 import { useTableTabs } from '@/hooks/use-table-tabs'
+import type { TableListActionProps } from '@/types'
 import {
   Copy01Icon,
   Edit03Icon,
@@ -20,11 +21,6 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { SidebarMenuAction } from '../ui/sidebar'
-
-export interface TableListActionProps {
-  schema: string
-  table: string
-}
 
 export function TableListAction({ schema, table }: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)

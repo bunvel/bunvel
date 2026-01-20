@@ -1,16 +1,18 @@
 import {
-  DatabaseTableColumns,
-  DatabaseTableIndexes,
-  DatabaseTables,
-  Table,
-  getDatabaseEnums,
-  getDatabaseFunctions,
-  getDatabaseTableColumns,
-  getDatabaseTableIndexes,
-  getDatabaseTables,
-  getDatabaseTriggers,
-  getTables,
+    getDatabaseEnums,
+    getDatabaseFunctions,
+    getDatabaseTableColumns,
+    getDatabaseTableIndexes,
+    getDatabaseTables,
+    getDatabaseTriggers,
+    getTables,
 } from '@/services/table.service'
+import type {
+    DatabaseTableColumns,
+    DatabaseTableIndexes,
+    DatabaseTables,
+    Table
+} from '@/types'
 import { useQuery } from '@tanstack/react-query'
 import { queryKeys } from './query-key'
 

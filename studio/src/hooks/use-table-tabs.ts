@@ -1,5 +1,6 @@
 import { useTableTabsContext } from '@/contexts/table-tabs-context'
 import { SchemaTable } from '@/types'
+import { MAX_TABLE_TABS } from '@/utils/constant'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useCallback, useEffect } from 'react'
 
@@ -14,7 +15,6 @@ interface UseTableTabsReturn {
 }
 
 export function useTableTabs(): UseTableTabsReturn {
-  const maxTabs = 5 
   const navigate = useNavigate()
   const { schema, table } = useSearch({ strict: false }) as SchemaTable
   const { 
@@ -55,8 +55,8 @@ export function useTableTabs(): UseTableTabsReturn {
   }, [removeTable])
 
   const addTable = useCallback((newSchema: string, newTable: string) => {
-    contextAddTable(newSchema, newTable, maxTabs)
-  }, [contextAddTable, maxTabs])
+    contextAddTable(newSchema, newTable, MAX_TABLE_TABS)
+  }, [contextAddTable, MAX_TABLE_TABS])
 
   // Update selected tables when URL changes
   useEffect(() => {

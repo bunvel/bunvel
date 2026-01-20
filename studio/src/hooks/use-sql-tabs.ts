@@ -1,11 +1,7 @@
 import { useSqlTabsContext } from '@/contexts/sql-tabs-context'
+import type { SqlTab } from '@/types'
+import { MAX_TABLE_TABS } from '@/utils/constant'
 import { useCallback } from 'react'
-
-import type { SqlTab } from '@/contexts/sql-tabs-context'
-
-interface UseSqlTabsOptions {
-  maxTabs?: number
-}
 
 interface UseSqlTabsReturn {
   tabs: SqlTab[]
@@ -20,8 +16,7 @@ interface UseSqlTabsReturn {
   createNewQueryTab: () => void
 }
 
-export function useSqlTabs(options: UseSqlTabsOptions = {}): UseSqlTabsReturn {
-  const { maxTabs = 10 } = options
+export function useSqlTabs(): UseSqlTabsReturn {
   const { 
     tabs, 
     activeTabId, 
@@ -49,8 +44,8 @@ export function useSqlTabs(options: UseSqlTabsOptions = {}): UseSqlTabsReturn {
   }, [removeTab])
 
   const addTab = useCallback((tab: SqlTab) => {
-    contextAddTab(tab, maxTabs)
-  }, [contextAddTab, maxTabs])
+    contextAddTab(tab, MAX_TABLE_TABS)
+  }, [contextAddTab, MAX_TABLE_TABS])
 
   const updateTabQuery = useCallback((tabId: string, query: string) => {
     contextUpdateTabQuery(tabId, query)

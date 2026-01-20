@@ -7,16 +7,10 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
+import type { QueryHistoryItem } from '@/types'
 import { SqlIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useMemo } from 'react'
-
-export interface QueryHistoryItem {
-  id: string
-  query: string
-  timestamp: number
-  success: boolean
-}
 
 interface QueryHistoryProps {
   history: QueryHistoryItem[]

@@ -1,11 +1,9 @@
-import {
-  DatabaseTable,
-  type TableColumn,
-} from '@/components/database/database-table'
+import { DatabaseTable } from '@/components/database/database-table'
 import { TableFormSheet } from '@/components/editor/table-form-sheet'
 import { Button } from '@/components/ui/button'
-import { TableCell, TableHead, TableRow } from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseTables } from '@/hooks/queries/useTables'
+import type { TableColumn } from '@/types'
 import { SchemaTable } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
 import {
@@ -38,17 +36,6 @@ function RouteComponent() {
     isLoading,
     error,
   } = useDatabaseTables(schema || 'public')
-
-  // Custom header row
-  const headerRow = (cols: TableColumn[]) => (
-    <TableRow>
-      {cols.map((column) => (
-        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
-          {column.header}
-        </TableHead>
-      ))}
-    </TableRow>
-  )
 
   // Custom body row
   const bodyRow = (item: any, index: number) => {
@@ -102,7 +89,6 @@ function RouteComponent() {
         searchable={true}
         searchFields={['name', 'description']}
         searchPlaceholder={PLACEHOLDERS.SEARCH_TABLE}
-        headerRow={headerRow}
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}

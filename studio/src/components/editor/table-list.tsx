@@ -9,8 +9,7 @@ import {
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
-import { Table } from '@/services/table.service'
-import { SchemaTable } from '@/types'
+import { SchemaTable, Table } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
 import {
   EyeFreeIcons,
@@ -110,7 +109,7 @@ export function TableList() {
 
   if (tables.length === 0) {
     return (
-      <div className="p-4 flex-1 flex flex-col items-center justify-center text-center">
+      <div className="p-4 flex-1 flex flex-col items-center text-center">
         <HugeiconsIcon
           icon={TableIcon}
           className="mb-2 h-8 w-8 text-muted-foreground/50"

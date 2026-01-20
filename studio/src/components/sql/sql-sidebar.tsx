@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button'
-import type { SqlTab } from '@/contexts/sql-tabs-context'
 import { cn } from '@/lib/utils'
+import type { QueryHistoryItem, SqlTab } from '@/types'
 import { useState } from 'react'
-import { QueryHistory, QueryHistoryItem } from './query-history'
+import { QueryHistory } from './query-history'
 import { SqlTemplates } from './sql-templates'
 
 interface SqlSidebarProps {

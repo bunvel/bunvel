@@ -14,11 +14,12 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
+import type { SortConfig } from '@/types'
 import {
-  closestCenter,
   DndContext,
   KeyboardSensor,
   PointerSensor,
+  closestCenter,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
@@ -27,13 +28,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import {
-  Plus,
-  Sort,
-  SortingAZ02Icon,
-  SortingZA01Icon,
-  X,
-} from '@hugeicons/core-free-icons'
+import { Plus, Sorting05Icon, X } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
 import { SortableItem } from './sortable-item'
@@ -43,11 +38,6 @@ interface SortButtonProps {
   table: string
   onSortChange?: (sorts: SortConfig[]) => void
   initialSorts?: SortConfig[]
-}
-
-type SortConfig = {
-  column: string
-  direction: 'asc' | 'desc'
 }
 
 export function SortButton({
@@ -155,7 +145,7 @@ export function SortButton({
       <DropdownMenuTrigger
         render={
           <Button variant="outline" size="sm" className="gap-2">
-            <HugeiconsIcon icon={Sort} size={16} />
+            <HugeiconsIcon icon={Sorting05Icon} size={16} />
             Sort
             {sorts.length > 0 && (
               <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
@@ -251,17 +241,7 @@ export function SortButton({
                               handleToggleSortDirection(sort.column)
                             }
                           >
-                            <HugeiconsIcon
-                              icon={
-                                sort.direction === 'asc'
-                                  ? SortingAZ02Icon
-                                  : SortingZA01Icon
-                              }
-                              className="h-4 w-4"
-                            />
-                            <span>
-                              {sort.direction === 'asc' ? 'A → Z' : 'Z → A'}
-                            </span>
+                            {sort.direction === 'asc' ? 'A → Z' : 'Z → A'}
                           </Button>
 
                           <Button

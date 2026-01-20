@@ -2,11 +2,10 @@ import { SqlEditor } from '@/components/sql/sql-editor'
 import { SqlSidebar } from '@/components/sql/sql-sidebar'
 import { SqlTabsProvider, useSqlTabsContext } from '@/contexts/sql-tabs-context'
 import { useQueryHistory } from '@/hooks/use-query-history'
+import { cn } from '@/lib/utils'
+import type { SqlTab } from '@/types'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-
-import type { SqlTab } from '@/contexts/sql-tabs-context'
-import { cn } from '@/lib/utils'
 
 export const Route = createFileRoute('/(main)/sql/')({
   component: RouteComponent,

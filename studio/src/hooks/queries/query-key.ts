@@ -1,3 +1,4 @@
+import type { QueryKeys } from '@/types';
 import { FilterOperator } from "@/utils/constant";
 
 export const queryKeys = {
@@ -29,4 +30,4 @@ export const queryKeys = {
   },
 } as const
 
-export type QueryKeys = typeof queryKeys
+export { QueryKeys };

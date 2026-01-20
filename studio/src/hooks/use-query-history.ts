@@ -1,14 +1,6 @@
+import type { QueryHistoryItem, UseQueryHistoryReturn } from '@/types'
 import { useCallback } from 'react'
 import { useLocalStorage } from './use-local-storage'
-
-import type { QueryHistoryItem } from '@/components/sql/query-history'
-
-export interface UseQueryHistoryReturn {
-  history: QueryHistoryItem[]
-  addToHistory: (query: string, success: boolean) => void
-  clearHistory: () => void
-  selectFromHistory: (query: string) => void
-}
 
 export function useQueryHistory(
   onSelect?: (query: string) => void

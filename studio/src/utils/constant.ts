@@ -8,6 +8,8 @@ export const DEFAULT_PAGE_SIZE_OPTIONS = [
   { value: Number.MAX_SAFE_INTEGER, label: 'No Limit' }
 ]
 
+export const MAX_TABLE_TABS = 5
+
 export const DEFAULT_EMPTY_MESSAGE = 'No data available'
 
 export const DEFAULT_PAGE_SIZE = 50
@@ -224,8 +226,8 @@ export const DESCRIPTIONS = {
 
 // Screen reader labels
 export const SCREEN_READER_LABELS = {
-  TOGGLE_SIDEBAR: 'Toggle Sidebar',
-  CLOSE: 'Close',
-  MORE: 'More',
-  TOGGLE_THEME: 'Toggle theme',
+  TOGGLE_SIDEBAR: TITLES.TOGGLE_SIDEBAR,
+  CLOSE: TITLES.CLOSE,
+  MORE: TITLES.MORE,
+  TOGGLE_THEME: TITLES.TOGGLE_THEME,
 } as const

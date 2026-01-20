@@ -1,7 +1,4 @@
-import {
-  DatabaseTable,
-  type TableColumn,
-} from '@/components/database/database-table'
+import { DatabaseTable } from '@/components/database/database-table'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -10,8 +7,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { TableCell, TableHead, TableRow } from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseEnums } from '@/hooks/queries/useTables'
+import type { TableColumn } from '@/types'
 import { SchemaTable } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
@@ -35,7 +33,7 @@ function RouteComponent() {
     values: string[]
     schema: string
   } | null>(null)
-  const search = useSearch({ strict: false }) as SchemaTable
+  const search = useSearch({ strict: false }) as Partial<SchemaTable>
   const { schema } = search
 
   const {
@@ -60,17 +58,6 @@ function RouteComponent() {
     schema_name: enums.find((e) => e.enum_name === name)?.schema_name || '',
     values, // Store the full array of values for the details view
   }))
-
-  // Custom header row
-  const headerRow = (cols: TableColumn[]) => (
-    <TableRow>
-      {cols.map((column) => (
-        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
-          {column.header}
-        </TableHead>
-      ))}
-    </TableRow>
-  )
 
   // Custom body row
   const bodyRow = (item: (typeof enumData)[number], index: number) => {
@@ -132,7 +119,6 @@ function RouteComponent() {
         searchable={true}
         searchFields={['enum_name', 'enum_values']}
         searchPlaceholder={PLACEHOLDERS.SEARCH_ENUMS}
-        headerRow={headerRow}
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}

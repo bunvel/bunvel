@@ -6,8 +6,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useSchemas } from '@/hooks/queries/useSchemas'
-import { Schema } from '@/services/schema.service'
-import { SchemaTable } from '@/types'
+import { Schema, SchemaTable } from '@/types'
 import {
   useNavigate,
   useSearch,

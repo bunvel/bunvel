@@ -1,7 +1,4 @@
-import {
-  DatabaseTable,
-  type TableColumn,
-} from '@/components/database/database-table'
+import { DatabaseTable } from '@/components/database/database-table'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -10,10 +7,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { TableCell, TableHead, TableRow } from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseTriggers } from '@/hooks/queries/useTables'
-import { DatabaseTrigger } from '@/services/table.service'
-import { SchemaTable } from '@/types'
+import type { TableColumn } from '@/types'
+import { DatabaseTrigger, SchemaTable } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
@@ -43,17 +40,6 @@ function RouteComponent() {
     isLoading,
     error,
   } = useDatabaseTriggers(schema || 'public')
-
-  // Custom header row
-  const headerRow = (cols: TableColumn[]) => (
-    <TableRow>
-      {cols.map((column) => (
-        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
-          {column.header}
-        </TableHead>
-      ))}
-    </TableRow>
-  )
 
   // Custom body row
   const bodyRow = (trigger: DatabaseTrigger, index: number) => {
@@ -143,7 +129,6 @@ function RouteComponent() {
           'timing',
         ]}
         searchPlaceholder={PLACEHOLDERS.SEARCH_TRIGGERS}
-        headerRow={headerRow}
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}

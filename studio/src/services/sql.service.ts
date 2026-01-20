@@ -1,13 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 
-export interface QueryResult {
-  data: Record<string, any>[]
-  columns: string[]
-  rowCount: number
-  executionTime: number
-}
-
 export const executeQuery = createServerFn({ method: 'POST' })
   .inputValidator((d: string) => d)
   .handler(async ({ data }) => {

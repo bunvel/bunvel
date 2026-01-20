@@ -23,7 +23,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useCreateTable } from '@/hooks/mutations/useTableMutations'
-import type { ColumnDefinition as BaseColumnDefinition } from '@/services/table.service'
+import type { ColumnDefinition as BaseColumnDefinition } from '@/types'
 import {
   DATA_TYPES,
   DEFAULT_COLUMN,

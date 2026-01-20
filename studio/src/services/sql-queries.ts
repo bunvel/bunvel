@@ -301,4 +301,5 @@ export const SQL_QUERIES = {
   `,
 } as const
 
-export type SqlQueryKey = keyof typeof SQL_QUERIES
+import type { SqlQueryKey } from '@/types'
+export { SqlQueryKey }

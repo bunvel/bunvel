@@ -1,11 +1,8 @@
+import type { Schema } from '@/types'
 import { escapeIdentifier } from '@/utils/func'
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
-
-export interface Schema {
-  schema_name: string
-}
 
 export const getSchemas = createServerFn({ method: 'POST' }).handler(
   async () => {

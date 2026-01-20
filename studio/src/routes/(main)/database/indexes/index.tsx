@@ -1,7 +1,4 @@
-import {
-  DatabaseTable,
-  type TableColumn,
-} from '@/components/database/database-table'
+import { DatabaseTable } from '@/components/database/database-table'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -10,10 +7,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { TableCell, TableHead, TableRow } from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseIndexes } from '@/hooks/queries/useTables'
-import { DatabaseTableIndexes } from '@/services/table.service'
-import { SchemaTable } from '@/types'
+import type { TableColumn } from '@/types'
+import { DatabaseTableIndexes, SchemaTable } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
@@ -41,17 +38,6 @@ function RouteComponent() {
     isLoading,
     error,
   } = useDatabaseIndexes(schema || 'public')
-
-  // Custom header row
-  const headerRow = (cols: TableColumn[]) => (
-    <TableRow>
-      {cols.map((column) => (
-        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
-          {column.header}
-        </TableHead>
-      ))}
-    </TableRow>
-  )
 
   // Custom body row
   const bodyRow = (item: DatabaseTableIndexes, index: number) => {
@@ -100,7 +86,6 @@ function RouteComponent() {
         searchable={true}
         searchFields={['table_name', 'column_name', 'index_name']}
         searchPlaceholder={PLACEHOLDERS.SEARCH_INDEXES}
-        headerRow={headerRow}
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}
