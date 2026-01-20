@@ -85,6 +85,16 @@ export function FilterButton({
     }
   }, [open, filters])
 
+  // Sync filters when initialFilters changes (table switch)
+  useEffect(() => {
+    setFilters(
+      initialFilters?.map((f) => ({
+        ...f,
+        id: `${f.column}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      })) || [],
+    )
+  }, [initialFilters])
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {

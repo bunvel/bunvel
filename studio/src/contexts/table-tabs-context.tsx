@@ -1,16 +1,16 @@
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useState,
-} from 'react'
+import { useTableStore } from '@/stores/table-store'
+import { createContext, ReactNode, useContext } from 'react'
 
 interface TableTabsContextType {
   selectedTables: string[]
+  activeTableKey: string | null
+  maxTabs: number
   addTable: (schema: string, table: string, maxTabs?: number) => void
   removeTable: (tableKey: string) => void
   removeTableBySchema: (schema: string, table: string) => void
+  setActiveTable: (tableKey: string | null) => void
+  setMaxTabs: (maxTabs: number) => void
+  clearAllTabs: () => void
 }
 
 const TableTabsContext = createContext<TableTabsContextType | undefined>(
@@ -22,36 +22,27 @@ interface TableTabsProviderProps {
 }
 
 export function TableTabsProvider({ children }: TableTabsProviderProps) {
-  const [selectedTables, setSelectedTables] = useState<string[]>([])
-
-  const addTable = useCallback((schema: string, table: string, maxTabs = 5) => {
-    const tableKey = `${schema}.${table}`
-    setSelectedTables((prev) =>
-      prev.includes(tableKey)
-        ? prev
-        : prev.length >= maxTabs
-          ? [...prev.slice(0, maxTabs - 1), tableKey]
-          : [...prev, tableKey],
-    )
-  }, [])
-
-  const removeTable = useCallback((tableKey: string) => {
-    setSelectedTables((prev) => prev.filter((t) => t !== tableKey))
-  }, [])
-
-  const removeTableBySchema = useCallback(
-    (schema: string, table: string) => {
-      const tableKey = `${schema}.${table}`
-      removeTable(tableKey)
-    },
-    [removeTable],
+  // Use Zustand store instead of local state
+  const tabs = useTableStore((state) => state.tabs)
+  const addTable = useTableStore((state) => state.addTable)
+  const removeTable = useTableStore((state) => state.removeTable)
+  const removeTableBySchema = useTableStore(
+    (state) => state.removeTableBySchema,
   )
+  const setActiveTable = useTableStore((state) => state.setActiveTable)
+  const setMaxTabs = useTableStore((state) => state.setMaxTabs)
+  const clearAllTabs = useTableStore((state) => state.clearAllTabs)
 
   const value: TableTabsContextType = {
-    selectedTables,
+    selectedTables: tabs.selectedTables,
+    activeTableKey: tabs.activeTableKey,
+    maxTabs: tabs.maxTabs,
     addTable,
     removeTable,
     removeTableBySchema,
+    setActiveTable,
+    setMaxTabs,
+    clearAllTabs,
   }
 
   return (

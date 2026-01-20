@@ -2,13 +2,14 @@ import { DataTable } from '@/components/data-table/data-table'
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTables } from '@/hooks/queries/useTables'
 import { TableKind } from '@/services/table.service'
+import { useTableStore } from '@/stores/table-store'
 import { DEFAULT_PAGE_SIZE, FilterOperator } from '@/utils/constant'
 import { formatCellValue, formatDataType } from '@/utils/format'
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useSearch } from '@tanstack/react-router'
 import { ColumnDef } from '@tanstack/react-table'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { TableToolbar } from './table-toolbar'
 
@@ -21,29 +22,76 @@ type TableRow = Record<string, unknown>
 
 export function TableViewer() {
   const { schema, table } = useSearch({ strict: false }) as SearchParams
-  const [selectedRows, setSelectedRows] = useState<TableRow[]>([])
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: DEFAULT_PAGE_SIZE,
-  })
-  const [sorts, setSorts] = useState<
-    Array<{ column: string; direction: 'asc' | 'desc' }>
-  >([])
-  const [filters, setFilters] = useState<
-    Array<{
-      column: string
-      operator: FilterOperator
-      value: string
-    }>
-  >([])
+
+  // Zustand store hooks
+  const setTableState = useTableStore((state) => state.setTableState)
+  const setSelectedRows = useTableStore((state) => state.setSelectedRows)
+  const setRowSelection = useTableStore((state) => state.setRowSelection)
+  const setPagination = useTableStore((state) => state.setPagination)
+  const setSorts = useTableStore((state) => state.setSorts)
+  const setFilters = useTableStore((state) => state.setFilters)
+
+  // Get current table key
+  const currentTableKey = useMemo(() => {
+    return schema && table ? `${schema}.${table}` : null
+  }, [schema, table])
+
+  // Get current table state with proper subscription
+  const tableState = useTableStore((state) =>
+    currentTableKey ? state.tableStates[currentTableKey] : null,
+  )
+
+  // Initialize table state for new tables
+  useEffect(() => {
+    if (currentTableKey) {
+      // This will create the table state if it doesn't exist
+      setTableState(currentTableKey, {})
+    }
+  }, [currentTableKey, setTableState])
+
+  const handleRowSelectionChange = useCallback(
+    (newSelectedRows: TableRow[]) => {
+      if (currentTableKey) {
+        setSelectedRows(currentTableKey, newSelectedRows)
+      }
+    },
+    [currentTableKey, setSelectedRows],
+  )
+
+  const handleRowSelectionStateChange = useCallback(
+    (
+      updaterOrValue:
+        | Record<string, boolean>
+        | ((old: Record<string, boolean>) => Record<string, boolean>),
+    ) => {
+      if (currentTableKey) {
+        const currentRowSelection = tableState?.rowSelection || {}
+        const newRowSelection =
+          typeof updaterOrValue === 'function'
+            ? updaterOrValue(currentRowSelection)
+            : updaterOrValue
+        setRowSelection(currentTableKey, newRowSelection)
+      }
+    },
+    [currentTableKey, tableState?.rowSelection, setRowSelection],
+  )
 
   const handleSortChange = useCallback(
     (newSorts: Array<{ column: string; direction: 'asc' | 'desc' }>) => {
-      setSorts(newSorts)
-      // Reset to first page when sort changes
-      setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+      if (currentTableKey) {
+        setSorts(currentTableKey, newSorts)
+        // Reset to first page when sort changes
+        const currentPagination = tableState?.pagination || {
+          pageIndex: 0,
+          pageSize: DEFAULT_PAGE_SIZE,
+        }
+        setPagination(currentTableKey, {
+          ...currentPagination,
+          pageIndex: 0,
+        })
+      }
     },
-    [],
+    [currentTableKey, tableState?.pagination, setSorts, setPagination],
   )
 
   const handleFilterChange = useCallback(
@@ -54,11 +102,29 @@ export function TableViewer() {
         value: string
       }>,
     ) => {
-      setFilters(newFilters)
-      // Reset to first page when filters change
-      setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+      if (currentTableKey) {
+        setFilters(currentTableKey, newFilters)
+        // Reset to first page when filters change
+        const currentPagination = tableState?.pagination || {
+          pageIndex: 0,
+          pageSize: DEFAULT_PAGE_SIZE,
+        }
+        setPagination(currentTableKey, {
+          ...currentPagination,
+          pageIndex: 0,
+        })
+      }
     },
-    [],
+    [currentTableKey, tableState?.pagination, setFilters, setPagination],
+  )
+
+  const handlePaginationChange = useCallback(
+    (newPagination: { pageIndex: number; pageSize: number }) => {
+      if (currentTableKey) {
+        setPagination(currentTableKey, newPagination)
+      }
+    },
+    [currentTableKey, setPagination],
   )
 
   // Get table metadata for columns
@@ -73,11 +139,14 @@ export function TableViewer() {
     isLoading: isTableDataLoading,
     error,
   } = useTableData(schema, table, {
-    page: pagination.pageIndex + 1, // +1 because backend is 1-indexed
-    pageSize: pagination.pageSize,
+    page: (tableState?.pagination.pageIndex ?? 0) + 1, // +1 because backend is 1-indexed
+    pageSize: tableState?.pagination.pageSize ?? DEFAULT_PAGE_SIZE,
     primaryKeys: metadata?.primary_keys || [],
-    sorts,
-    filters: filters.length > 0 ? filters : undefined,
+    sorts: tableState?.sorts,
+    filters:
+      tableState?.filters && tableState.filters.length > 0
+        ? tableState.filters
+        : undefined,
   })
 
   const { data: tables } = useTables()
@@ -166,13 +235,13 @@ export function TableViewer() {
   return (
     <>
       <TableToolbar
-        selectedRows={selectedRows}
+        selectedRows={tableState?.selectedRows || []}
         schema={schema}
         table={table}
         kind={kind}
-        sorts={sorts}
+        sorts={tableState?.sorts || []}
         onSortChange={handleSortChange}
-        filters={filters}
+        filters={tableState?.filters || []}
         onFilterChange={handleFilterChange}
       />
 
@@ -183,12 +252,16 @@ export function TableViewer() {
           isLoading={isLoading}
           error={error}
           enableRowSelection={true}
-          onRowSelectionChange={setSelectedRows}
-          onPaginationChange={setPagination}
+          onRowSelectionChange={handleRowSelectionChange}
+          onRowSelectionStateChange={handleRowSelectionStateChange}
+          onPaginationChange={handlePaginationChange}
           pageCount={tableData?.totalPages || 0}
           state={{
-            pagination,
-            rowSelection: {},
+            pagination: tableState?.pagination || {
+              pageIndex: 0,
+              pageSize: DEFAULT_PAGE_SIZE,
+            },
+            rowSelection: tableState?.rowSelection || {},
           }}
         />
       </div>

@@ -28,6 +28,11 @@ interface DataTableProps<TData, TValue = unknown> {
   enableRowSelection?: boolean
   onRowClick?: (row: TData) => void
   onRowSelectionChange?: (selectedRows: TData[]) => void
+  onRowSelectionStateChange?: (
+    updaterOrValue:
+      | Record<string, boolean>
+      | ((old: Record<string, boolean>) => Record<string, boolean>),
+  ) => void
   onPaginationChange?: (pagination: {
     pageIndex: number
     pageSize: number
@@ -49,13 +54,11 @@ export function DataTable<TData, TValue = unknown>({
   enableRowSelection = false,
   onRowClick,
   onRowSelectionChange,
+  onRowSelectionStateChange,
   onPaginationChange,
   pageCount,
   state,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState<
-    Record<string, boolean>
-  >(state.rowSelection || {})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   // Add selection column if enabled
@@ -92,12 +95,12 @@ export function DataTable<TData, TValue = unknown>({
 
   // Handle row selection changes
   React.useEffect(() => {
-    if (onRowSelectionChange) {
+    if (onRowSelectionChange && state.rowSelection) {
       const selectedRows =
         table?.getSelectedRowModel().flatRows.map((row) => row.original) || []
       onRowSelectionChange(selectedRows)
     }
-  }, [rowSelection, onRowSelectionChange])
+  }, [state.rowSelection, onRowSelectionChange])
 
   const table = useReactTable({
     data,
@@ -105,12 +108,12 @@ export function DataTable<TData, TValue = unknown>({
     state: {
       sorting: state.sorting,
       columnVisibility,
-      rowSelection: enableRowSelection ? rowSelection : {},
+      rowSelection: enableRowSelection ? state.rowSelection : {},
       columnFilters: state.columnFilters,
       pagination: state.pagination,
     },
     enableRowSelection,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: onRowSelectionStateChange,
     manualPagination: true, // Enable manual pagination
     pageCount,
     onPaginationChange: (updater) => {

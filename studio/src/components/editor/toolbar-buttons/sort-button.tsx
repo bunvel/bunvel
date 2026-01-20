@@ -70,6 +70,11 @@ export function SortButton({
     }
   }, [open, sorts])
 
+  // Sync sorts when initialSorts changes (table switch)
+  useEffect(() => {
+    setSorts(initialSorts)
+  }, [initialSorts])
+
   const availableColumns = columns.filter(
     (col) => !pendingSorts.some((sort) => sort.column === col.column_name),
   )
