@@ -13,13 +13,9 @@ import {
 import { TableCell, TableHead, TableRow } from '@/components/ui/table'
 import { useDatabaseIndexes } from '@/hooks/queries/useTables'
 import { DatabaseTableIndexes } from '@/services/table.service'
+import { SearchParams } from '@/types'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
-
-interface SearchParams {
-  schema?: string
-  table?: string
-}
 
 export const Route = createFileRoute('/(main)/database/indexes/')({
   component: RouteComponent,

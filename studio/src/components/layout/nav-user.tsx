@@ -11,7 +11,7 @@ import {
 import {
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import {
   BadgeCheck,
@@ -23,15 +23,13 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}) {
+const user = {
+  name: 'Bunvel',
+  email: 'admin@bunvel.com',
+  avatar: '/logo.svg',
+}
+
+export function NavUser() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -40,7 +38,7 @@ export function NavUser({
             render={
               <SidebarMenuButton
                 size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground md:h-12 md:px-4"
+                className="cursor-not-allowed data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground md:h-12 md:px-4"
               >
                 <Avatar className="h-8 w-8 rounded-lg after:rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />

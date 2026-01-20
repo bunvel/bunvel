@@ -8,12 +8,12 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { Env } from '@/utils/func'
-import { Image } from "@unpic/react"
+import { Image } from '@unpic/react'
 
 export function SiteHeader() {
   return (
     <header className="bg-sidebar sticky top-0 z-50 flex w-full items-center border-b px-4">
-      <div className="flex h-(--header-height) w-full items-center gap-2">
+      <div className="flex h-(--header-height) w-full items-center justify-between gap-2">
         <Breadcrumb className="hidden sm:block">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -32,9 +32,7 @@ export function SiteHeader() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="ml-auto">
-          <ModeToggle />
-        </div>
+        <ModeToggle />
       </div>
     </header>
   )

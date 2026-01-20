@@ -10,6 +10,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
 import { Table } from '@/services/table.service'
+import { SearchParams } from '@/types'
 import {
   EyeFreeIcons,
   PropertyViewFreeIcons,
@@ -22,11 +23,6 @@ import { Input } from '../ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { TableFormSheet } from './table-form-sheet'
 import { TableListAction } from './table-list-action'
-
-interface SearchParams {
-  schema?: string
-  table?: string
-}
 
 export function TableList() {
   const navigate = useNavigate()
@@ -165,7 +161,8 @@ export function TableList() {
                   {filteredTables.map((table) => {
                     const isActive = search.table === table.name
                     const isView = table.kind === 'VIEW'
-                    const isMaterializedView = table.kind === 'MATERIALIZED VIEW'
+                    const isMaterializedView =
+                      table.kind === 'MATERIALIZED VIEW'
 
                     return (
                       <SidebarMenuItem key={`${schema}.${table.name}`}>

@@ -5,26 +5,6 @@ import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Button } from '../ui/button'
 
-interface SqlTabProps {
-  tabId: string
-  title: string
-  isActive: boolean
-  isModified?: boolean
-  onClose: (e: React.MouseEvent, tabId: string) => void
-}
-
-function SqlTab({ tabId, title, isActive, isModified, onClose }: SqlTabProps) {
-  return (
-    <BunvelTab
-      value={tabId}
-      title={title}
-      isActive={isActive}
-      isModified={isModified}
-      onClose={onClose}
-    />
-  )
-}
-
 export function SqlTabs() {
   const {
     tabs,
@@ -41,9 +21,9 @@ export function SqlTabs() {
       <Tabs value={activeTabId} onValueChange={handleTabChange}>
         <TabsList className="inline-flex justify-start rounded-none bg-card p-0">
           {tabs.map((tab) => (
-            <SqlTab
+            <BunvelTab
               key={tab.id}
-              tabId={tab.id}
+              value={tab.id}
               title={tab.title}
               isActive={activeTabId === tab.id}
               isModified={tab.isModified}

@@ -3,6 +3,7 @@ import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTables } from '@/hooks/queries/useTables'
 import { TableKind } from '@/services/table.service'
 import { useTableStore } from '@/stores/table-store'
+import { SearchParams } from '@/types'
 import { DEFAULT_PAGE_SIZE, FilterOperator } from '@/utils/constant'
 import { formatCellValue, formatDataType } from '@/utils/format'
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
@@ -12,11 +13,6 @@ import { ColumnDef } from '@tanstack/react-table'
 import { useCallback, useEffect, useMemo } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { TableToolbar } from './table-toolbar'
-
-interface SearchParams {
-  schema?: string
-  table?: string
-}
 
 type TableRow = Record<string, unknown>
 

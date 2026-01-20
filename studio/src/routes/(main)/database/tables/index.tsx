@@ -6,6 +6,7 @@ import { TableFormSheet } from '@/components/editor/table-form-sheet'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableHead, TableRow } from '@/components/ui/table'
 import { useDatabaseTables } from '@/hooks/queries/useTables'
+import { SearchParams } from '@/types'
 import {
   EyeFreeIcons,
   PropertyViewFreeIcons,
@@ -13,11 +14,6 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
-
-interface SearchParams {
-  schema?: string
-  table?: string
-}
 
 export const Route = createFileRoute('/(main)/database/tables/')({
   component: RouteComponent,

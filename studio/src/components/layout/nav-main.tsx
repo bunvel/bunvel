@@ -1,5 +1,3 @@
-import * as React from 'react'
-
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -7,24 +5,44 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { HugeiconsIcon, IconSvgElement } from '@hugeicons/react'
+import {
+  Database,
+  Home01Icon,
+  SqlIcon,
+  TableIcon,
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { Link } from '@tanstack/react-router'
 
-export function NavMain({
-  items,
-  ...props
-}: {
-  items: {
-    title: string
-    url: string
-    icon: IconSvgElement
-  }[]
-} & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+const navMain = [
+  {
+    title: 'Dashboard',
+    url: '/',
+    icon: Home01Icon,
+  },
+  {
+    title: 'SQL Editor',
+    url: '/sql',
+    icon: SqlIcon,
+  },
+  {
+    title: 'Table Editor',
+    url: '/editor',
+    icon: TableIcon,
+  },
+  {
+    title: 'Database',
+    url: '/database/tables',
+    icon: Database,
+  },
+]
+
+export function NavMain() {
   return (
-    <SidebarGroup {...props}>
+    <SidebarGroup>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map((item) => (
+          {navMain.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 render={
