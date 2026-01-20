@@ -3,7 +3,7 @@ import { PanelLeft, PanelLeftClose } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
 interface ToggleSidebarProps {
-  onToggleSidebar?: () => void | undefined
+  onToggleSidebar?: () => void
   showSidebar: boolean
 }
 
@@ -13,6 +13,7 @@ export function ToggleSidebar({
 }: ToggleSidebarProps) {
   return (
     <Button
+      type="button"
       variant="ghost"
       size="sm"
       onClick={() => onToggleSidebar?.()}

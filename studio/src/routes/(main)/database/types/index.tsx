@@ -12,12 +12,9 @@ import {
 } from '@/components/ui/sheet'
 import { TableCell, TableHead, TableRow } from '@/components/ui/table'
 import { useDatabaseEnums } from '@/hooks/queries/useTables'
+import { SearchParams } from '@/types'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
-
-interface SearchParams {
-  schema?: string
-}
 
 export const Route = createFileRoute('/(main)/database/types/')({
   component: RouteComponent,

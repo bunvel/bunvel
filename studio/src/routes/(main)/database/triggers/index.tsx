@@ -13,12 +13,9 @@ import {
 import { TableCell, TableHead, TableRow } from '@/components/ui/table'
 import { useDatabaseTriggers } from '@/hooks/queries/useTables'
 import { DatabaseTrigger } from '@/services/table.service'
+import { SearchParams } from '@/types'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
-
-interface SearchParams {
-  schema?: string
-}
 
 export const Route = createFileRoute('/(main)/database/triggers/')({
   component: RouteComponent,

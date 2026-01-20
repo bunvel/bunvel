@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/select'
 import { useSchemas } from '@/hooks/queries/useSchemas'
 import { Schema } from '@/services/schema.service'
+import { SearchParams } from '@/types'
 import {
   useNavigate,
   useSearch,
@@ -16,11 +17,6 @@ import { useEffect } from 'react'
 import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
 import { CreateSchemaSheet } from './create-schema-sheet'
-
-type SearchParams = {
-  schema?: string
-  table?: string
-}
 
 export function SchemaSelector({ hideCreate = true }: { hideCreate: boolean }) {
   const navigate = useNavigate()
