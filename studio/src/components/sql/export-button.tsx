@@ -8,6 +8,12 @@ import {
 import { useCopy } from '@/hooks/use-copy'
 import { useExport } from '@/hooks/use-export'
 import {
+  BUTTON_LABELS,
+  DROPDOWN_LABELS,
+  EXPORT_FORMATS,
+  ExportFormat,
+} from '@/utils/constant'
+import {
   ArrowDown,
   Files as FileJson,
   File as FileText,
@@ -18,14 +24,14 @@ export function ExportButton({ selectedRows }: { selectedRows: any[] }) {
   const { exportData } = useExport()
   const { copyRows } = useCopy()
 
-  const handleExport = async (format: 'json' | 'csv' | 'sql') => {
+  const handleExport = async (format: ExportFormat) => {
     await exportData(selectedRows, {
       format,
       tableName: new Date().toISOString(),
     })
   }
 
-  const handleCopy = async (format: 'json' | 'csv' | 'sql') => {
+  const handleCopy = async (format: ExportFormat) => {
     await copyRows(selectedRows, {
       format,
       tableName: new Date().toISOString(),
@@ -42,7 +48,7 @@ export function ExportButton({ selectedRows }: { selectedRows: any[] }) {
             className="gap-1"
             disabled={selectedRows.length === 0}
           >
-            <span>Export</span>
+            <span>{BUTTON_LABELS.EXPORT}</span>
             <HugeiconsIcon icon={ArrowDown} className="h-4 w-4" />
           </Button>
         }
@@ -52,21 +58,21 @@ export function ExportButton({ selectedRows }: { selectedRows: any[] }) {
           className="cursor-pointer"
           onClick={(e) => {
             e.preventDefault()
-            handleCopy('json')
+            handleCopy(EXPORT_FORMATS.JSON)
           }}
         >
           <HugeiconsIcon icon={FileJson} className="mr-2 h-4 w-4" />
-          <span>Copy as JSON</span>
+          <span>{DROPDOWN_LABELS.COPY_AS_JSON}</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer"
           onClick={(e) => {
             e.preventDefault()
-            handleExport('csv')
+            handleExport(EXPORT_FORMATS.CSV)
           }}
         >
           <HugeiconsIcon icon={FileText} className="mr-2 h-4 w-4" />
-          <span>Export as CSV</span>
+          <span>{DROPDOWN_LABELS.EXPORT_AS_CSV}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

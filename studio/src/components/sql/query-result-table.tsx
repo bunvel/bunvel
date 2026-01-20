@@ -1,13 +1,7 @@
+import type { QueryResult } from '@/types'
 import { ColumnDef, Row } from '@tanstack/react-table'
 import { useCallback, useMemo, useState } from 'react'
 import { DataTable } from '../data-table/data-table'
-
-export interface QueryResult<T = any> {
-  data: T[]
-  columns: string[]
-  rowCount: number
-  executionTime?: number
-}
 
 interface QueryResultTableProps {
   result?: QueryResult | null

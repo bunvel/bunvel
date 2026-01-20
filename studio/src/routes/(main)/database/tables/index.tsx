@@ -1,11 +1,11 @@
-import {
-  DatabaseTable,
-  type TableColumn,
-} from '@/components/database/database-table'
+import { DatabaseTable } from '@/components/database/database-table'
 import { TableFormSheet } from '@/components/editor/table-form-sheet'
 import { Button } from '@/components/ui/button'
-import { TableCell, TableHead, TableRow } from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseTables } from '@/hooks/queries/useTables'
+import type { TableColumn } from '@/types'
+import { SchemaTable } from '@/types'
+import { PLACEHOLDERS } from '@/utils/constant'
 import {
   EyeFreeIcons,
   PropertyViewFreeIcons,
@@ -13,11 +13,6 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
-
-interface SearchParams {
-  schema?: string
-  table?: string
-}
 
 export const Route = createFileRoute('/(main)/database/tables/')({
   component: RouteComponent,
@@ -33,7 +28,7 @@ const columns: TableColumn[] = [
 ]
 
 function RouteComponent() {
-  const search = useSearch({ strict: false }) as SearchParams
+  const search = useSearch({ strict: false }) as Partial<SchemaTable>
   const { schema } = search
 
   const {
@@ -41,17 +36,6 @@ function RouteComponent() {
     isLoading,
     error,
   } = useDatabaseTables(schema || 'public')
-
-  // Custom header row
-  const headerRow = (cols: TableColumn[]) => (
-    <TableRow>
-      {cols.map((column) => (
-        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
-          {column.header}
-        </TableHead>
-      ))}
-    </TableRow>
-  )
 
   // Custom body row
   const bodyRow = (item: any, index: number) => {
@@ -104,8 +88,7 @@ function RouteComponent() {
         data={tables}
         searchable={true}
         searchFields={['name', 'description']}
-        searchPlaceholder="Search for a table"
-        headerRow={headerRow}
+        searchPlaceholder={PLACEHOLDERS.SEARCH_TABLE}
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}

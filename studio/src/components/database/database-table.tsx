@@ -9,22 +9,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
+import type { TableColumn, TableData } from '@/types'
 import { Back, Loading03Icon, Search } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import * as React from 'react'
 import { Button } from '../ui/button'
 import { Card } from '../ui/card'
-
-export interface TableColumn {
-  key: string
-  header: string
-  width?: string
-  className?: string
-}
-
-export interface TableData {
-  [key: string]: string | number | boolean | null
-}
 interface DatabaseTableProps<T = TableData> {
   columns: TableColumn[]
   data: T[]
@@ -67,57 +57,67 @@ export function DatabaseTable<T = TableData>({
   onBack = () => window.history.back(),
 }: DatabaseTableProps<T>) {
   const [searchQuery, setSearchQuery] = React.useState('')
-  
+
   // Filter data based on search query if searchable is true
   const filteredData = React.useMemo(() => {
     if (!searchable || !searchQuery.trim()) return initialData
 
     const query = searchQuery.toLowerCase()
-    const fieldsToSearch = searchFields || columns.map(col => col.key)
+    const fieldsToSearch = searchFields || columns.map((col) => col.key)
 
     return initialData.filter((item) =>
       Object.entries(item as object).some(
         ([key, value]) =>
-          fieldsToSearch.includes(key) && 
-          value?.toString().toLowerCase().includes(query)
-      )
+          fieldsToSearch.includes(key) &&
+          value?.toString().toLowerCase().includes(query),
+      ),
     )
   }, [searchQuery, initialData, searchable, searchFields, columns])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }
-  // Default header row implementation
-  const defaultHeaderRow = (cols: TableColumn[]) => (
-    <TableRow>
-      {cols.map((column) => (
-        <TableHead
-          key={column.key}
-          style={{ width: column.width || 'auto' }}
-          className={cn(column.className)}
-        >
-          {column.header}
-        </TableHead>
-      ))}
-    </TableRow>
+
+  // Memoize default implementations
+  const defaultHeaderRow = React.useCallback(
+    (cols: TableColumn[]) => (
+      <TableRow>
+        {cols.map((column) => (
+          <TableHead
+            key={column.key}
+            style={{ width: column.width || 'auto' }}
+            className={cn(column.className)}
+          >
+            {column.header}
+          </TableHead>
+        ))}
+      </TableRow>
+    ),
+    [],
   )
-  // Default body row implementation
-  const defaultBodyRow = (item: any, index: number) => (
-    <TableRow key={index}>
-      {columns.map((column) => (
-        <TableCell key={`${index}-${column.key}`}>
-          {String(item[column.key] ?? '-')}
-        </TableCell>
-      ))}
-    </TableRow>
+
+  const defaultBodyRow = React.useCallback(
+    (item: any, index: number) => (
+      <TableRow key={index}>
+        {columns.map((column) => (
+          <TableCell key={`${index}-${column.key}`}>
+            {String(item[column.key] ?? '-')}
+          </TableCell>
+        ))}
+      </TableRow>
+    ),
+    [columns],
   )
-  const renderHeaderRow = React.useMemo(() => 
-    headerRow || defaultHeaderRow
-  , [headerRow])
-  
-  const renderBodyRow = React.useMemo(() => 
-    bodyRow || defaultBodyRow
-  , [bodyRow])
+
+  const renderHeaderRow = React.useMemo(
+    () => headerRow || defaultHeaderRow,
+    [headerRow, defaultHeaderRow],
+  )
+
+  const renderBodyRow = React.useMemo(
+    () => bodyRow || defaultBodyRow,
+    [bodyRow, defaultBodyRow],
+  )
 
   return (
     <Card className="p-4">
@@ -152,8 +152,8 @@ export function DatabaseTable<T = TableData>({
       </div>
       <div className="rounded-md border">
         <Table>
-          <TableHeader className='bg-secondary'>
-            {typeof renderHeaderRow === 'function' ? renderHeaderRow(columns) : defaultHeaderRow(columns)}
+          <TableHeader className="bg-secondary">
+            {renderHeaderRow(columns)}
           </TableHeader>
           <TableBody>
             {isLoading ? (

@@ -1,12 +1,13 @@
 import { Button } from '@/components/ui/button'
+import { DESCRIPTIONS, TITLES } from '@/utils/constant'
 import { Link } from '@tanstack/react-router'
 import { ErrorLayout } from './error-layout'
 
 export function NotFound({ children }: { children?: React.ReactNode }) {
   return (
     <ErrorLayout
-      title="Oops! Page Not Found"
-      description="The page you're looking for doesn't exist or has been moved."
+      title={TITLES.PAGE_NOT_FOUND}
+      description={DESCRIPTIONS.PAGE_NOT_FOUND}
       icon="404"
       actions={
         <>

@@ -1,7 +1,4 @@
-import {
-  DatabaseTable,
-  type TableColumn,
-} from '@/components/database/database-table'
+import { DatabaseTable } from '@/components/database/database-table'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -10,16 +7,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { TableCell, TableHead, TableRow } from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseIndexes } from '@/hooks/queries/useTables'
-import { DatabaseTableIndexes } from '@/services/table.service'
+import type { DatabaseTableIndexes, SchemaTable, TableColumn } from '@/types'
+import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
-
-interface SearchParams {
-  schema?: string
-  table?: string
-}
 
 export const Route = createFileRoute('/(main)/database/indexes/')({
   component: RouteComponent,
@@ -36,7 +29,7 @@ const columns: TableColumn[] = [
 function RouteComponent() {
   const [selectedIndex, setSelectedIndex] =
     useState<DatabaseTableIndexes | null>(null)
-  const search = useSearch({ strict: false }) as SearchParams
+  const search = useSearch({ strict: false }) as Partial<SchemaTable>
   const { schema } = search
 
   const {
@@ -44,17 +37,6 @@ function RouteComponent() {
     isLoading,
     error,
   } = useDatabaseIndexes(schema || 'public')
-
-  // Custom header row
-  const headerRow = (cols: TableColumn[]) => (
-    <TableRow>
-      {cols.map((column) => (
-        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
-          {column.header}
-        </TableHead>
-      ))}
-    </TableRow>
-  )
 
   // Custom body row
   const bodyRow = (item: DatabaseTableIndexes, index: number) => {
@@ -102,8 +84,7 @@ function RouteComponent() {
         data={tables}
         searchable={true}
         searchFields={['table_name', 'column_name', 'index_name']}
-        searchPlaceholder="Search for an index"
-        headerRow={headerRow}
+        searchPlaceholder={PLACEHOLDERS.SEARCH_INDEXES}
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}

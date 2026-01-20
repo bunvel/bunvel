@@ -1,11 +1,22 @@
+import { EXPORT_FORMATS, ExportFormat } from '@/utils/constant'
 import { useCallback } from 'react'
 
 interface ExportOptions {
-  format?: 'json' | 'csv' | 'sql'
+  format?: ExportFormat
   tableName?: string
   delimiter?: string
   lineTerminator?: string
   includeTableStructure?: boolean
+}
+
+interface FormatHandlerResult {
+  content: string
+  mimeType: string
+  fileExtension: string
+}
+
+interface FormatHandler<T extends Record<string, unknown>> {
+  handle: (data: T[], options: ExportOptions) => FormatHandlerResult
 }
 
 export function useExport() {
@@ -35,6 +46,78 @@ export function useExport() {
            ');\n\n'
   }
 
+  const jsonHandler: FormatHandler<Record<string, unknown>> = {
+    handle: (data) => ({
+      content: JSON.stringify(data, null, 2),
+      mimeType: 'application/json',
+      fileExtension: 'json'
+    })
+  }
+
+  const csvHandler: FormatHandler<Record<string, unknown>> = {
+    handle: (data, options) => {
+      const { delimiter = ',', lineTerminator = '\n' } = options
+      const headers = Object.keys(data[0] || {})
+      const csvRows = data.map(row => 
+        headers
+          .map(header => escapeCsvValue(row[header]))
+          .join(delimiter)
+      )
+      csvRows.unshift(headers.map(escapeCsvValue).join(delimiter))
+      
+      return {
+        content: csvRows.join(lineTerminator),
+        mimeType: 'text/csv',
+        fileExtension: 'csv'
+      }
+    }
+  }
+
+  const sqlHandler: FormatHandler<Record<string, unknown>> = {
+    handle: (data, options) => {
+      const { tableName = 'exported_data', includeTableStructure = true } = options
+      const columns = Object.keys(data[0] || {})
+      const escapedTableName = escapeSqlIdentifier(tableName)
+      const escapedColumns = columns.map(escapeSqlIdentifier)
+      
+      let content = ''
+
+      if (includeTableStructure) {
+        content += generateTableStructure(columns, tableName)
+      }
+
+      const values = data.map(row => 
+        `(${columns
+          .map(col => {
+            const val = row[col]
+            if (val === null || val === undefined) return 'NULL'
+            if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`
+            if (typeof val === 'boolean') return val ? 'TRUE' : 'FALSE'
+            if (typeof val === 'number') return val.toString()
+            if (typeof val === 'object') return `'${JSON.stringify(val).replace(/'/g, "''")}'`
+            return `'${String(val).replace(/'/g, "''")}'`
+          })
+          .join(', ')})`
+      ).join(',\n')
+
+      content += `-- Data for ${escapedTableName}\n`
+      content += `INSERT INTO ${escapedTableName} (${escapedColumns.join(', ')})\n` +
+                `VALUES\n${values};\n`
+      
+      return {
+        content,
+        mimeType: 'text/plain',
+        fileExtension: 'sql'
+      }
+    }
+  }
+
+  const formatHandlers = {
+    [EXPORT_FORMATS.JSON]: jsonHandler,
+    [EXPORT_FORMATS.CSV]: csvHandler,
+    [EXPORT_FORMATS.SQL]: sqlHandler
+  }
+
   const exportData = useCallback(
     async <T extends Record<string, unknown>>(
       data: T[],
@@ -47,63 +130,17 @@ export function useExport() {
         }
 
         const {
-          format = 'json',
-          tableName = 'exported_data',
-          delimiter = ',',
-          lineTerminator = '\n',
-          includeTableStructure = true
+          format = EXPORT_FORMATS.JSON,
+          tableName = 'exported_data'
         } = options
 
-        let content = ''
-        let mimeType = 'text/plain'
-        let fileExtension = 'txt'
-
-        if (format === 'json') {
-          content = JSON.stringify(data, null, 2)
-          mimeType = 'application/json'
-          fileExtension = 'json'
-        } else if (format === 'csv') {
-          const headers = Object.keys(data[0] || {})
-          const csvRows = data.map(row => 
-            headers
-              .map(header => escapeCsvValue(row[header]))
-              .join(delimiter)
-          )
-          csvRows.unshift(headers.map(escapeCsvValue).join(delimiter))
-          content = csvRows.join(lineTerminator)
-          mimeType = 'text/csv'
-          fileExtension = 'csv'
-        } else if (format === 'sql') {
-          const columns = Object.keys(data[0] || {})
-          const escapedTableName = escapeSqlIdentifier(tableName)
-          const escapedColumns = columns.map(escapeSqlIdentifier)
-          
-          content = ''
-
-          if (includeTableStructure) {
-            content += generateTableStructure(columns, tableName)
-          }
-
-          const values = data.map(row => 
-            `(${columns
-              .map(col => {
-                const val = row[col]
-                if (val === null || val === undefined) return 'NULL'
-                if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`
-                if (typeof val === 'boolean') return val ? 'TRUE' : 'FALSE'
-                if (typeof val === 'number') return val.toString()
-                if (typeof val === 'object') return `'${JSON.stringify(val).replace(/'/g, "''")}'`
-                return `'${String(val).replace(/'/g, "''")}'`
-              })
-              .join(', ')})`
-          ).join(',\n')
-
-          content += `-- Data for ${escapedTableName}\n`
-          content += `INSERT INTO ${escapedTableName} (${escapedColumns.join(', ')})\n` +
-                    `VALUES\n${values};\n`
-          
-          fileExtension = 'sql'
+        const handler = formatHandlers[format]
+        if (!handler) {
+          console.error(`Unsupported export format: ${format}`)
+          return false
         }
+
+        const { content, mimeType, fileExtension } = handler.handle(data, options)
 
         // Create and trigger download
         const blob = new Blob([content], { type: `${mimeType};charset=utf-8;` })

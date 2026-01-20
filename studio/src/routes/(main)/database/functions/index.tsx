@@ -1,7 +1,4 @@
-import {
-  DatabaseTable,
-  type TableColumn,
-} from '@/components/database/database-table'
+import { DatabaseTable } from '@/components/database/database-table'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -10,15 +7,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { TableCell, TableHead, TableRow } from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseFunctions } from '@/hooks/queries/useTables'
-import { DatabaseFunction } from '@/services/table.service'
+import type { TableColumn } from '@/types'
+import { DatabaseFunction, SchemaTable } from '@/types'
+import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
-
-interface SearchParams {
-  schema?: string
-}
 
 export const Route = createFileRoute('/(main)/database/functions/')({
   component: RouteComponent,
@@ -36,7 +31,7 @@ const columns: TableColumn[] = [
 function RouteComponent() {
   const [selectedFunction, setSelectedFunction] =
     useState<DatabaseFunction | null>(null)
-  const search = useSearch({ strict: false }) as SearchParams
+  const search = useSearch({ strict: false }) as Partial<SchemaTable>
   const { schema } = search
 
   const {
@@ -44,17 +39,6 @@ function RouteComponent() {
     isLoading,
     error,
   } = useDatabaseFunctions(schema || 'public')
-
-  // Custom header row
-  const headerRow = (cols: TableColumn[]) => (
-    <TableRow>
-      {cols.map((column) => (
-        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
-          {column.header}
-        </TableHead>
-      ))}
-    </TableRow>
-  )
 
   // Custom body row
   const bodyRow = (func: DatabaseFunction, index: number) => {
@@ -91,7 +75,7 @@ function RouteComponent() {
                 <SheetTitle>{selectedFunction?.function_name}</SheetTitle>
               </SheetHeader>
               <div className="flex-1 p-4 overflow-auto">
-                <p>Defination detail not yet implemented</p>
+                <p>Definition detail not yet implemented</p>
               </div>
             </SheetContent>
           </Sheet>
@@ -107,8 +91,7 @@ function RouteComponent() {
         data={functions}
         searchable={true}
         searchFields={['function_name', 'arguments', 'return_type']}
-        searchPlaceholder="Search functions..."
-        headerRow={headerRow}
+        searchPlaceholder={PLACEHOLDERS.SEARCH_FUNCTIONS}
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}

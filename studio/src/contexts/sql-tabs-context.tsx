@@ -1,3 +1,4 @@
+import type { SqlTab, SqlTabsContextType } from '@/types'
 import {
   createContext,
   ReactNode,
@@ -6,34 +7,6 @@ import {
   useEffect,
   useState,
 } from 'react'
-
-export interface SqlTab {
-  id: string
-  title: string
-  query: string
-  isModified?: boolean
-  result?: any
-  error?: any
-  isExecuting?: boolean
-  lastExecutedQuery?: string
-}
-
-interface SqlTabsContextType {
-  tabs: SqlTab[]
-  activeTabId: string | undefined
-  addTab: (tab: SqlTab, maxTabs?: number) => void
-  removeTab: (tabId: string) => void
-  setActiveTab: (tabId: string) => void
-  updateTabQuery: (tabId: string, query: string) => void
-  updateTabExecution: (
-    tabId: string,
-    result: any,
-    error: any,
-    isExecuting: boolean,
-    lastExecutedQuery: string,
-  ) => void
-  createNewQueryTab: () => void
-}
 
 const SqlTabsContext = createContext<SqlTabsContextType | undefined>(undefined)
 

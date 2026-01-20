@@ -6,17 +6,10 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
+import type { SqlTemplate } from '@/types'
 import { FileText, Users } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { SQL_TEMPLATE_QUERIES } from './sql-template-queries'
-
-export interface SqlTemplate {
-  id: string
-  name: string
-  description: string
-  query: string
-  icon: any
-}
 
 const sqlTemplates: SqlTemplate[] = [
   {

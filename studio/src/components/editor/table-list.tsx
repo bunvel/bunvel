@@ -9,7 +9,8 @@ import {
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
-import { Table } from '@/services/table.service'
+import { SchemaTable, Table } from '@/types'
+import { PLACEHOLDERS } from '@/utils/constant'
 import {
   EyeFreeIcons,
   PropertyViewFreeIcons,
@@ -23,14 +24,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { TableFormSheet } from './table-form-sheet'
 import { TableListAction } from './table-list-action'
 
-interface SearchParams {
-  schema?: string
-  table?: string
-}
-
 export function TableList() {
   const navigate = useNavigate()
-  const search = useSearch({ strict: false }) as SearchParams
+  const search = useSearch({ strict: false }) as SchemaTable
   const { schema } = search
   const { data: tables = [], isLoading, error, refetch } = useTables(schema)
   const [searchQuery, setSearchQuery] = useState('')
@@ -113,7 +109,7 @@ export function TableList() {
 
   if (tables.length === 0) {
     return (
-      <div className="p-4 flex-1 flex flex-col items-center justify-center text-center">
+      <div className="p-4 flex-1 flex flex-col items-center text-center">
         <HugeiconsIcon
           icon={TableIcon}
           className="mb-2 h-8 w-8 text-muted-foreground/50"
@@ -139,7 +135,7 @@ export function TableList() {
       <div className="shrink-0 p-4 pb-2">
         <div className="flex gap-1">
           <Input
-            placeholder="Search tables & views..."
+            placeholder={PLACEHOLDERS.SEARCH_TABLES}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-1"
@@ -165,7 +161,8 @@ export function TableList() {
                   {filteredTables.map((table) => {
                     const isActive = search.table === table.name
                     const isView = table.kind === 'VIEW'
-                    const isMaterializedView = table.kind === 'MATERIALIZED VIEW'
+                    const isMaterializedView =
+                      table.kind === 'MATERIALIZED VIEW'
 
                     return (
                       <SidebarMenuItem key={`${schema}.${table.name}`}>

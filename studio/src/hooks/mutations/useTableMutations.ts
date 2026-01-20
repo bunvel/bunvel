@@ -1,4 +1,5 @@
-import { createTable, CreateTableParams } from '@/services/table.service'
+import { createTable } from '@/services/table.service'
+import type { CreateTableParams } from '@/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '../queries/query-key'

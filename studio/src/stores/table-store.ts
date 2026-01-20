@@ -1,38 +1,14 @@
-import { DEFAULT_PAGE_SIZE, FilterOperator } from '@/utils/constant'
+import type {
+    FilterConfig,
+    PaginationConfig,
+    SortConfig,
+    TableRow,
+    TableState,
+    TableTabsState
+} from '@/types'
+import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
-
-export type TableRow = Record<string, unknown>
-
-export interface FilterConfig {
-  column: string
-  operator: FilterOperator
-  value: string
-}
-
-export interface SortConfig {
-  column: string
-  direction: 'asc' | 'desc'
-}
-
-export interface PaginationConfig {
-  pageIndex: number
-  pageSize: number
-}
-
-export interface TableState {
-  selectedRows: TableRow[]
-  rowSelection: Record<string, boolean>
-  pagination: PaginationConfig
-  sorts: SortConfig[]
-  filters: FilterConfig[]
-}
-
-export interface TableTabsState {
-  selectedTables: string[]
-  maxTabs: number
-  activeTableKey: string | null
-}
 
 export interface TableStore {
   // Table states per table

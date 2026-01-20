@@ -1,4 +1,4 @@
-import { TableKind } from '@/services/table.service'
+import { TableKind } from '@/types'
 import { FilterOperator } from '@/utils/constant'
 import { isReadonlySchema } from '@/utils/func'
 import {

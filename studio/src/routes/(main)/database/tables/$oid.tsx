@@ -1,9 +1,8 @@
-import {
-  DatabaseTable,
-  TableColumn,
-} from '@/components/database/database-table'
-import { TableCell, TableHead, TableRow } from '@/components/ui/table'
+import { DatabaseTable } from '@/components/database/database-table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseTableColumns } from '@/hooks/queries/useTables'
+import type { TableColumn } from '@/types'
+import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(main)/database/tables/$oid')({
@@ -16,26 +15,12 @@ const columns: TableColumn[] = [
   { key: 'description', header: 'DESCRIPTION' },
   { key: 'data_type', header: 'DATA TYPE' },
   { key: 'nullable', header: 'NULLABLE' },
-  { key: 'poistion', header: 'POSITION' },
+  { key: 'position', header: 'POSITION' },
 ]
 
 function RouteComponent() {
   const { oid } = Route.useParams()
   const { data: tables = [], isLoading, error } = useDatabaseTableColumns(oid)
-
-  // Custom header row
-  const headerRow = (cols: TableColumn[]) => (
-    <TableRow>
-      {cols.map((column) => (
-        <TableHead
-          key={column.key}
-          style={{ width: column.width || 'auto' }}
-        >
-          {column.header}
-        </TableHead>
-      ))}
-    </TableRow>
-  )
 
   // Custom body row
   const bodyRow = (item: any, index: number) => {
@@ -63,8 +48,7 @@ function RouteComponent() {
         data={tables}
         searchable={true}
         searchFields={['name', 'description', 'data_type']}
-        searchPlaceholder="Search for a column"
-        headerRow={headerRow}
+        searchPlaceholder={PLACEHOLDERS.SEARCH_COLUMN}
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}

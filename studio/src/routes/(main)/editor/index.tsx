@@ -1,11 +1,10 @@
+import { ToggleSidebar } from '@/components/common/toggle-sidebar'
 import { SchemaSelector } from '@/components/editor/schema-selector'
 import { TableList } from '@/components/editor/table-list'
 import { TableTabs } from '@/components/editor/table-tabs'
 import { TableViewer } from '@/components/editor/table-viewer'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import { PanelLeft, PanelLeftClose } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
@@ -43,17 +42,10 @@ function RouteComponent() {
       >
         <div className="h-full flex flex-col">
           <div className="flex items-center">
-            <button
-              onClick={handleToggleSidebar}
-              className="h-8 w-8 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-sm"
-            >
-              {showSidebar ? (
-                <HugeiconsIcon icon={PanelLeftClose} className="h-4 w-4" />
-              ) : (
-                <HugeiconsIcon icon={PanelLeft} className="h-4 w-4" />
-              )}
-              <span className="sr-only">Toggle Sidebar</span>
-            </button>
+            <ToggleSidebar
+              onToggleSidebar={handleToggleSidebar}
+              showSidebar={showSidebar}
+            />
             <TableTabs />
           </div>
           <TableViewer />

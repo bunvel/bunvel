@@ -1,17 +1,6 @@
 import { useTableStore } from '@/stores/table-store'
+import type { TableTabsContextType } from '@/types'
 import { createContext, ReactNode, useContext } from 'react'
-
-interface TableTabsContextType {
-  selectedTables: string[]
-  activeTableKey: string | null
-  maxTabs: number
-  addTable: (schema: string, table: string, maxTabs?: number) => void
-  removeTable: (tableKey: string) => void
-  removeTableBySchema: (schema: string, table: string) => void
-  setActiveTable: (tableKey: string | null) => void
-  setMaxTabs: (maxTabs: number) => void
-  clearAllTabs: () => void
-}
 
 const TableTabsContext = createContext<TableTabsContextType | undefined>(
   undefined,

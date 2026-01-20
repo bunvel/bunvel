@@ -10,6 +10,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useCreateSchema } from '@/hooks/mutations/useCreateSchema'
+import { BUTTON_LABELS, DESCRIPTIONS, PLACEHOLDERS } from '@/utils/constant'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useForm } from '@tanstack/react-form'
@@ -80,10 +81,10 @@ export function CreateSchemaSheet() {
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="Enter schema name"
+                    placeholder={PLACEHOLDERS.SCHEMA_NAME}
                     required
                     pattern="[a-zA-Z_][a-zA-Z0-9_]*"
-                    title="Schema name must start with a letter or underscore and contain only letters, numbers, or underscores"
+                    title={DESCRIPTIONS.SCHEMA_NAME_RULES}
                   />
                   {field.state.meta.errors && (
                     <p className="text-sm text-red-500">
@@ -101,10 +102,10 @@ export function CreateSchemaSheet() {
               onClick={() => setOpen(false)}
               disabled={isPending}
             >
-              Cancel
+              {BUTTON_LABELS.CANCEL}
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? 'Creating...' : 'Create Schema'}
+              {isPending ? 'Creating...' : BUTTON_LABELS.CREATE_SCHEMA}
             </Button>
           </SheetFooter>
         </form>

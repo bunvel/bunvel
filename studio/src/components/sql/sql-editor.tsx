@@ -1,16 +1,10 @@
-import { Button } from '@/components/ui/button'
 import { useExecuteSqlQuery } from '@/hooks/mutations/useExecuteSqlQuery'
 import { useSqlTabs } from '@/hooks/use-sql-tabs'
 import { cn } from '@/lib/utils'
-import {
-  Alert,
-  Check,
-  Info,
-  PanelLeft,
-  PanelLeftClose,
-} from '@hugeicons/core-free-icons'
+import { Alert, Check, Info } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
+import { ToggleSidebar } from '../common/toggle-sidebar'
 import { Spinner } from '../ui/spinner'
 import { QueryResultActions } from './query-result-actions'
 import { QueryResultTable } from './query-result-table'
@@ -85,19 +79,10 @@ export function SqlEditor({
   return (
     <div className={cn('h-full flex flex-col', className)}>
       <div className="flex items-center gap-2 border-b">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggleSidebar}
-          className="h-8 w-8 p-0"
-        >
-          {showSidebar ? (
-            <HugeiconsIcon icon={PanelLeftClose} className="h-4 w-4" />
-          ) : (
-            <HugeiconsIcon icon={PanelLeft} className="h-4 w-4" />
-          )}
-          <span className="sr-only">Toggle Sidebar</span>
-        </Button>
+        <ToggleSidebar
+          onToggleSidebar={onToggleSidebar}
+          showSidebar={showSidebar}
+        />
         <SqlTabs />
       </div>
       <div className="flex-1 min-h-0 flex flex-col">

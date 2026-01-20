@@ -300,5 +300,3 @@ export const SQL_QUERIES = {
       array_position(c.conkey, a.attnum);
   `,
 } as const
-
-export type SqlQueryKey = keyof typeof SQL_QUERIES
