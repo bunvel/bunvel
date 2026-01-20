@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { SCREEN_READER_LABELS } from '@/utils/constant'
 import { PanelLeft, PanelLeftClose } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
@@ -24,7 +25,7 @@ export function ToggleSidebar({
       ) : (
         <HugeiconsIcon icon={PanelLeft} className="h-4 w-4" />
       )}
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">{SCREEN_READER_LABELS.TOGGLE_SIDEBAR}</span>
     </Button>
   )
 }

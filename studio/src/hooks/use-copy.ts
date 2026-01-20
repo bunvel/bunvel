@@ -1,10 +1,11 @@
+import { EXPORT_FORMATS, ExportFormat } from '@/utils/constant'
 import { escapeIdentifier } from '@/utils/func'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 import { useCopyToClipboard } from './use-clipboard'
 
 interface CopyOptions {
-  format?: 'json' | 'csv' | 'sql'
+  format?: ExportFormat
   tableName?: string
   delimiter?: string
   lineTerminator?: string
@@ -33,7 +34,7 @@ export function useCopy() {
       options: CopyOptions = {},
     ): Promise<boolean> => {
       const {
-        format = 'json',
+        format = EXPORT_FORMATS.JSON,
         tableName = 'table_name',
         delimiter = ',',
         lineTerminator = '\n',
@@ -47,9 +48,9 @@ export function useCopy() {
 
         let text = ''
 
-        if (format === 'json') {
+        if (format === EXPORT_FORMATS.JSON) {
           text = JSON.stringify(rows, null, 2)
-        } else if (format === 'csv') {
+        } else if (format === EXPORT_FORMATS.CSV) {
           const headers = Object.keys(rows[0] || {})
           const csvRows = rows.map((row) =>
             headers
@@ -58,7 +59,7 @@ export function useCopy() {
           )
           csvRows.unshift(headers.map(escapeCsvValue).join(delimiter))
           text = csvRows.join(lineTerminator)
-        } else if (format === 'sql') {
+        } else if (format === EXPORT_FORMATS.SQL) {
           if (!tableName) {
             throw new Error('Table name is required for SQL format')
           }

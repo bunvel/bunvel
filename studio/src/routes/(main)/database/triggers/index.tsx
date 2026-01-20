@@ -13,7 +13,8 @@ import {
 import { TableCell, TableHead, TableRow } from '@/components/ui/table'
 import { useDatabaseTriggers } from '@/hooks/queries/useTables'
 import { DatabaseTrigger } from '@/services/table.service'
-import { SearchParams } from '@/types'
+import { SchemaTable } from '@/types'
+import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 
@@ -34,7 +35,7 @@ const columns: TableColumn[] = [
 function RouteComponent() {
   const [selectedTrigger, setSelectedTrigger] =
     useState<DatabaseTrigger | null>(null)
-  const search = useSearch({ strict: false }) as SearchParams
+  const search = useSearch({ strict: false }) as SchemaTable
   const { schema } = search
 
   const {
@@ -141,7 +142,7 @@ function RouteComponent() {
           'events',
           'timing',
         ]}
-        searchPlaceholder="Search triggers..."
+        searchPlaceholder={PLACEHOLDERS.SEARCH_TRIGGERS}
         headerRow={headerRow}
         bodyRow={bodyRow}
         isLoading={isLoading}

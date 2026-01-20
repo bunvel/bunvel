@@ -4,6 +4,7 @@ import {
 } from '@/components/database/database-table'
 import { TableCell, TableHead, TableRow } from '@/components/ui/table'
 import { useDatabaseTableColumns } from '@/hooks/queries/useTables'
+import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(main)/database/tables/$oid')({
@@ -27,10 +28,7 @@ function RouteComponent() {
   const headerRow = (cols: TableColumn[]) => (
     <TableRow>
       {cols.map((column) => (
-        <TableHead
-          key={column.key}
-          style={{ width: column.width || 'auto' }}
-        >
+        <TableHead key={column.key} style={{ width: column.width || 'auto' }}>
           {column.header}
         </TableHead>
       ))}
@@ -63,7 +61,7 @@ function RouteComponent() {
         data={tables}
         searchable={true}
         searchFields={['name', 'description', 'data_type']}
-        searchPlaceholder="Search for a column"
+        searchPlaceholder={PLACEHOLDERS.SEARCH_COLUMN}
         headerRow={headerRow}
         bodyRow={bodyRow}
         isLoading={isLoading}

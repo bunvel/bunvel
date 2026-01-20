@@ -6,7 +6,8 @@ import { TableFormSheet } from '@/components/editor/table-form-sheet'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableHead, TableRow } from '@/components/ui/table'
 import { useDatabaseTables } from '@/hooks/queries/useTables'
-import { SearchParams } from '@/types'
+import { SchemaTable } from '@/types'
+import { PLACEHOLDERS } from '@/utils/constant'
 import {
   EyeFreeIcons,
   PropertyViewFreeIcons,
@@ -29,7 +30,7 @@ const columns: TableColumn[] = [
 ]
 
 function RouteComponent() {
-  const search = useSearch({ strict: false }) as SearchParams
+  const search = useSearch({ strict: false }) as SchemaTable
   const { schema } = search
 
   const {
@@ -100,7 +101,7 @@ function RouteComponent() {
         data={tables}
         searchable={true}
         searchFields={['name', 'description']}
-        searchPlaceholder="Search for a table"
+        searchPlaceholder={PLACEHOLDERS.SEARCH_TABLE}
         headerRow={headerRow}
         bodyRow={bodyRow}
         isLoading={isLoading}

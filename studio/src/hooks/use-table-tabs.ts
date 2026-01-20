@@ -1,5 +1,5 @@
 import { useTableTabsContext } from '@/contexts/table-tabs-context'
-import { SearchParams } from '@/types'
+import { SchemaTable } from '@/types'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useCallback, useEffect } from 'react'
 
@@ -16,7 +16,7 @@ interface UseTableTabsReturn {
 export function useTableTabs(): UseTableTabsReturn {
   const maxTabs = 5 
   const navigate = useNavigate()
-  const { schema, table } = useSearch({ strict: false }) as SearchParams
+  const { schema, table } = useSearch({ strict: false }) as SchemaTable
   const { 
     selectedTables, 
     addTable: contextAddTable, 

@@ -29,6 +29,7 @@ import {
   DEFAULT_COLUMN,
   DEFAULT_FOREIGN_KEY,
   FOREIGN_KEY_ACTIONS,
+  PLACEHOLDERS,
 } from '@/utils/constant'
 import { Plus, Settings, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -214,7 +215,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                   name="name"
                   value={formValues.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="users, products, orders"
+                  placeholder={PLACEHOLDERS.TABLE_NAME}
                   required
                   pattern="[a-zA-Z_][a-zA-Z0-9_]*"
                   className="w-full"
@@ -232,7 +233,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                   onChange={(e) =>
                     handleInputChange('description', e.target.value)
                   }
-                  placeholder="Optional"
+                  placeholder={PLACEHOLDERS.OPTIONAL}
                   className="w-full"
                   disabled={isSubmitting}
                 />
@@ -281,7 +282,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                           onChange={(e) =>
                             handleColumnChange(index, 'name', e.target.value)
                           }
-                          placeholder="e.g., name"
+                          placeholder={PLACEHOLDERS.COLUMN_NAME}
                           required
                           disabled={isSubmitting}
                         />
@@ -320,7 +321,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                               e.target.value,
                             )
                           }
-                          placeholder="Optional"
+                          placeholder={PLACEHOLDERS.OPTIONAL}
                           disabled={isSubmitting}
                         />
                       </div>
@@ -492,7 +493,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                               ),
                             }))
                           }
-                          placeholder="Table name"
+                          placeholder={PLACEHOLDERS.TABLE_NAME_FK}
                           className="w-full"
                         />
                       </div>
@@ -513,7 +514,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                               ),
                             }))
                           }
-                          placeholder="Column name"
+                          placeholder={PLACEHOLDERS.COLUMN_NAME_FK}
                           className="w-full"
                         />
                       </div>

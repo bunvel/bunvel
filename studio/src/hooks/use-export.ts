@@ -1,7 +1,8 @@
+import { EXPORT_FORMATS, ExportFormat } from '@/utils/constant'
 import { useCallback } from 'react'
 
 interface ExportOptions {
-  format?: 'json' | 'csv' | 'sql'
+  format?: ExportFormat
   tableName?: string
   delimiter?: string
   lineTerminator?: string
@@ -47,7 +48,7 @@ export function useExport() {
         }
 
         const {
-          format = 'json',
+          format = EXPORT_FORMATS.JSON,
           tableName = 'exported_data',
           delimiter = ',',
           lineTerminator = '\n',
@@ -58,11 +59,11 @@ export function useExport() {
         let mimeType = 'text/plain'
         let fileExtension = 'txt'
 
-        if (format === 'json') {
+        if (format === EXPORT_FORMATS.JSON) {
           content = JSON.stringify(data, null, 2)
           mimeType = 'application/json'
           fileExtension = 'json'
-        } else if (format === 'csv') {
+        } else if (format === EXPORT_FORMATS.CSV) {
           const headers = Object.keys(data[0] || {})
           const csvRows = data.map(row => 
             headers
@@ -73,7 +74,7 @@ export function useExport() {
           content = csvRows.join(lineTerminator)
           mimeType = 'text/csv'
           fileExtension = 'csv'
-        } else if (format === 'sql') {
+        } else if (format === EXPORT_FORMATS.SQL) {
           const columns = Object.keys(data[0] || {})
           const escapedTableName = escapeSqlIdentifier(tableName)
           const escapedColumns = columns.map(escapeSqlIdentifier)

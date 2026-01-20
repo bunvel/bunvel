@@ -28,7 +28,7 @@ function SqlRouteContent() {
     useQueryHistory(setSelectedQuery)
 
   const handleToggleSidebar = () => {
-    setShowSidebar(!showSidebar)
+    setShowSidebar((prev) => !prev)
   }
 
   const handleOpenInTab = (tab: SqlTab) => {

@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/sheet'
 import { TableCell, TableHead, TableRow } from '@/components/ui/table'
 import { useDatabaseEnums } from '@/hooks/queries/useTables'
-import { SearchParams } from '@/types'
+import { SchemaTable } from '@/types'
+import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 
@@ -34,7 +35,7 @@ function RouteComponent() {
     values: string[]
     schema: string
   } | null>(null)
-  const search = useSearch({ strict: false }) as SearchParams
+  const search = useSearch({ strict: false }) as SchemaTable
   const { schema } = search
 
   const {
@@ -130,7 +131,7 @@ function RouteComponent() {
         data={enumData}
         searchable={true}
         searchFields={['enum_name', 'enum_values']}
-        searchPlaceholder="Search for an enum type"
+        searchPlaceholder={PLACEHOLDERS.SEARCH_ENUMS}
         headerRow={headerRow}
         bodyRow={bodyRow}
         isLoading={isLoading}

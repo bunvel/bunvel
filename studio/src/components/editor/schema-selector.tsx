@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/select'
 import { useSchemas } from '@/hooks/queries/useSchemas'
 import { Schema } from '@/services/schema.service'
-import { SearchParams } from '@/types'
+import { SchemaTable } from '@/types'
 import {
   useNavigate,
   useSearch,
@@ -20,7 +20,7 @@ import { CreateSchemaSheet } from './create-schema-sheet'
 
 export function SchemaSelector({ hideCreate = true }: { hideCreate: boolean }) {
   const navigate = useNavigate()
-  const search = useSearch({ strict: false }) as SearchParams
+  const search = useSearch({ strict: false }) as SchemaTable
   const { data: schemas, error, isFetching, refetch } = useSchemas()
 
   // Calculate derived state
@@ -33,7 +33,7 @@ export function SchemaSelector({ hideCreate = true }: { hideCreate: boolean }) {
   useEffect(() => {
     if (defaultSchema && !search.schema) {
       navigate({
-        search: (prev: SearchParams) => ({
+        search: (prev: SchemaTable) => ({
           ...prev,
           schema: defaultSchema,
         }),
@@ -81,7 +81,7 @@ export function SchemaSelector({ hideCreate = true }: { hideCreate: boolean }) {
 
   const handleSchemaChange = (value: string | null) => {
     navigate({
-      search: (prev: SearchParams) => ({
+      search: (prev: SchemaTable) => ({
         ...prev,
         schema: value || defaultSchema,
         table: undefined,

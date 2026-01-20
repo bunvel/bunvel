@@ -43,6 +43,7 @@ export interface SortConfig {
   direction: 'asc' | 'desc'
 }
 
+import { SchemaTable } from '@/types'
 import { FilterOperator } from '@/utils/constant'
 
 export interface FilterConfig {
@@ -66,13 +67,8 @@ export interface TableMetadataResult {
   data: TableMetadata
 }
 
-export interface TableMetadataParams {
-  schema: string
-  table: string
-}
-
 export const getTableMetadata = createServerFn({ method: 'POST' })
-  .inputValidator((d: TableMetadataParams) => d)
+  .inputValidator((d: SchemaTable) => d)
   .handler(async ({ data }) => {
     try {
       // Single API call to get all metadata

@@ -4,6 +4,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { BUTTON_LABELS } from '@/utils/constant'
 import { Edit } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { toast } from 'sonner'
@@ -30,7 +31,7 @@ export function EditButton({ selectRows, disabled = false }: EditButtonProps) {
       disabled={isDisabled}
     >
       <HugeiconsIcon icon={Edit} className="h-4 w-4" />
-      <span>Edit</span>
+      <span>{BUTTON_LABELS.EDIT}</span>
     </Button>
   )
 

@@ -7,6 +7,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useExport } from '@/hooks/use-export'
 import {
+  BUTTON_LABELS,
+  DROPDOWN_LABELS,
+  EXPORT_FORMATS,
+  ExportFormat,
+} from '@/utils/constant'
+import {
   ArrowDown,
   Files as FileJson,
   File as FileText,
@@ -27,7 +33,7 @@ export function ExportButton({
 }: ExportButtonProps) {
   const { exportData } = useExport()
 
-  const handleExport = async (format: 'json' | 'csv' | 'sql') => {
+  const handleExport = async (format: ExportFormat) => {
     await exportData(selectedRows, {
       format,
       tableName: `${schema}_${table}`,
@@ -44,7 +50,7 @@ export function ExportButton({
             className="gap-1"
             disabled={!table || !schema || selectedRows.length === 0}
           >
-            <span>Export</span>
+            <span>{BUTTON_LABELS.EXPORT}</span>
             <HugeiconsIcon icon={ArrowDown} className="h-4 w-4" />
           </Button>
         }
@@ -54,32 +60,32 @@ export function ExportButton({
           className="cursor-pointer"
           onClick={(e) => {
             e.preventDefault()
-            handleExport('json')
+            handleExport(EXPORT_FORMATS.JSON)
           }}
         >
           <HugeiconsIcon icon={FileJson} className="mr-2 h-4 w-4" />
-          <span>Export as JSON</span>
+          <span>{DROPDOWN_LABELS.EXPORT_AS_JSON}</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer"
           onClick={(e) => {
             e.preventDefault()
-            handleExport('csv')
+            handleExport(EXPORT_FORMATS.CSV)
           }}
         >
           <HugeiconsIcon icon={FileText} className="mr-2 h-4 w-4" />
-          <span>Export as CSV</span>
+          <span>{DROPDOWN_LABELS.EXPORT_AS_CSV}</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer"
           onClick={(e) => {
             e.preventDefault()
-            handleExport('sql')
+            handleExport(EXPORT_FORMATS.SQL)
           }}
           disabled={!table}
         >
           <HugeiconsIcon icon={FileTypeSql} className="mr-2 h-4 w-4" />
-          <span>Export as SQL</span>
+          <span>{DROPDOWN_LABELS.EXPORT_AS_SQL}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

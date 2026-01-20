@@ -7,6 +7,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useCopy } from '@/hooks/use-copy'
 import {
+  BUTTON_LABELS,
+  DROPDOWN_LABELS,
+  EXPORT_FORMATS,
+  ExportFormat,
+} from '@/utils/constant'
+import {
   ArrowDown,
   Files as FileJson,
   File as FileText,
@@ -22,7 +28,7 @@ interface CopyButtonProps {
 export function CopyButton({ selectedRows, table }: CopyButtonProps) {
   const { copyRows } = useCopy()
 
-  const handleCopy = async (format: 'json' | 'csv' | 'sql') => {
+  const handleCopy = async (format: ExportFormat) => {
     await copyRows(selectedRows, { format, tableName: table })
   }
 
@@ -31,7 +37,7 @@ export function CopyButton({ selectedRows, table }: CopyButtonProps) {
       <DropdownMenuTrigger
         render={
           <Button variant="outline" size="sm" className="gap-1">
-            <span>Copy</span>
+            <span>{BUTTON_LABELS.COPY}</span>
             <HugeiconsIcon icon={ArrowDown} className="h-4 w-4" />
           </Button>
         }
@@ -41,32 +47,32 @@ export function CopyButton({ selectedRows, table }: CopyButtonProps) {
           className="cursor-pointer"
           onClick={(e) => {
             e.preventDefault()
-            handleCopy('json')
+            handleCopy(EXPORT_FORMATS.JSON)
           }}
         >
           <HugeiconsIcon icon={FileJson} className="mr-2 h-4 w-4" />
-          <span>Copy as JSON</span>
+          <span>{DROPDOWN_LABELS.COPY_AS_JSON}</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer"
           onClick={(e) => {
             e.preventDefault()
-            handleCopy('csv')
+            handleCopy(EXPORT_FORMATS.CSV)
           }}
         >
           <HugeiconsIcon icon={FileText} className="mr-2 h-4 w-4" />
-          <span>Copy as CSV</span>
+          <span>{DROPDOWN_LABELS.COPY_AS_CSV}</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer"
           onClick={(e) => {
             e.preventDefault()
-            handleCopy('sql')
+            handleCopy(EXPORT_FORMATS.SQL)
           }}
           disabled={!table}
         >
           <HugeiconsIcon icon={FileTypeSql} className="mr-2 h-4 w-4" />
-          <span>Copy as SQL</span>
+          <span>{DROPDOWN_LABELS.COPY_AS_SQL}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -13,7 +13,8 @@ import {
 import { TableCell, TableHead, TableRow } from '@/components/ui/table'
 import { useDatabaseIndexes } from '@/hooks/queries/useTables'
 import { DatabaseTableIndexes } from '@/services/table.service'
-import { SearchParams } from '@/types'
+import { SchemaTable } from '@/types'
+import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 
@@ -32,7 +33,7 @@ const columns: TableColumn[] = [
 function RouteComponent() {
   const [selectedIndex, setSelectedIndex] =
     useState<DatabaseTableIndexes | null>(null)
-  const search = useSearch({ strict: false }) as SearchParams
+  const search = useSearch({ strict: false }) as SchemaTable
   const { schema } = search
 
   const {
@@ -98,7 +99,7 @@ function RouteComponent() {
         data={tables}
         searchable={true}
         searchFields={['table_name', 'column_name', 'index_name']}
-        searchPlaceholder="Search for an index"
+        searchPlaceholder={PLACEHOLDERS.SEARCH_INDEXES}
         headerRow={headerRow}
         bodyRow={bodyRow}
         isLoading={isLoading}

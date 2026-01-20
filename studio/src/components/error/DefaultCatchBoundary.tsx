@@ -1,12 +1,13 @@
 import { Button } from '@/components/ui/button'
+import { DESCRIPTIONS, TITLES } from '@/utils/constant'
 import { ErrorComponent, Link } from '@tanstack/react-router'
 import { ErrorLayout } from './error-layout'
 
 export function DefaultCatchBoundary({ error }: { error: Error }) {
   return (
     <ErrorLayout
-      title="An Error Occurred"
-      description="Something went wrong while processing your request."
+      title={TITLES.AN_ERROR_OCCURRED}
+      description={DESCRIPTIONS.ERROR_OCCURRED}
       icon="!"
       variant="destructive"
       actions={

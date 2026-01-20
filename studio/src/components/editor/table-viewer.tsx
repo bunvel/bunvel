@@ -3,7 +3,7 @@ import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTables } from '@/hooks/queries/useTables'
 import { TableKind } from '@/services/table.service'
 import { useTableStore } from '@/stores/table-store'
-import { SearchParams } from '@/types'
+import { SchemaTable } from '@/types'
 import { DEFAULT_PAGE_SIZE, FilterOperator } from '@/utils/constant'
 import { formatCellValue, formatDataType } from '@/utils/format'
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
@@ -17,7 +17,7 @@ import { TableToolbar } from './table-toolbar'
 type TableRow = Record<string, unknown>
 
 export function TableViewer() {
-  const { schema, table } = useSearch({ strict: false }) as SearchParams
+  const { schema, table } = useSearch({ strict: false }) as SchemaTable
 
   // Zustand store hooks
   const setTableState = useTableStore((state) => state.setTableState)

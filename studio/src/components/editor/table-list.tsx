@@ -10,7 +10,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
 import { Table } from '@/services/table.service'
-import { SearchParams } from '@/types'
+import { SchemaTable } from '@/types'
+import { PLACEHOLDERS } from '@/utils/constant'
 import {
   EyeFreeIcons,
   PropertyViewFreeIcons,
@@ -26,7 +27,7 @@ import { TableListAction } from './table-list-action'
 
 export function TableList() {
   const navigate = useNavigate()
-  const search = useSearch({ strict: false }) as SearchParams
+  const search = useSearch({ strict: false }) as SchemaTable
   const { schema } = search
   const { data: tables = [], isLoading, error, refetch } = useTables(schema)
   const [searchQuery, setSearchQuery] = useState('')
@@ -135,7 +136,7 @@ export function TableList() {
       <div className="shrink-0 p-4 pb-2">
         <div className="flex gap-1">
           <Input
-            placeholder="Search tables & views..."
+            placeholder={PLACEHOLDERS.SEARCH_TABLES}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-1"
