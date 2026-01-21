@@ -24,24 +24,10 @@ export function SqlSidebar({
 }: SqlSidebarProps) {
   const [activeTab, setActiveTab] = useState<'history' | 'templates'>('history')
 
-  const handleSelectFromHistory = (query: string, title?: string) => {
+  const handleSelectQuery = (query: string, title?: string) => {
     if (onOpenInTab) {
       const tab: SqlTab = {
-        id: `history-${Date.now()}`,
-        title: title || 'New Query',
-        query,
-        isModified: false,
-      }
-      onOpenInTab(tab)
-    } else {
-      onSelect(query)
-    }
-  }
-
-  const handleSelectFromTemplate = (query: string, title: string) => {
-    if (onOpenInTab) {
-      const tab: SqlTab = {
-        id: `template-${Date.now()}`,
+        id: Bun.randomUUIDv7(),
         title: title || 'New Query',
         query,
         isModified: false,
@@ -83,13 +69,13 @@ export function SqlSidebar({
         {activeTab === 'history' ? (
           <QueryHistory
             history={history}
-            onSelect={(query) => handleSelectFromHistory(query)}
+            onSelect={(query) => handleSelectQuery(query)}
             onClear={onClear}
             className="h-full"
           />
         ) : (
           <SqlTemplates
-            onSelect={(query, title) => handleSelectFromTemplate(query, title)}
+            onSelect={(query, title) => handleSelectQuery(query, title)}
             className="h-full"
           />
         )}
