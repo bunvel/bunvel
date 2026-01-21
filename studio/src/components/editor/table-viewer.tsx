@@ -147,6 +147,14 @@ export function TableViewer() {
 
   const isLoading = isMetadataLoading || isTableDataLoading
 
+  // Create a function to clear selection for the current table
+  const handleSelectionClear = useCallback(() => {
+    if (currentTableKey) {
+      setSelectedRows(currentTableKey, [])
+      setRowSelection(currentTableKey, {})
+    }
+  }, [currentTableKey, setSelectedRows, setRowSelection])
+
   const columns = useMemo<ColumnDef<TableRow>[]>(() => {
     if (!metadata?.columns) return []
 
@@ -229,10 +237,12 @@ export function TableViewer() {
         schema={schema}
         table={table}
         kind={kind}
+        primaryKeys={metadata?.primary_keys || []}
         sorts={tableState?.sorts || []}
         onSortChange={handleSortChange}
         filters={tableState?.filters || []}
         onFilterChange={handleFilterChange}
+        onSelectionClear={handleSelectionClear}
       />
 
       <div className="flex-1 overflow-auto">

@@ -81,3 +81,10 @@ export interface TableDataParams {
 export interface TableMetadataResult {
   data: TableMetadata
 }
+
+export interface DeleteRowsParams {
+  schema: string
+  table: string
+  primaryKeys: string[]
+  rows: Record<string, any>[]
+}

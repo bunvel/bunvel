@@ -1,4 +1,9 @@
-import { ColumnMetadata, SchemaTable, TableDataParams } from '@/types'
+import {
+  ColumnMetadata,
+  DeleteRowsParams,
+  SchemaTable,
+  TableDataParams,
+} from '@/types'
 import { DEFAULT_PAGE_SIZE, FilterSqlOperators } from '@/utils/constant'
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
@@ -205,6 +210,61 @@ export const getTableData = createServerFn({ method: 'POST' })
       }
     } catch (error) {
       console.error('Error in getTableData:', error)
+      handleApiError(error)
+    }
+  })
+
+export const deleteRows = createServerFn({ method: 'POST' })
+  .inputValidator((data: DeleteRowsParams) => {
+    if (!data?.schema || !data?.table) {
+      throw new Error('Schema and table names are required')
+    }
+    if (!data?.primaryKeys?.length) {
+      throw new Error('At least one primary key is required')
+    }
+    if (!data?.rows?.length) {
+      throw new Error('At least one row to delete is required')
+    }
+    return data
+  })
+  .handler(async ({ data }) => {
+    try {
+      const { schema, table, primaryKeys, rows } = data
+      const tableRef = `"${schema}"."${table}"`
+
+      // Build WHERE clause for each row based on primary keys
+      const whereClauses: string[] = []
+      const params: any[] = []
+
+      rows.forEach((row) => {
+        const rowConditions: string[] = []
+
+        primaryKeys.forEach((pk) => {
+          const paramIndex = params.length + 1
+          rowConditions.push(`"${pk}" = $${paramIndex}`)
+          params.push(row[pk])
+        })
+
+        if (rowConditions.length > 0) {
+          whereClauses.push(`(${rowConditions.join(' AND ')})`)
+        }
+      })
+
+      if (whereClauses.length === 0) {
+        throw new Error('No valid conditions for deletion')
+      }
+
+      const whereClause = `WHERE ${whereClauses.join(' OR ')}`
+      const query = `DELETE FROM ${tableRef} ${whereClause}`
+
+      await apiClient.post('/meta/query', { query, params })
+
+      return {
+        success: true,
+        deletedCount: rows.length,
+      }
+    } catch (error) {
+      console.error('Error in deleteRows:', error)
       handleApiError(error)
     }
   })

@@ -27,7 +27,7 @@ export function ConfirmDeleteDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: (cascade: boolean) => void
-  isLoading:boolean
+  isLoading: boolean
   title: string
   description: string
   confirmText?: string

@@ -15,12 +15,14 @@ export interface TableToolbarProps {
   schema: string
   table: string
   kind: TableKind | undefined
+  primaryKeys?: string[]
   sorts?: Array<{ column: string; direction: 'asc' | 'desc' }>
   filters?: FilterConfig[]
   onSortChange?: (
     sorts: Array<{ column: string; direction: 'asc' | 'desc' }>,
   ) => void
   onFilterChange?: (filters: FilterConfig[]) => void
+  onSelectionClear?: () => void
 }
 
 export function TableToolbar({
@@ -28,10 +30,12 @@ export function TableToolbar({
   schema,
   table,
   kind,
+  primaryKeys = [],
   sorts = [],
   filters = [],
   onSortChange = () => {},
   onFilterChange = () => {},
+  onSelectionClear,
 }: TableToolbarProps) {
   const hasSelection = selectedRows.length > 0
   const isReadOnly = isReadonlySchema(schema)
@@ -41,7 +45,14 @@ export function TableToolbar({
       {hasSelection ? (
         <div className="flex items-center space-x-2">
           {kind === 'TABLE' && (
-            <DeleteButton selectRows={selectedRows} disabled={isReadOnly} />
+            <DeleteButton
+              selectRows={selectedRows}
+              disabled={isReadOnly}
+              schema={schema}
+              table={table}
+              primaryKeys={primaryKeys}
+              onSelectionClear={onSelectionClear}
+            />
           )}
           {kind === 'TABLE' && (
             <EditButton selectRows={selectedRows} disabled={isReadOnly} />
