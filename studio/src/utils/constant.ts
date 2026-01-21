@@ -1,11 +1,12 @@
-
-export const API_URL = import.meta.env.SSR ? "http://app:8000"  : process.env.VITE_API_URL
+export const API_URL = import.meta.env.SSR
+  ? 'http://app:8000'
+  : process.env.VITE_API_URL
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [
   { value: 50, label: '50' },
   { value: 100, label: '100' },
   { value: 200, label: '200' },
-  { value: Number.MAX_SAFE_INTEGER, label: 'No Limit' }
+  { value: Number.MAX_SAFE_INTEGER, label: 'No Limit' },
 ]
 
 export const MAX_TABLE_TABS = 5
@@ -19,27 +20,28 @@ export const DEFAULT_CURRENT_PAGE = 1
 export const READONLY_SCHEMAS: readonly string[] = ['auth']
 
 export const FilterOperators = {
-  EQUALS: 'eq',
-  NOT_EQUALS: 'neq',
-  GREATER_THAN: 'gt',
-  GREATER_THAN_OR_EQUAL: 'gte',
-  LESS_THAN: 'lt',
-  LESS_THAN_OR_EQUAL: 'lte',
-  LIKE: 'like',
-  ILIKE: 'ilike',
-  IS_NULL: 'is_null',
-  IS_NOT_NULL: 'not_null',
+  EQUALS: '=',
+  NOT_EQUALS: '!=',
+  GREATER_THAN: '>',
+  GREATER_THAN_OR_EQUAL: '>=',
+  LESS_THAN: '<',
+  LESS_THAN_OR_EQUAL: '<=',
+  LIKE: 'LIKE',
+  ILIKE: 'ILIKE',
+  IS_NULL: 'IS NULL',
+  IS_NOT_NULL: 'IS NOT NULL',
 } as const
 
-export type FilterOperator = typeof FilterOperators[keyof typeof FilterOperators]
+export type FilterOperator =
+  (typeof FilterOperators)[keyof typeof FilterOperators]
 
 export const FilterOperatorLabels: Record<FilterOperator, string> = {
-  [FilterOperators.EQUALS]: '=',
-  [FilterOperators.NOT_EQUALS]: '≠',
-  [FilterOperators.GREATER_THAN]: '>',
-  [FilterOperators.GREATER_THAN_OR_EQUAL]: '≥',
-  [FilterOperators.LESS_THAN]: '<',
-  [FilterOperators.LESS_THAN_OR_EQUAL]: '≤',
+  [FilterOperators.EQUALS]: '= (equals)',
+  [FilterOperators.NOT_EQUALS]: '≠ (not equals)',
+  [FilterOperators.GREATER_THAN]: '> (greater than)',
+  [FilterOperators.GREATER_THAN_OR_EQUAL]: '≥ (greater than or equal)',
+  [FilterOperators.LESS_THAN]: '< (less than)',
+  [FilterOperators.LESS_THAN_OR_EQUAL]: '≤ (less than or equal)',
   [FilterOperators.LIKE]: 'contains',
   [FilterOperators.ILIKE]: 'contains (case-insensitive)',
   [FilterOperators.IS_NULL]: 'is null',
@@ -47,10 +49,10 @@ export const FilterOperatorLabels: Record<FilterOperator, string> = {
 }
 
 export const FilterOperatorTypes = {
-  TEXT: [FilterOperators.EQUALS, FilterOperators.NOT_EQUALS, FilterOperators.LIKE, FilterOperators.ILIKE, FilterOperators.IS_NULL, FilterOperators.IS_NOT_NULL],
-  NUMBER: [FilterOperators.EQUALS, FilterOperators.NOT_EQUALS, FilterOperators.GREATER_THAN, FilterOperators.GREATER_THAN_OR_EQUAL, FilterOperators.LESS_THAN, FilterOperators.LESS_THAN_OR_EQUAL, FilterOperators.IS_NULL, FilterOperators.IS_NOT_NULL],
-  DATE: [FilterOperators.EQUALS, FilterOperators.NOT_EQUALS, FilterOperators.GREATER_THAN, FilterOperators.GREATER_THAN_OR_EQUAL, FilterOperators.LESS_THAN, FilterOperators.LESS_THAN_OR_EQUAL, FilterOperators.IS_NULL, FilterOperators.IS_NOT_NULL],
-  BOOLEAN: [FilterOperators.EQUALS, FilterOperators.NOT_EQUALS, FilterOperators.IS_NULL, FilterOperators.IS_NOT_NULL],
+  TEXT: ['=', '!=', 'LIKE', 'ILIKE', 'IS NULL', 'IS NOT NULL'],
+  NUMBER: ['=', '!=', '>', '>=', '<', '<=', 'IS NULL', 'IS NOT NULL'],
+  DATE: ['=', '!=', '>', '>=', '<', '<=', 'IS NULL', 'IS NOT NULL'],
+  BOOLEAN: ['=', '!=', 'IS NULL', 'IS NOT NULL'],
 } as const
 
 export const DATA_TYPES = [
@@ -58,7 +60,7 @@ export const DATA_TYPES = [
   { value: 'varchar', label: 'VARCHAR' },
   { value: 'char', label: 'CHAR' },
   { value: 'text', label: 'TEXT' },
-  
+
   // Numeric Types
   { value: 'smallint', label: 'SMALLINT' },
   { value: 'integer', label: 'INTEGER' },
@@ -69,10 +71,10 @@ export const DATA_TYPES = [
   { value: 'double precision', label: 'DOUBLE PRECISION' },
   { value: 'serial', label: 'SERIAL' },
   { value: 'bigserial', label: 'BIGSERIAL' },
-  
+
   // Boolean
   { value: 'boolean', label: 'BOOLEAN' },
-  
+
   // Date/Time Types
   { value: 'date', label: 'DATE' },
   { value: 'time', label: 'TIME' },
@@ -80,28 +82,28 @@ export const DATA_TYPES = [
   { value: 'timestamp', label: 'TIMESTAMP' },
   { value: 'timestamptz', label: 'TIMESTAMP WITH TIME ZONE' },
   { value: 'interval', label: 'INTERVAL' },
-  
+
   // Network Address Types
   { value: 'inet', label: 'INET' },
   { value: 'cidr', label: 'CIDR' },
   { value: 'macaddr', label: 'MACADDR' },
-  
+
   // JSON Types
   { value: 'json', label: 'JSON' },
   { value: 'jsonb', label: 'JSONB' },
-  
+
   // Binary Data
   { value: 'bytea', label: 'BYTEA' },
-  
+
   // UUID
   { value: 'uuid', label: 'UUID' },
-  
+
   // Special Types
   { value: 'money', label: 'MONEY' },
   { value: 'tsvector', label: 'TSVECTOR' },
   { value: 'tsquery', label: 'TSQUERY' },
   { value: 'xml', label: 'XML' },
-  
+
   // Geometric Types
   { value: 'point', label: 'POINT' },
   { value: 'line', label: 'LINE' },
@@ -109,7 +111,7 @@ export const DATA_TYPES = [
   { value: 'box', label: 'BOX' },
   { value: 'path', label: 'PATH' },
   { value: 'polygon', label: 'POLYGON' },
-  { value: 'circle', label: 'CIRCLE' }
+  { value: 'circle', label: 'CIRCLE' },
 ] as const
 
 export const DEFAULT_COLUMN = {
@@ -143,7 +145,7 @@ export const EXPORT_FORMATS = {
   SQL: 'sql',
 } as const
 
-export type ExportFormat = typeof EXPORT_FORMATS[keyof typeof EXPORT_FORMATS]
+export type ExportFormat = (typeof EXPORT_FORMATS)[keyof typeof EXPORT_FORMATS]
 
 // Common button text labels
 export const BUTTON_LABELS = {
@@ -220,8 +222,10 @@ export const TITLES = {
 // Common description texts
 export const DESCRIPTIONS = {
   ERROR_OCCURRED: 'Something went wrong while processing your request.',
-  PAGE_NOT_FOUND: 'The page you\'re looking for doesn\'t exist or has been moved.',
-  SCHEMA_NAME_RULES: 'Schema name must start with a letter or underscore and contain only letters, numbers, or underscores',
+  PAGE_NOT_FOUND:
+    "The page you're looking for doesn't exist or has been moved.",
+  SCHEMA_NAME_RULES:
+    'Schema name must start with a letter or underscore and contain only letters, numbers, or underscores',
 } as const
 
 // Screen reader labels
@@ -230,4 +234,33 @@ export const SCREEN_READER_LABELS = {
   CLOSE: TITLES.CLOSE,
   MORE: TITLES.MORE,
   TOGGLE_THEME: TITLES.TOGGLE_THEME,
+} as const
+
+// SQL operator mappings for filter operations
+export const FilterSqlOperators: Record<
+  FilterOperator,
+  {
+    template: string
+    valueFormatter?: (value: any) => any
+    requiresParameter: boolean
+  }
+> = {
+  '=': { template: '= $%d', requiresParameter: true },
+  '!=': { template: '!= $%d', requiresParameter: true },
+  '>': { template: '> $%d', requiresParameter: true },
+  '>=': { template: '>= $%d', requiresParameter: true },
+  '<': { template: '< $%d', requiresParameter: true },
+  '<=': { template: '<= $%d', requiresParameter: true },
+  LIKE: {
+    template: 'LIKE $%d',
+    valueFormatter: (value) => `%${String(value)}%`,
+    requiresParameter: true,
+  },
+  ILIKE: {
+    template: 'ILIKE $%d',
+    valueFormatter: (value) => `%${String(value)}%`,
+    requiresParameter: true,
+  },
+  'IS NULL': { template: 'IS NULL', requiresParameter: false },
+  'IS NOT NULL': { template: 'IS NOT NULL', requiresParameter: false },
 } as const

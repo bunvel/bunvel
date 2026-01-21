@@ -15,7 +15,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
-import { FilterOperator } from '@/utils/constant'
+import { FilterConfig as BaseFilterConfig } from '@/types/table'
+import { FilterOperator, FilterOperatorLabels } from '@/utils/constant'
 import {
   DndContext,
   DragEndEvent,
@@ -35,11 +36,8 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
 import { SortableItem } from './sortable-item'
 
-export interface FilterConfig {
+interface FilterConfig extends BaseFilterConfig {
   id: string
-  column: string
-  operator: FilterOperator
-  value: string
 }
 
 interface FilterButtonProps {
@@ -55,16 +53,26 @@ export function FilterButton({
   onFilterChange,
   initialFilters = [],
 }: FilterButtonProps) {
+  // Filter out invalid filters from initial state
+  const validInitialFilters = (initialFilters || []).filter(
+    (filter) =>
+      filter.operator === 'IS NULL' ||
+      filter.operator === 'IS NOT NULL' ||
+      (filter.value !== null &&
+        filter.value !== '' &&
+        filter.value !== undefined),
+  )
+
   const [filters, setFilters] = useState<FilterConfig[]>(
     () =>
-      initialFilters?.map((f) => ({
+      validInitialFilters.map((f) => ({
         ...f,
         id: `${f.column}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       })) || [],
   )
   const [pendingFilters, setPendingFilters] = useState<FilterConfig[]>(
     () =>
-      initialFilters?.map((f) => ({
+      validInitialFilters.map((f) => ({
         ...f,
         id: `${f.column}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       })) || [],
@@ -81,19 +89,18 @@ export function FilterButton({
   // Sync pending filters when dropdown opens
   useEffect(() => {
     if (open) {
-      setPendingFilters(filters)
+      // Filter out invalid filters when syncing to pending state
+      const validFilters = filters.filter(
+        (filter) =>
+          filter.operator === 'IS NULL' ||
+          filter.operator === 'IS NOT NULL' ||
+          (filter.value !== null &&
+            filter.value !== '' &&
+            filter.value !== undefined),
+      )
+      setPendingFilters(validFilters)
     }
   }, [open, filters])
-
-  // Sync filters when initialFilters changes (table switch)
-  useEffect(() => {
-    setFilters(
-      initialFilters?.map((f) => ({
-        ...f,
-        id: `${f.column}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      })) || [],
-    )
-  }, [initialFilters])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -136,10 +143,24 @@ export function FilterButton({
   }
 
   const handleApplyFilters = () => {
-    const newFilters = [...pendingFilters]
-    setFilters(newFilters)
+    // Only include filters that are valid:
+    // - IS NULL and IS NOT NULL don't need values
+    // - Other operators must have non-empty values
+    const validFilters = pendingFilters.filter((filter: FilterConfig) => {
+      if (filter.operator === 'IS NULL' || filter.operator === 'IS NOT NULL') {
+        return true // These operators don't need values
+      }
+      // For other operators, value must be provided and not empty
+      return (
+        filter.value !== null &&
+        filter.value !== '' &&
+        filter.value !== undefined
+      )
+    })
+
+    setFilters(validFilters)
     // Strip the id before passing to parent
-    onFilterChange?.(newFilters.map(({ id, ...rest }) => rest))
+    onFilterChange?.(validFilters.map(({ id, ...rest }) => rest))
     setOpen(false)
   }
 
@@ -153,6 +174,16 @@ export function FilterButton({
   }
 
   const hasChanges = JSON.stringify(filters) !== JSON.stringify(pendingFilters)
+
+  // Check if there are invalid filters (empty values)
+  const hasInvalidFilters = pendingFilters.some(
+    (filter: FilterConfig) =>
+      filter.operator !== 'IS NULL' &&
+      filter.operator !== 'IS NOT NULL' &&
+      (filter.value === null ||
+        filter.value === '' ||
+        filter.value === undefined),
+  )
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -253,7 +284,7 @@ export function FilterButton({
                                 })
                               } else {
                                 handleUpdateFilter(filter.id, {
-                                  operator: 'eq',
+                                  operator: '=',
                                 })
                               }
                             }}
@@ -262,36 +293,21 @@ export function FilterButton({
                               <SelectValue title="Operator" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="eq">= (equals)</SelectItem>
-                              <SelectItem value="neq">
-                                ≠ (not equals)
-                              </SelectItem>
-                              <SelectItem value="gt">
-                                › (greater than)
-                              </SelectItem>
-                              <SelectItem value="gte">
-                                ≥ (greater than or equal)
-                              </SelectItem>
-                              <SelectItem value="lt">‹ (less than)</SelectItem>
-                              <SelectItem value="lte">
-                                ≤ (less than or equal)
-                              </SelectItem>
-                              <SelectItem value="like">contains</SelectItem>
-                              <SelectItem value="ilike">
-                                contains (case-insensitive)
-                              </SelectItem>
-                              <SelectItem value="is_null">is null</SelectItem>
-                              <SelectItem value="not_null">
-                                is not null
-                              </SelectItem>
+                              {Object.entries(FilterOperatorLabels).map(
+                                ([operator, label]) => (
+                                  <SelectItem key={operator} value={operator}>
+                                    {String(label)}
+                                  </SelectItem>
+                                ),
+                              )}
                             </SelectContent>
                           </Select>
 
-                          {filter.operator !== 'is_null' &&
-                            filter.operator !== 'not_null' && (
+                          {filter.operator !== 'IS NULL' &&
+                            filter.operator !== 'IS NOT NULL' && (
                               <Input
                                 type="text"
-                                value={filter.value ?? ''}
+                                value={filter.value?.toString() ?? ''}
                                 onChange={(e) => {
                                   const value = e.target.value
                                   setPendingFilters((prev) =>
@@ -324,8 +340,8 @@ export function FilterButton({
                   const newFilter: FilterConfig = {
                     id: `new-${Date.now()}`,
                     column: availableColumns[0].column_name,
-                    operator: 'eq',
-                    value: '',
+                    operator: '=',
+                    value: null, // Use null instead of empty string
                   }
                   setPendingFilters((prev) => [...prev, newFilter])
                 }
@@ -350,7 +366,7 @@ export function FilterButton({
                 type="button"
                 size="sm"
                 onClick={handleApplyFilters}
-                disabled={!hasChanges}
+                disabled={!hasChanges || hasInvalidFilters}
               >
                 Apply
               </Button>

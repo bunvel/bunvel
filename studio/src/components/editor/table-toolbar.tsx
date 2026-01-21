@@ -1,5 +1,4 @@
-import { TableKind } from '@/types'
-import { FilterOperator } from '@/utils/constant'
+import { FilterConfig, TableKind } from '@/types'
 import { isReadonlySchema } from '@/utils/func'
 import {
   CopyButton,
@@ -17,21 +16,11 @@ export interface TableToolbarProps {
   table: string
   kind: TableKind | undefined
   sorts?: Array<{ column: string; direction: 'asc' | 'desc' }>
-  filters?: Array<{
-    column: string
-    operator: FilterOperator
-    value: string
-  }>
+  filters?: FilterConfig[]
   onSortChange?: (
     sorts: Array<{ column: string; direction: 'asc' | 'desc' }>,
   ) => void
-  onFilterChange?: (
-    filters: Array<{
-      column: string
-      operator: FilterOperator
-      value: string
-    }>,
-  ) => void
+  onFilterChange?: (filters: FilterConfig[]) => void
 }
 
 export function TableToolbar({

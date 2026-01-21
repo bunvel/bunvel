@@ -1,5 +1,5 @@
-import type { ColumnMetadata, SchemaTable, TableDataParams } from '@/types'
-import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
+import { ColumnMetadata, SchemaTable, TableDataParams } from '@/types'
+import { DEFAULT_PAGE_SIZE, FilterSqlOperators } from '@/utils/constant'
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
@@ -133,48 +133,37 @@ export const getTableData = createServerFn({ method: 'POST' })
 
       if (data.filters?.length) {
         data.filters.forEach((filter) => {
-          const paramIndex = params.length + 1
-          const columnRef = `"${filter.column}"`
+          // Skip filters with empty values (except IS NULL and IS NOT NULL)
+          if (
+            filter.operator !== 'IS NULL' &&
+            filter.operator !== 'IS NOT NULL' &&
+            (filter.value === null ||
+              filter.value === '' ||
+              filter.value === undefined)
+          ) {
+            return // Skip this filter
+          }
 
-          switch (filter.operator) {
-            case 'eq':
-              whereClauses.push(`${columnRef} = $${paramIndex}`)
-              params.push(filter.value)
-              break
-            case 'neq':
-              whereClauses.push(`${columnRef} != $${paramIndex}`)
-              params.push(filter.value)
-              break
-            case 'gt':
-              whereClauses.push(`${columnRef} > $${paramIndex}`)
-              params.push(filter.value)
-              break
-            case 'gte':
-              whereClauses.push(`${columnRef} >= $${paramIndex}`)
-              params.push(filter.value)
-              break
-            case 'lt':
-              whereClauses.push(`${columnRef} < $${paramIndex}`)
-              params.push(filter.value)
-              break
-            case 'lte':
-              whereClauses.push(`${columnRef} <= $${paramIndex}`)
-              params.push(filter.value)
-              break
-            case 'like':
-              whereClauses.push(`${columnRef} LIKE $${paramIndex}`)
-              params.push(`%${filter.value}%`)
-              break
-            case 'ilike':
-              whereClauses.push(`${columnRef} ILIKE $${paramIndex}`)
-              params.push(`%${filter.value}%`)
-              break
-            case 'is_null':
-              whereClauses.push(`${columnRef} IS NULL`)
-              break
-            case 'not_null':
-              whereClauses.push(`${columnRef} IS NOT NULL`)
-              break
+          const columnRef = `"${filter.column}"`
+          const sqlOperator = FilterSqlOperators[filter.operator]
+
+          if (sqlOperator) {
+            let whereClause: string
+
+            if (sqlOperator.requiresParameter) {
+              const paramIndex = params.length + 1
+              whereClause = `${columnRef} ${sqlOperator.template.replace('%d', paramIndex.toString())}`
+
+              const value = sqlOperator.valueFormatter
+                ? sqlOperator.valueFormatter(filter.value)
+                : filter.value
+              params.push(value)
+            } else {
+              // For IS NULL and IS NOT NULL, no parameter needed
+              whereClause = `${columnRef} ${sqlOperator.template}`
+            }
+
+            whereClauses.push(whereClause)
           }
         })
       }

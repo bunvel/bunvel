@@ -1,5 +1,5 @@
 import type { QueryKeys } from '@/types'
-import { FilterOperator } from '@/utils/constant'
+import { FilterConfig } from '@/types/table'
 
 export const queryKeys = {
   sql: {
@@ -19,11 +19,7 @@ export const queryKeys = {
       page: number
       pageSize: number
       sorts?: Array<{ column: string; direction: 'asc' | 'desc' }>
-      filters?: Array<{
-        column: string
-        operator: FilterOperator
-        value: string
-      }>
+      filters?: FilterConfig[]
     }) => ['tableData', params] as const,
     detail: (schema: string, table: string) =>
       [...queryKeys.tables.list(schema), table] as const,

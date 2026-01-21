@@ -3,7 +3,8 @@ import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTables } from '@/hooks/queries/useTables'
 import { useTableStore } from '@/stores/table-store'
 import { SchemaTable, TableKind } from '@/types'
-import { DEFAULT_PAGE_SIZE, FilterOperator } from '@/utils/constant'
+import { FilterConfig } from '@/types/table'
+import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
 import { formatCellValue, formatDataType } from '@/utils/format'
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -90,13 +91,7 @@ export function TableViewer() {
   )
 
   const handleFilterChange = useCallback(
-    (
-      newFilters: Array<{
-        column: string
-        operator: FilterOperator
-        value: string
-      }>,
-    ) => {
+    (newFilters: FilterConfig[]) => {
       if (currentTableKey) {
         setFilters(currentTableKey, newFilters)
         // Reset to first page when filters change

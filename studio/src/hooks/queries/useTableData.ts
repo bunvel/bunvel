@@ -1,5 +1,5 @@
 import { getTableData, getTableMetadata } from '@/services/editor.service'
-import { FilterOperator } from '@/utils/constant'
+import { FilterConfig } from '@/types/table'
 import { useQuery } from '@tanstack/react-query'
 import { queryKeys } from './query-key'
 
@@ -26,16 +26,12 @@ export function useTableData(
     page: number
     pageSize: number
     sorts?: Array<{ column: string; direction: 'asc' | 'desc' }>
-    filters?: Array<{
-      column: string
-      operator: FilterOperator
-      value: string
-    }>
+    filters?: FilterConfig[]
     primaryKeys?: string[]
-  } = { 
-    page: 1, 
+  } = {
+    page: 1,
     pageSize: 50,
-    filters: []
+    filters: [],
   },
 ) {
   const { data: metadata } = useTableMetadata(schema, table)
