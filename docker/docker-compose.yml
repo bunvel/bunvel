@@ -28,7 +28,7 @@ services:
 
   studio:
     container_name: bunvel-studio
-    image: bunvel/studio:0.5.4
+    image: bunvel/studio:0.6.0
     ports:
       - "3000:3000"
     environment:
