@@ -27,7 +27,7 @@ export function SqlSidebar({
   const handleSelectQuery = (query: string, title?: string) => {
     if (onOpenInTab) {
       const tab: SqlTab = {
-        id: Bun.randomUUIDv7(),
+        id: crypto.randomUUID(),
         title: title || 'New Query',
         query,
         isModified: false,
