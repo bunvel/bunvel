@@ -1,3 +1,5 @@
+import { IconSvgElement } from '@hugeicons/react'
+
 export interface TableColumn {
   key: string
   header: string
@@ -14,7 +16,9 @@ export interface SqlTemplate {
   name: string
   description: string
   query: string
-  icon: any
+  icon: IconSvgElement
+  category?: 'basic' | 'blog' | 'ecommerce' | 'analytics'
+  difficulty?: 'beginner' | 'intermediate' | 'advanced'
 }
 
 export interface TableListActionProps {
