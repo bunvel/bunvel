@@ -117,11 +117,6 @@ export function RowFormSheet({ schema, table, disabled }: RowFormSheetProps) {
       column.is_nullable === 'NO' && column.column_default === null
     const isPrimaryKey = column.is_primary_key
 
-    // Skip identity columns (auto-increment)
-    if (column.is_identity === 'YES') {
-      return null
-    }
-
     const fieldType = column.data_type.toLowerCase()
     const commonProps = {
       disabled: isSubmitting || isDisabled,
@@ -132,8 +127,7 @@ export function RowFormSheet({ schema, table, disabled }: RowFormSheetProps) {
     const renderFieldLabel = () => (
       <div className="flex flex-col">
         <Label htmlFor={column.column_name} className="text-sm font-medium">
-          {column.column_name}
-          {isRequired && <span className="text-red-500 ml-1">*</span>}
+          <span>{column.column_name}</span>
         </Label>
         <span className="text-xs text-muted-foreground mt-1">
           {column.data_type}
@@ -293,9 +287,8 @@ export function RowFormSheet({ schema, table, disabled }: RowFormSheetProps) {
         className="grid grid-cols-[200px_1fr] gap-4 items-start"
       >
         {renderFieldLabel()}
-        <Input
+        <Textarea
           id={column.column_name}
-          type="text"
           value={value || ''}
           onChange={(e) =>
             handleInputChange(column.column_name, e.target.value)
@@ -351,9 +344,82 @@ export function RowFormSheet({ schema, table, disabled }: RowFormSheetProps) {
               </div>
             ) : (
               <div className="space-y-6 flex flex-col">
-                {metadata.columns
-                  .filter((column) => column.is_identity !== 'YES') // Skip identity columns
-                  .map((column) => renderFormField(column))}
+                {(() => {
+                  const primaryKeyFields = metadata.columns.filter(
+                    (column) => column.is_primary_key === true,
+                  )
+                  const requiredFields = metadata.columns.filter(
+                    (column) =>
+                      column.is_identity !== 'YES' &&
+                      column.is_primary_key !== true &&
+                      column.is_nullable === 'NO' &&
+                      column.column_default === null,
+                  )
+                  const optionalFields = metadata.columns.filter(
+                    (column) =>
+                      column.is_identity !== 'YES' &&
+                      column.is_primary_key !== true &&
+                      (column.is_nullable === 'YES' ||
+                        column.column_default !== null),
+                  )
+
+                  return (
+                    <>
+                      {primaryKeyFields.length > 0 && (
+                        <>
+                          <div className="space-y-6">
+                            <h3 className="text-sm font-medium text-foreground">
+                              Primary Key
+                            </h3>
+                            {primaryKeyFields.map((column) =>
+                              renderFormField(column),
+                            )}
+                          </div>
+                        </>
+                      )}
+                      {requiredFields.length > 0 && (
+                        <>
+                          {primaryKeyFields.length > 0 && (
+                            <div className="border-t pt-6">
+                              <div className="space-y-2">
+                                <h3 className="text-sm font-medium text-foreground">
+                                  Required Fields
+                                </h3>
+                              </div>
+                            </div>
+                          )}
+                          <div className="space-y-6">
+                            {requiredFields.map((column) =>
+                              renderFormField(column),
+                            )}
+                          </div>
+                        </>
+                      )}
+                      {optionalFields.length > 0 && (
+                        <>
+                          {(primaryKeyFields.length > 0 ||
+                            requiredFields.length > 0) && (
+                            <div className="border-t pt-6">
+                              <div className="space-y-2">
+                                <h3 className="text-sm font-medium text-muted-foreground">
+                                  Optional Fields
+                                </h3>
+                                <p className="text-xs text-muted-foreground">
+                                  These are columns that do not need any value
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                          <div className="space-y-6">
+                            {optionalFields.map((column) =>
+                              renderFormField(column),
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )
+                })()}
               </div>
             )}
           </div>
