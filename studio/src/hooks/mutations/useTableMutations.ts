@@ -1,6 +1,6 @@
-import { deleteRows, type DeleteRowsParams } from '@/services/editor.service'
+import { deleteRows } from '@/services/editor.service'
 import { createTable } from '@/services/table.service'
-import type { CreateTableParams } from '@/types'
+import type { CreateTableParams, DeleteRowsParams } from '@/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { queryKeys } from '../queries/query-key'

@@ -1,5 +1,6 @@
 import {
   ColumnMetadata,
+  CreateRowParams,
   DeleteRowsParams,
   SchemaTable,
   TableDataParams,
@@ -265,6 +266,51 @@ export const deleteRows = createServerFn({ method: 'POST' })
       }
     } catch (error) {
       console.error('Error in deleteRows:', error)
+      handleApiError(error)
+    }
+  })
+
+export const insertRow = createServerFn({ method: 'POST' })
+  .inputValidator((data: CreateRowParams) => {
+    if (!data?.schema || !data?.table) {
+      throw new Error('Schema and table names are required')
+    }
+    if (!data?.row) {
+      throw new Error('Row data is required')
+    }
+    return data
+  })
+  .handler(async ({ data }) => {
+    try {
+      const { schema, table, row } = data
+      const tableRef = `"${schema}"."${table}"`
+
+      // Build INSERT query
+      const columns = Object.keys(row)
+      const values = Object.values(row)
+
+      if (columns.length === 0) {
+        throw new Error('At least one column value is required')
+      }
+
+      const columnNames = columns.map((col) => `"${col}"`).join(', ')
+      const paramPlaceholders = values
+        .map((_, index) => `$${index + 1}`)
+        .join(', ')
+
+      const query = `INSERT INTO ${tableRef} (${columnNames}) VALUES (${paramPlaceholders}) RETURNING *`
+
+      const result = await apiClient.post<Array<Record<string, any>>>(
+        '/meta/query',
+        { query, params: values },
+      )
+
+      return {
+        success: true,
+        data: result.data?.[0] || null,
+      }
+    } catch (error) {
+      console.error('Error in insertRow:', error)
       handleApiError(error)
     }
   })

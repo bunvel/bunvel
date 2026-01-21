@@ -30,6 +30,12 @@ export interface CreateTableParams {
   foreignKeys?: ForeignKeyDefinition[]
 }
 
+export interface CreateRowParams {
+  schema: string
+  table: string
+  row: Record<string, any>
+}
+
 export interface DeleteTableParams {
   schema: string
   table: string
