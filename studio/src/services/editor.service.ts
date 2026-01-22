@@ -6,6 +6,7 @@ import {
   TableDataParams,
 } from '@/types'
 import { DEFAULT_PAGE_SIZE, FilterSqlOperators } from '@/utils/constant'
+import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
@@ -36,7 +37,7 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
           foreign_column_name?: string
           constraint_name?: string
         }>
-      >('/meta/query', {
+      >('/meta/query?key=' + QUERY_OPERATION_KEYS.GET_TABLE_METADATA, {
         query: SQL_QUERIES.GET_TABLE_METADATA,
         params: [data.schema, data.table],
       })
@@ -181,7 +182,7 @@ export const getTableData = createServerFn({ method: 'POST' })
       // Get total count with filters
       const countQuery = `SELECT COUNT(*) as total FROM ${tableRef} ${whereClause}`
       const countResult = await apiClient.post<Array<{ total: number }>>(
-        '/meta/query',
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_TABLE_DATA,
         { query: countQuery, params },
       )
 
@@ -198,7 +199,7 @@ export const getTableData = createServerFn({ method: 'POST' })
       const dataQuery = `SELECT * FROM ${tableRef} ${whereClause} ${orderByClause} LIMIT ${limit} OFFSET ${offset}`
 
       const result = await apiClient.post<Array<Record<string, any>>>(
-        '/meta/query',
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_TABLE_DATA,
         { query: dataQuery, params },
       )
 
@@ -258,7 +259,10 @@ export const deleteRows = createServerFn({ method: 'POST' })
       const whereClause = `WHERE ${whereClauses.join(' OR ')}`
       const query = `DELETE FROM ${tableRef} ${whereClause}`
 
-      await apiClient.post('/meta/query', { query, params })
+      await apiClient.post(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.DELETE_ROWS,
+        { query, params },
+      )
 
       return {
         success: true,
@@ -301,7 +305,7 @@ export const insertRow = createServerFn({ method: 'POST' })
       const query = `INSERT INTO ${tableRef} (${columnNames}) VALUES (${paramPlaceholders}) RETURNING *`
 
       const result = await apiClient.post<Array<Record<string, any>>>(
-        '/meta/query',
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.CREATE_ROW,
         { query, params: values },
       )
 

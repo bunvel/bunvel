@@ -1,5 +1,6 @@
 import type { Schema } from '@/types'
 import { escapeIdentifier } from '@/utils/func'
+import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
@@ -7,9 +8,12 @@ import { SQL_QUERIES } from './sql-queries'
 export const getSchemas = createServerFn({ method: 'POST' }).handler(
   async () => {
     try {
-      const response = await apiClient.post<Array<Schema>>('/meta/query', {
-        query: SQL_QUERIES.GET_SCHEMAS,
-      })
+      const response = await apiClient.post<Array<Schema>>(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_SCHEMAS,
+        {
+          query: SQL_QUERIES.GET_SCHEMAS,
+        },
+      )
 
       if (!Array.isArray(response.data)) {
         throw new Error('Invalid response format: expected an array of rows')
@@ -38,9 +42,12 @@ export const createSchema = createServerFn({ method: 'POST' })
 
       const query = `CREATE SCHEMA IF NOT EXISTS ${escapeIdentifier(data)}`
 
-      const response = await apiClient.post('/meta/query', {
-        query,
-      })
+      const response = await apiClient.post(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.CREATE_SCHEMA,
+        {
+          query,
+        },
+      )
 
       return {
         success: true,

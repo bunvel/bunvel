@@ -1,4 +1,4 @@
-import type { QueryResult } from '@/types'
+import type { QueryResult, TableMetadata } from '@/types'
 import { ColumnDef, Row } from '@tanstack/react-table'
 import { useCallback, useMemo, useState } from 'react'
 import { DataTable } from '../data-table/data-table'
@@ -48,10 +48,22 @@ export function QueryResultTable({
   // Use query result data directly, empty states are handled in JSX
   const displayData = useMemo(() => result?.data || [], [result?.data])
 
+  // Create minimal metadata for query results (no foreign keys or detailed column info)
+  const metadata: TableMetadata = useMemo(
+    () => ({
+      columns: [],
+      primary_keys: [],
+      foreign_keys: [],
+      table_type: 'r',
+    }),
+    [],
+  )
+
   return (
     <DataTable
       data={displayData}
       columns={columns}
+      metadata={metadata}
       isLoading={isExecuting}
       error={error}
       state={{

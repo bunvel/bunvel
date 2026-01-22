@@ -55,9 +55,9 @@ export interface DatabaseTables {
   name: string
   kind: TableKind
   description: string
-  rows: number
-  size: string
-  columns: number
+  row_count: number
+  total_size: string
+  column_count: number
 }
 
 export interface DatabaseTableColumns {

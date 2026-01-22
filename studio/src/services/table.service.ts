@@ -6,9 +6,11 @@ import type {
   DatabaseTableIndexes,
   DatabaseTables,
   DatabaseTrigger,
-  DeleteTableParams, Table
+  DeleteTableParams,
+  Table,
 } from '@/types'
 import { escapeIdentifier, formatDefaultValue } from '@/utils/func'
+import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from './api-client'
 import { SQL_QUERIES } from './sql-queries'
@@ -22,10 +24,13 @@ export const getTables = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<Table[]>('/meta/query', {
-        query: SQL_QUERIES.GET_TABLES,
-        params: [data.schema],
-      })
+      const response = await apiClient.post<Table[]>(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_TABLES,
+        {
+          query: SQL_QUERIES.GET_TABLES,
+          params: [data.schema],
+        },
+      )
       return response.data as Table[]
     } catch (error) {
       console.error('Error fetching tables:', error)
@@ -42,10 +47,14 @@ export const getDatabaseTables = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<DatabaseTables[]>('/meta/query', {
-        query: SQL_QUERIES.GET_DATABASE_TABLES,
-        params: [data.schema],
-      })
+      const response = await apiClient.post<DatabaseTables[]>(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_TABLES,
+        {
+          query: SQL_QUERIES.GET_DATABASE_TABLES,
+          params: [data.schema],
+        },
+      )
+
       return response.data as DatabaseTables[]
     } catch (error) {
       console.error('Error fetching tables:', error)
@@ -63,7 +72,7 @@ export const getDatabaseTableColumns = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     try {
       const response = await apiClient.post<DatabaseTableColumns[]>(
-        '/meta/query',
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_TABLE_COLUMNS,
         {
           query: SQL_QUERIES.GET_TABLE_COLUMNS,
           params: [data.oid],
@@ -86,7 +95,7 @@ export const getDatabaseTableIndexes = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     try {
       const response = await apiClient.post<DatabaseTableIndexes[]>(
-        '/meta/query',
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_INDEXES,
         {
           query: SQL_QUERIES.GET_TABLE_INDEXES,
           params: [data.schema],
@@ -108,10 +117,13 @@ export const getDatabaseEnums = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<DatabaseEnum[]>('/meta/query', {
-        query: SQL_QUERIES.GET_ENUMS,
-        params: [data.schema],
-      })
+      const response = await apiClient.post<DatabaseEnum[]>(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_ENUMS,
+        {
+          query: SQL_QUERIES.GET_ENUMS,
+          params: [data.schema],
+        },
+      )
       return response.data as DatabaseEnum[]
     } catch (error) {
       console.error('Error fetching enums:', error)
@@ -125,10 +137,13 @@ export const getDatabaseTriggers = createServerFn({ method: 'POST' })
   }))
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<DatabaseTrigger[]>('/meta/query', {
-        query: SQL_QUERIES.GET_TRIGGERS,
-        params: [data.schema],
-      })
+      const response = await apiClient.post<DatabaseTrigger[]>(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_TRIGGERS,
+        {
+          query: SQL_QUERIES.GET_TRIGGERS,
+          params: [data.schema],
+        },
+      )
       return response.data as DatabaseTrigger[]
     } catch (error) {
       console.error('Error fetching triggers:', error)
@@ -142,10 +157,13 @@ export const getDatabaseFunctions = createServerFn({ method: 'POST' })
   }))
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<DatabaseFunction[]>('/meta/query', {
-        query: SQL_QUERIES.GET_FUNCTIONS,
-        params: [data.schema],
-      })
+      const response = await apiClient.post<DatabaseFunction[]>(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_FUNCTIONS,
+        {
+          query: SQL_QUERIES.GET_FUNCTIONS,
+          params: [data.schema],
+        },
+      )
       return response.data as DatabaseFunction[]
     } catch (error) {
       console.error('Error fetching functions:', error)
@@ -220,7 +238,7 @@ export const createTable = createServerFn({ method: 'POST' })
       const escapedName = escapeIdentifier(col.name)
       const lowerType = col.type.toLowerCase()
       let def = `${escapedName} ${col.type.toUpperCase()}`
-      
+
       // Handle primary key based on data type
       if (col.isPrimaryKey && hasSinglePK) {
         // Auto-increment for integer types
@@ -236,14 +254,17 @@ export const createTable = createServerFn({ method: 'POST' })
           def += ' PRIMARY KEY'
         }
       }
-      
+
       if (!col.nullable && !col.isPrimaryKey) def += ' NOT NULL'
-      
+
       // Handle default values (skip if already handled for UUID PK)
-      if (col.defaultValue !== undefined && !(col.isPrimaryKey && hasSinglePK && lowerType === 'uuid')) {
+      if (
+        col.defaultValue !== undefined &&
+        !(col.isPrimaryKey && hasSinglePK && lowerType === 'uuid')
+      ) {
         def += ` DEFAULT ${formatDefaultValue(col.defaultValue, col.type)}`
       }
-      
+
       return def
     })
 

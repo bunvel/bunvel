@@ -3,7 +3,7 @@ import { createTable } from '@/services/table.service'
 import type { CreateTableParams, DeleteRowsParams } from '@/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { queryKeys } from '../queries/query-key'
+import { reactQueryKeys } from '../queries/react-query-keys'
 
 export function useCreateTable() {
   const queryClient = useQueryClient()
@@ -12,7 +12,7 @@ export function useCreateTable() {
     mutationFn: (params: CreateTableParams) => createTable({ data: params }),
     onSuccess: (_, { schema }) => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.tables.list(schema),
+        queryKey: reactQueryKeys.tables.list(schema),
       })
       toast.success('Table created successfully')
     },
@@ -34,7 +34,7 @@ export function useDeleteRows() {
     onSuccess: (result, { schema, table }) => {
       // Invalidate table data query to refresh the data
       queryClient.invalidateQueries({
-        queryKey: queryKeys.tables.data({
+        queryKey: reactQueryKeys.tables.data({
           schema,
           table,
           page: 1, // Will be invalidated for all pages

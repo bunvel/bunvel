@@ -1,6 +1,6 @@
 import { createSchema } from '@/services/schema.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { queryKeys } from '../queries/query-key'
+import { reactQueryKeys } from '../queries/react-query-keys'
 
 interface CreateSchemaVariables {
   name: string
@@ -18,11 +18,11 @@ export function useCreateSchema() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.schemas.all(),
-      });
+        queryKey: reactQueryKeys.schemas.all(),
+      })
     },
     onError: (error: Error) => {
-      console.error('Schema creation failed:', error);
+      console.error('Schema creation failed:', error)
     },
   })
 }

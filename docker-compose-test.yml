@@ -2,7 +2,7 @@ services:
   app:
     container_name: bunvel-app
     image: bunvel/app
-    build: 
+    build:
       context: ./app
       dockerfile: Dockerfile
     ports:
@@ -25,14 +25,16 @@ services:
       - VITE_STUDIO_DEFAULT_PROJECT=${VITE_STUDIO_DEFAULT_PROJECT}
     networks:
       - bunvel-network
+    volumes:
+      - ./app/logs:/app/logs
     depends_on:
       postgres:
         condition: service_healthy
-  
+
   studio:
     container_name: bunvel-studio
     image: bunvel/studio
-    build: 
+    build:
       context: ./studio
       dockerfile: Dockerfile
     ports:
@@ -71,7 +73,6 @@ services:
       retries: 30
       start_period: 5s
 
-
   rest:
     container_name: bunvel-rest
     image: postgrest/postgrest:v14.3
@@ -87,7 +88,15 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8001"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8001",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5

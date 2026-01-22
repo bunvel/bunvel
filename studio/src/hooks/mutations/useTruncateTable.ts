@@ -1,7 +1,7 @@
 import { truncateTable } from '@/services/table.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { queryKeys } from '../queries/query-key'
+import { reactQueryKeys } from '../queries/react-query-keys'
 
 export function useTruncateTable() {
   const queryClient = useQueryClient()
@@ -12,7 +12,7 @@ export function useTruncateTable() {
     onSuccess: (_, { schema, table }) => {
       // Invalidate the specific query with the exact parameters
       queryClient.invalidateQueries({
-        queryKey: queryKeys.tables.data({
+        queryKey: reactQueryKeys.tables.data({
           schema,
           table,
           page: 1,

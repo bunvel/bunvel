@@ -1,13 +1,13 @@
 import { getTableData, getTableMetadata } from '@/services/editor.service'
 import { FilterConfig } from '@/types/table'
 import { useQuery } from '@tanstack/react-query'
-import { queryKeys } from './query-key'
+import { reactQueryKeys } from './react-query-keys'
 
 export function useTableMetadata(schema?: string, table?: string) {
   return useQuery({
     queryKey:
       schema && table
-        ? queryKeys.tables.metadata(schema, table)
+        ? reactQueryKeys.tables.metadata(schema, table)
         : ['tableMetadata', schema, table],
     queryFn: async () => {
       if (!schema || !table)
@@ -16,6 +16,8 @@ export function useTableMetadata(schema?: string, table?: string) {
       return result?.data
     },
     enabled: !!schema && !!table,
+    staleTime: 10 * 60 * 1000, // 10 minutes for metadata
+    gcTime: 30 * 60 * 1000, // 30 minutes garbage collection
   })
 }
 
@@ -39,7 +41,7 @@ export function useTableData(
   return useQuery({
     queryKey:
       schema && table
-        ? queryKeys.tables.data({
+        ? reactQueryKeys.tables.data({
             schema,
             table,
             page: options.page,
@@ -67,5 +69,7 @@ export function useTableData(
     },
     enabled: !!schema && !!table && !!metadata,
     placeholderData: (previousData) => previousData,
+    staleTime: 2 * 60 * 1000, // 2 minutes for table data
+    gcTime: 5 * 60 * 1000, // 5 minutes garbage collection
   })
 }

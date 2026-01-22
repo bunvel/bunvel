@@ -1,7 +1,7 @@
 import { getTableData } from '@/services/editor.service'
 import { ColumnMetadata, FilterConfig, TableDataResult } from '@/types/table'
 import { useQuery } from '@tanstack/react-query'
-import { queryKeys } from './query-key'
+import { reactQueryKeys } from './react-query-keys'
 
 const MAX_ROWS = 10
 
@@ -45,7 +45,7 @@ export function useRelatedTableData({
     error,
   } = useQuery<TableDataResult>({
     queryKey: shouldFetch
-      ? queryKeys.tables.data({
+      ? reactQueryKeys.tables.data({
           schema: foreignKeyColumn.foreign_table_schema!,
           table: foreignKeyColumn.foreign_table_name!,
           page: 1,
@@ -71,6 +71,8 @@ export function useRelatedTableData({
     enabled: shouldFetch,
     placeholderData: (previousData: TableDataResult | undefined) =>
       previousData,
+    staleTime: 1 * 60 * 1000, // 1 minute for related table data
+    gcTime: 3 * 60 * 1000, // 3 minutes garbage collection
   })
 
   return {

@@ -2,7 +2,7 @@ import { insertRow } from '@/services/editor.service'
 import type { CreateRowParams } from '@/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { queryKeys } from '../queries/query-key'
+import { reactQueryKeys } from '../queries/react-query-keys'
 
 export function useCreateRow() {
   const queryClient = useQueryClient()
@@ -12,7 +12,7 @@ export function useCreateRow() {
     onSuccess: (_, { schema, table }) => {
       // Invalidate table data query to refresh the data
       queryClient.invalidateQueries({
-        queryKey: queryKeys.tables.data({
+        queryKey: reactQueryKeys.tables.data({
           schema,
           table,
           page: 1, // Will be invalidated for all pages

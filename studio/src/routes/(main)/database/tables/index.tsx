@@ -3,7 +3,7 @@ import { TableFormSheet } from '@/components/editor/table-form-sheet'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseTables } from '@/hooks/queries/useTables'
-import type { TableColumn } from '@/types'
+import type { DatabaseTables, TableColumn } from '@/types'
 import { SchemaTable } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
 import {
@@ -22,8 +22,8 @@ export const Route = createFileRoute('/(main)/database/tables/')({
 const columns: TableColumn[] = [
   { key: 'name', header: 'Name' },
   { key: 'description', header: 'Description' },
-  { key: 'row_count', header: 'Rows' },
-  { key: 'total_size', header: 'Size' },
+  { key: 'row_count', header: 'Rows (ESTIMATED)' },
+  { key: 'total_size', header: 'Size (ESTIMATED)' },
   { key: 'column_count', header: '' },
 ]
 
@@ -38,7 +38,8 @@ function RouteComponent() {
   } = useDatabaseTables(schema || 'public')
 
   // Custom body row
-  const bodyRow = (item: any, index: number) => {
+  const bodyRow = (item: DatabaseTables, index: number) => {
+    const isTable = item.kind === 'TABLE'
     const isView = item.kind === 'VIEW'
     const isMaterializedView = item.kind === 'MATERIALIZED VIEW'
 
@@ -64,8 +65,10 @@ function RouteComponent() {
             <span className="text-muted-foreground">No Description</span>
           )}
         </TableCell>
-        <TableCell>{item.row_count?.toLocaleString() || '0'}</TableCell>
-        <TableCell>{item.total_size || '0 KB'}</TableCell>
+        <TableCell>
+          {isTable ? item.row_count?.toLocaleString() || '0' : '-'}
+        </TableCell>
+        <TableCell>{isTable ? item.total_size || '0 KB' : '-'}</TableCell>
         <TableCell>
           <Button
             variant="outline"

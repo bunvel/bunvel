@@ -2,11 +2,15 @@ import { Elysia } from "elysia";
 import { httpExceptionPlugin } from "elysia-http-exception";
 import { rateLimit } from "elysia-rate-limit";
 import { corsPlugin } from "./plugins/cors";
+import { loggingPlugin } from "./plugins/logging";
 import { metaService } from "./services/meta";
 import { restService } from "./services/rest";
 import { env } from "./utils/config";
 
 new Elysia()
+  // Logging configuration
+  .use(loggingPlugin)
+
   // CORS configuration
   .use(corsPlugin)
 
@@ -18,7 +22,7 @@ new Elysia()
         // Skip rate limiting for health checks
         return request.url == "/";
       },
-    })
+    }),
   )
 
   // Error handling

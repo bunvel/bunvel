@@ -1,5 +1,6 @@
 import Elysia, { t } from "elysia";
 import { db } from "../../../../database";
+import { queryLogger } from "../../../../plugins/logging";
 import {
   MAX_PARAMS_LENGTH,
   MAX_QUERY_LENGTH,
@@ -35,6 +36,12 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
     }
 
     try {
+      queryLogger.info("SQL query executed", {
+        timestamp: new Date().toISOString(),
+        query: query,
+        params: body.params,
+      });
+
       // Execute query with or without parameters
       const result = await db.begin(async (tx) => {
         return body.params
@@ -51,12 +58,28 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
         return Response.json([]);
       }
 
+      const resultCount = Array.isArray(result) ? result.length : 1;
+      queryLogger.info("SQL query completed", {
+        timestamp: new Date().toISOString(),
+        query: query,
+        resultCount: resultCount,
+      });
+
       return Response.json(result);
     } catch (error) {
       const message =
         error instanceof Error
           ? `Query execution failed: ${error.message}`
           : "An unexpected error occurred while executing the query";
+
+      queryLogger.error("SQL query failed", {
+        timestamp: new Date().toISOString(),
+        query: query,
+        params: body.params,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
       set.status = 400;
       return Response.json({ message });
     }
@@ -72,8 +95,8 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
         t.Array(t.Union([t.String(), t.Number(), t.Boolean(), t.Null()]), {
           description:
             "Optional array of parameter values to be safely interpolated into the query",
-        })
+        }),
       ),
     }),
-  }
+  },
 );

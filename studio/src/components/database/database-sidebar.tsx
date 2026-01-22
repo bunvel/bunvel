@@ -4,6 +4,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { ListTodo } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { Link, useMatches } from '@tanstack/react-router'
 import { useCallback } from 'react'
 
@@ -54,13 +56,14 @@ export function DatabaseSidebar() {
   return (
     <div className="flex flex-col h-full w-full gap-2">
       <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-        <SidebarMenu className="mt-2">
+        <SidebarMenu className="mt-2 space-y-1">
           {menuItems.map((item: MenuItem) => (
             <SidebarMenuItem key={item.id}>
               <SidebarMenuButton
                 isActive={isActive(item.url)}
                 render={
                   <Link to={item.url}>
+                    <HugeiconsIcon icon={ListTodo} />
                     <span className="ml-2">{item.name}</span>
                   </Link>
                 }
