@@ -23,7 +23,9 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useCreateTable } from '@/hooks/mutations/useTableMutations'
-import type { ColumnDefinition as BaseColumnDefinition } from '@/types'
+import { useTableMetadata } from '@/hooks/queries/useTableData'
+import { useTables } from '@/hooks/queries/useTables'
+import type { ColumnDefinition as BaseColumnDefinition, Table } from '@/types'
 import {
   DATA_TYPES,
   DEFAULT_COLUMN,
@@ -36,6 +38,91 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Separator } from '../ui/separator'
+
+// ReferencedColumnSelector component
+interface ReferencedColumnSelectorProps {
+  value: string
+  onChange: (value: string | null) => void
+  schema: string
+  table: string
+  disabled?: boolean
+  localColumn?: ColumnDefinition // Add local column for type checking
+}
+
+function ReferencedColumnSelector({
+  value,
+  onChange,
+  schema,
+  table,
+  disabled,
+  localColumn,
+}: ReferencedColumnSelectorProps) {
+  const { data: metadata } = useTableMetadata(schema, table)
+
+  if (!table) {
+    return (
+      <Select disabled value="">
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select table first" />
+        </SelectTrigger>
+      </Select>
+    )
+  }
+
+  const getColumnTypeCompatibility = (refColumnType: string) => {
+    if (!localColumn) return { compatible: true, warning: '' }
+
+    const localType = localColumn.type.toLowerCase()
+    const refType = refColumnType.toLowerCase()
+
+    const isCompatible =
+      localType === refType ||
+      (localType.includes('int') && refType.includes('int')) ||
+      (localType.includes('varchar') && refType.includes('varchar')) ||
+      (localType.includes('text') && refType.includes('text')) ||
+      (localType.includes('char') && refType.includes('char')) ||
+      (localType === 'uuid' && refType === 'uuid') ||
+      (localType.includes('timestamp') && refType.includes('timestamp'))
+
+    return {
+      compatible: isCompatible,
+      warning: isCompatible
+        ? ''
+        : `⚠️ Type mismatch: ${localColumn.type} → ${refColumnType}`,
+    }
+  }
+
+  return (
+    <Select value={value} onValueChange={onChange} disabled={disabled}>
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Select column" />
+      </SelectTrigger>
+      <SelectContent>
+        {metadata?.columns?.map((column) => {
+          const compatibility = getColumnTypeCompatibility(column.data_type)
+          return (
+            <SelectItem
+              key={column.column_name}
+              value={column.column_name}
+              disabled={!compatibility.compatible}
+            >
+              <div className="flex flex-col">
+                <span>
+                  {column.column_name} ({column.data_type})
+                </span>
+                {!compatibility.compatible && (
+                  <span className="text-xs text-amber-600">
+                    {compatibility.warning}
+                  </span>
+                )}
+              </div>
+            </SelectItem>
+          )
+        })}
+      </SelectContent>
+    </Select>
+  )
+}
 
 type ColumnDefinition = BaseColumnDefinition & {
   isPrimaryKey?: boolean
@@ -72,6 +159,7 @@ type FormValues = {
 export function TableFormSheet({ schema }: TableFormSheetProps) {
   const [open, setOpen] = useState(false)
   const { mutate: createTable, isPending: isSubmitting } = useCreateTable()
+  const { data: tables = [] } = useTables(schema)
 
   const getDefaultColumns = () => [
     {
@@ -108,6 +196,11 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
     foreignKeys: [],
   })
 
+  // Filter out tables that are being created in the current form to avoid self-reference
+  const availableTables = tables.filter(
+    (table: Table) => table.name !== formValues.name && table.kind === 'TABLE',
+  )
+
   const handleInputChange = (field: keyof FormValues, value: string) => {
     setFormValues((prev) => ({
       ...prev,
@@ -142,43 +235,140 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
     }))
   }
 
+  // Validate foreign key type compatibility
+  const validateForeignKeyTypes = async () => {
+    const validForeignKeys = formValues.foreignKeys.filter(
+      (fk) => fk.column && fk.referencedTable && fk.referencedColumn,
+    )
+
+    if (validForeignKeys.length === 0) return true
+
+    for (const fk of validForeignKeys) {
+      // Find the local column
+      const localColumn = formValues.columns.find(
+        (col) => col.name === fk.column,
+      )
+      if (!localColumn) continue
+
+      try {
+        // Use the editor service to get table metadata
+        const { getTableMetadata } = await import('@/services/editor.service')
+        const result = await getTableMetadata({
+          data: { schema, table: fk.referencedTable },
+        })
+        const metadata = result?.data
+
+        if (metadata) {
+          const referencedColumn = metadata.columns?.find(
+            (col: any) => col.column_name === fk.referencedColumn,
+          )
+
+          if (referencedColumn) {
+            // Check if types are compatible
+            const localType = localColumn.type.toLowerCase()
+            const refType = referencedColumn.data_type.toLowerCase()
+
+            // Basic type compatibility check
+            const isCompatible =
+              localType === refType ||
+              (localType.includes('int') && refType.includes('int')) ||
+              (localType.includes('varchar') && refType.includes('varchar')) ||
+              (localType.includes('text') && refType.includes('text')) ||
+              (localType.includes('char') && refType.includes('char')) ||
+              (localType === 'uuid' && refType === 'uuid') ||
+              (localType.includes('timestamp') && refType.includes('timestamp'))
+
+            if (!isCompatible) {
+              toast.error('Foreign key type mismatch', {
+                description: `Column "${fk.column}" (${localColumn.type}) and referenced column "${fk.referencedColumn}" (${referencedColumn.data_type}) have incompatible types.`,
+              })
+              return false
+            }
+          }
+        }
+      } catch (error) {
+        // If we can't validate types, let the backend handle it
+        console.warn('Could not validate foreign key types:', error)
+      }
+    }
+
+    return true
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    try {
-      // Filter out empty column names and validate
-      const validColumns = formValues.columns.filter(
-        (col) => col.name.trim() !== '',
-      )
-      if (validColumns.length === 0) {
-        toast.error('At least one column is required')
-        return
-      }
-      // Validate column names
-      const columnNames = validColumns.map((col) => col.name.toLowerCase())
-      if (new Set(columnNames).size !== columnNames.length) {
-        toast.error('Column names must be unique')
-        return
-      }
-      // Filter out incomplete foreign keys
-      const validForeignKeys = formValues.foreignKeys.filter(
-        (fk) => fk.column && fk.referencedTable && fk.referencedColumn,
-      )
-      // Create table with columns and foreign keys
-      createTable({
+
+    // Filter out empty column names and validate
+    const validColumns = formValues.columns.filter(
+      (col) => col.name.trim() !== '',
+    )
+    if (validColumns.length === 0) {
+      toast.error('At least one column is required')
+      return
+    }
+
+    // Validate column names
+    const columnNames = validColumns.map((col) => col.name.toLowerCase())
+    if (new Set(columnNames).size !== columnNames.length) {
+      toast.error('Column names must be unique')
+      return
+    }
+
+    // Validate foreign key types before submission
+    const isTypesValid = await validateForeignKeyTypes()
+    if (!isTypesValid) {
+      return
+    }
+
+    // Filter out incomplete foreign keys
+    const validForeignKeys = formValues.foreignKeys.filter(
+      (fk) => fk.column && fk.referencedTable && fk.referencedColumn,
+    )
+
+    // Create table with columns and foreign keys
+    createTable(
+      {
         schema: schema,
         table: formValues.name,
         description: formValues.description,
         columns: validColumns,
         foreignKeys: validForeignKeys,
-      })
-      setOpen(false)
-    } catch (error) {
-      console.error('Error creating table:', error)
-      toast.error('Failed to create table', {
-        description:
-          error instanceof Error ? error.message : 'An unknown error occurred',
-      })
-    }
+      },
+      {
+        onSuccess: () => {
+          setOpen(false)
+          resetForm()
+        },
+        onError: (error) => {
+          console.error('Error creating table:', error)
+
+          // Extract meaningful error message
+          let errorMessage = 'Failed to create table'
+          let errorDescription = ''
+
+          if (error instanceof Error) {
+            errorMessage = error.message
+
+            // Handle specific foreign key type mismatch error
+            if (error.message.includes('incompatible types')) {
+              errorMessage = 'Foreign key type mismatch'
+              errorDescription =
+                'The column types in the foreign key relationship are not compatible. Make sure both columns have the same data type.'
+            } else if (error.message.includes('foreign key constraint')) {
+              errorMessage = 'Foreign key constraint error'
+              errorDescription =
+                'There is an issue with the foreign key constraint. Please check the referenced table and column exist and have compatible types.'
+            }
+          }
+
+          toast.error(errorMessage, {
+            description:
+              errorDescription ||
+              'Please check your table configuration and try again.',
+          })
+        },
+      },
+    )
   }
 
   return (
@@ -480,42 +670,61 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                         <Label className="text-sm font-medium">
                           Referenced Table
                         </Label>
-                        <Input
-                          type="text"
+                        <Select
                           value={fk.referencedTable}
-                          onChange={(e) =>
+                          onValueChange={(value: string | null) => {
+                            if (value === null) return
                             setFormValues((prev) => ({
                               ...prev,
                               foreignKeys: prev.foreignKeys.map((fk, i) =>
                                 i === fkIndex
-                                  ? { ...fk, referencedTable: e.target.value }
+                                  ? {
+                                      ...fk,
+                                      referencedTable: value,
+                                      referencedColumn: '',
+                                    }
                                   : fk,
                               ),
                             }))
-                          }
-                          placeholder={PLACEHOLDERS.TABLE_NAME_FK}
-                          className="w-full"
-                        />
+                          }}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue>
+                              {fk.referencedTable || 'Select table'}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableTables.map((table: Table) => (
+                              <SelectItem key={table.name} value={table.name}>
+                                {table.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="space-y-1">
                         <Label className="text-sm font-medium">
                           Referenced Column
                         </Label>
-                        <Input
-                          type="text"
+                        <ReferencedColumnSelector
                           value={fk.referencedColumn}
-                          onChange={(e) =>
+                          onChange={(value: string | null) => {
+                            if (value === null) return
                             setFormValues((prev) => ({
                               ...prev,
                               foreignKeys: prev.foreignKeys.map((fk, i) =>
                                 i === fkIndex
-                                  ? { ...fk, referencedColumn: e.target.value }
+                                  ? { ...fk, referencedColumn: value }
                                   : fk,
                               ),
                             }))
-                          }
-                          placeholder={PLACEHOLDERS.COLUMN_NAME_FK}
-                          className="w-full"
+                          }}
+                          schema={schema}
+                          table={fk.referencedTable}
+                          disabled={isSubmitting || !fk.referencedTable}
+                          localColumn={formValues.columns.find(
+                            (col) => col.name === fk.column,
+                          )}
                         />
                       </div>
                     </div>
