@@ -1,19 +1,10 @@
 import { DatabaseTable } from '@/components/database/database-table'
-import { Button } from '@/components/ui/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseTriggers } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types'
 import { DatabaseTrigger, SchemaTable } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { useState } from 'react'
 
 export const Route = createFileRoute('/(main)/database/triggers/')({
   component: RouteComponent,
@@ -26,12 +17,9 @@ const columns: TableColumn[] = [
   { key: 'function_name', header: 'Function' },
   { key: 'timing_events', header: 'Events' },
   { key: 'orientation', header: 'Orientation' },
-  { key: 'actions', header: '' },
 ]
 
 function RouteComponent() {
-  const [selectedTrigger, setSelectedTrigger] =
-    useState<DatabaseTrigger | null>(null)
   const search = useSearch({ strict: false }) as Partial<SchemaTable>
   const { schema } = search
 
@@ -54,63 +42,6 @@ function RouteComponent() {
           {`${trigger.timing} ${trigger.events}`}
         </TableCell>
         <TableCell>{trigger.orientation}</TableCell>
-        <TableCell>
-          <Sheet
-            onOpenChange={(open) =>
-              open ? setSelectedTrigger(trigger) : setSelectedTrigger(null)
-            }
-          >
-            <SheetTrigger
-              render={
-                <Button variant="outline" size="sm">
-                  View Details
-                </Button>
-              }
-            ></SheetTrigger>
-            <SheetContent
-              side="right"
-              className="bg-card min-w-2xl flex flex-col"
-            >
-              <SheetHeader className="border-b p-4">
-                <SheetTitle>
-                  Trigger: {selectedTrigger?.trigger_name}
-                </SheetTitle>
-              </SheetHeader>
-              <div className="flex-1 p-4 overflow-auto space-y-4">
-                <div>
-                  <h3 className="font-medium">Table</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedTrigger?.table_name}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Function</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedTrigger?.function_name}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Events</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedTrigger?.events}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Timing</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedTrigger?.timing}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-medium">Orientation</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedTrigger?.orientation}
-                  </p>
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </TableCell>
       </TableRow>
     )
   }
