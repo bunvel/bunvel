@@ -236,6 +236,50 @@ export const SCREEN_READER_LABELS = {
   TOGGLE_THEME: TITLES.TOGGLE_THEME,
 } as const
 
+// Table form specific messages
+export const TABLE_FORM_MESSAGES = {
+  // Titles and labels
+  CREATE_NEW_TABLE: 'Create New Table',
+  TABLE_NAME: 'Table Name',
+  DESCRIPTION: 'Description',
+  TABLE_COLUMNS: 'Table Columns',
+  FOREIGN_KEYS: 'Foreign Keys',
+  COLUMN_NAME: 'Column Name',
+  DATA_TYPE: 'Data Type',
+  DEFAULT: 'Default',
+  REFERENCED_TABLE: 'Referenced Table',
+  REFERENCED_COLUMN: 'Referenced Column',
+  ON_DELETE: 'On Delete',
+  ON_UPDATE: 'On Update',
+
+  // Descriptions
+  DEFINE_TABLE_STRUCTURE: 'Define your table structure by adding columns',
+  DEFINE_FOREIGN_KEYS: 'Define your foreign key relationships',
+
+  // Button labels
+  ADD_COLUMN: 'Add Column',
+  ADD_FOREIGN_KEY: 'Add Foreign Key',
+  CREATE_TABLE: 'Create Table',
+  CANCEL: 'Cancel',
+  CREATING: 'Creating...',
+  REMOVE: 'Remove',
+
+  // Placeholders
+  SELECT_TABLE_FIRST: 'Select table first',
+  SELECT_COLUMN: 'Select column',
+  SELECT_REFERENCED_TABLE: 'Select referenced table',
+  SELECT_REFERENCED_COLUMN: 'Select referenced column',
+
+  // Error messages
+  FOREIGN_KEY_TYPE_MISMATCH: 'Foreign key type mismatch',
+  TYPE_MISMATCH_TEMPLATE: `Column "{column}" ({localType}) and referenced column "{referencedColumn}" ({referencedType}) have incompatible types.`,
+
+  // Checkbox labels
+  PRIMARY_KEY: 'Primary Key',
+  UNIQUE: 'Unique',
+  NULLABLE: 'Nullable',
+} as const
+
 // SQL operator mappings for filter operations
 export const FilterSqlOperators: Record<
   FilterOperator,

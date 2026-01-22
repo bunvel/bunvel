@@ -6,6 +6,7 @@ export interface ColumnDefinition {
   nullable?: boolean
   defaultValue?: string
   isPrimaryKey?: boolean
+  unique?: boolean
 }
 
 export interface Table {
@@ -14,12 +15,19 @@ export interface Table {
   columns?: ColumnDefinition[]
 }
 
+export type ForeignKeyAction =
+  | 'NO ACTION'
+  | 'RESTRICT'
+  | 'CASCADE'
+  | 'SET NULL'
+  | 'SET DEFAULT'
+
 export interface ForeignKeyDefinition {
   column: string
   referencedTable: string
   referencedColumn: string
-  onDelete: 'NO ACTION' | 'RESTRICT' | 'CASCADE' | 'SET NULL' | 'SET DEFAULT'
-  onUpdate: 'NO ACTION' | 'RESTRICT' | 'CASCADE' | 'SET NULL' | 'SET DEFAULT'
+  onDelete: ForeignKeyAction
+  onUpdate: ForeignKeyAction
 }
 
 export interface CreateTableParams {

@@ -25,13 +25,19 @@ import {
 import { useCreateTable } from '@/hooks/mutations/useTableMutations'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTables } from '@/hooks/queries/useTables'
-import type { ColumnDefinition as BaseColumnDefinition, Table } from '@/types'
+import type {
+  ColumnDefinition,
+  ForeignKeyAction,
+  ForeignKeyDefinition,
+  Table,
+} from '@/types'
 import {
   DATA_TYPES,
   DEFAULT_COLUMN,
   DEFAULT_FOREIGN_KEY,
   FOREIGN_KEY_ACTIONS,
   PLACEHOLDERS,
+  TABLE_FORM_MESSAGES,
 } from '@/utils/constant'
 import { Plus, Settings, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -63,7 +69,7 @@ function ReferencedColumnSelector({
     return (
       <Select disabled value="">
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select table first" />
+          <SelectValue placeholder={TABLE_FORM_MESSAGES.SELECT_TABLE_FIRST} />
         </SelectTrigger>
       </Select>
     )
@@ -95,7 +101,7 @@ function ReferencedColumnSelector({
   return (
     <Select value={value} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger className="w-full">
-        <SelectValue placeholder="Select column" />
+        <SelectValue placeholder={TABLE_FORM_MESSAGES.SELECT_COLUMN} />
       </SelectTrigger>
       <SelectContent>
         {metadata?.columns?.map((column) => {
@@ -122,26 +128,6 @@ function ReferencedColumnSelector({
       </SelectContent>
     </Select>
   )
-}
-
-type ColumnDefinition = BaseColumnDefinition & {
-  isPrimaryKey?: boolean
-  unique?: boolean
-}
-
-type ForeignKeyAction =
-  | 'NO ACTION'
-  | 'RESTRICT'
-  | 'CASCADE'
-  | 'SET NULL'
-  | 'SET DEFAULT'
-
-interface ForeignKeyDefinition {
-  column: string
-  referencedTable: string
-  referencedColumn: string
-  onDelete: ForeignKeyAction
-  onUpdate: ForeignKeyAction
 }
 
 interface TableFormSheetProps {
@@ -279,8 +265,14 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
               (localType.includes('timestamp') && refType.includes('timestamp'))
 
             if (!isCompatible) {
-              toast.error('Foreign key type mismatch', {
-                description: `Column "${fk.column}" (${localColumn.type}) and referenced column "${fk.referencedColumn}" (${referencedColumn.data_type}) have incompatible types.`,
+              toast.error(TABLE_FORM_MESSAGES.FOREIGN_KEY_TYPE_MISMATCH, {
+                description: TABLE_FORM_MESSAGES.TYPE_MISMATCH_TEMPLATE.replace(
+                  '{column}',
+                  fk.column,
+                )
+                  .replace('{localType}', localColumn.type)
+                  .replace('{referencedColumn}', fk.referencedColumn)
+                  .replace('{referencedType}', referencedColumn.data_type),
               })
               return false
             }
@@ -391,14 +383,14 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
       <SheetContent side="right" className="bg-card min-w-2xl flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <SheetHeader className="border-b p-4">
-            <SheetTitle>Create New Table</SheetTitle>
+            <SheetTitle>{TABLE_FORM_MESSAGES.CREATE_NEW_TABLE}</SheetTitle>
           </SheetHeader>
           <div className="flex-1 overflow-auto">
             {/* Table Name Field */}
             <div className="p-6 space-y-6">
               <div className="flex">
                 <Label htmlFor="table-name" className="w-48">
-                  Table Name
+                  {TABLE_FORM_MESSAGES.TABLE_NAME}
                 </Label>
                 <Input
                   id="table-name"
@@ -414,7 +406,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
               </div>
               <div className="flex">
                 <Label htmlFor="description" className="w-48">
-                  Description
+                  {TABLE_FORM_MESSAGES.DESCRIPTION}
                 </Label>
                 <Input
                   id="description"
@@ -434,9 +426,11 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
             {/* Columns Section */}
             <div className="space-y-4 p-6">
               <div className="mb-4">
-                <h3 className="text-lg font-medium">Table Columns</h3>
+                <h3 className="text-lg font-medium">
+                  {TABLE_FORM_MESSAGES.TABLE_COLUMNS}
+                </h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Define your table structure by adding columns
+                  {TABLE_FORM_MESSAGES.DEFINE_TABLE_STRUCTURE}
                 </p>
               </div>
 
@@ -445,13 +439,19 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                 {/* Column Headers */}
                 <div className="grid grid-cols-12 gap-2 pb-2 border-b">
                   <div className="col-span-4">
-                    <Label className="text-sm font-medium">Column Name</Label>
+                    <Label className="text-sm font-medium">
+                      {TABLE_FORM_MESSAGES.COLUMN_NAME}
+                    </Label>
                   </div>
                   <div className="col-span-3">
-                    <Label className="text-sm font-medium">Data Type</Label>
+                    <Label className="text-sm font-medium">
+                      {TABLE_FORM_MESSAGES.DATA_TYPE}
+                    </Label>
                   </div>
                   <div className="col-span-3">
-                    <Label className="text-sm font-medium">Default</Label>
+                    <Label className="text-sm font-medium">
+                      {TABLE_FORM_MESSAGES.DEFAULT}
+                    </Label>
                   </div>
                   <div className="col-span-1 hidden">
                     <Label className="text-sm font-medium">Actions</Label>
@@ -545,7 +545,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                                 )
                               }
                             >
-                              Primary Key
+                              {TABLE_FORM_MESSAGES.PRIMARY_KEY}
                             </DropdownMenuCheckboxItem>
                             <DropdownMenuCheckboxItem
                               checked={column.nullable}
@@ -558,7 +558,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                               }
                               disabled={isSubmitting || column.isPrimaryKey}
                             >
-                              Nullable
+                              {TABLE_FORM_MESSAGES.NULLABLE}
                             </DropdownMenuCheckboxItem>
                             <DropdownMenuCheckboxItem
                               checked={column.unique}
@@ -570,7 +570,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                                 )
                               }
                             >
-                              Unique
+                              {TABLE_FORM_MESSAGES.UNIQUE}
                             </DropdownMenuCheckboxItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -613,7 +613,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                       className="w-full"
                     >
                       <HugeiconsIcon icon={Plus} className="h-4 w-4 mr-2" />
-                      Add Column
+                      {TABLE_FORM_MESSAGES.ADD_COLUMN}
                     </Button>
                   </div>
                 </div>
@@ -623,9 +623,11 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
             {/* Foreign Keys Section */}
             <div className="space-y-4 p-6 border-t">
               <div className="mb-4">
-                <h3 className="text-lg font-medium">Foreign Keys</h3>
+                <h3 className="text-lg font-medium">
+                  {TABLE_FORM_MESSAGES.FOREIGN_KEYS}
+                </h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Define relationships to other tables
+                  {TABLE_FORM_MESSAGES.DEFINE_FOREIGN_KEYS}
                 </p>
               </div>
 
@@ -639,7 +641,9 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                     {/* First Row: Column | Ref Table | Ref Column */}
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-1">
-                        <Label className="text-sm font-medium">Column</Label>
+                        <Label className="text-sm font-medium">
+                          {TABLE_FORM_MESSAGES.COLUMN_NAME}
+                        </Label>
                         <Select
                           value={fk.column}
                           onValueChange={(value: string | null) => {
@@ -654,7 +658,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                         >
                           <SelectTrigger className="w-full">
                             <SelectValue>
-                              {fk.column || 'Select column'}
+                              {fk.column || TABLE_FORM_MESSAGES.SELECT_COLUMN}
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
@@ -668,7 +672,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                       </div>
                       <div className="space-y-1">
                         <Label className="text-sm font-medium">
-                          Referenced Table
+                          {TABLE_FORM_MESSAGES.REFERENCED_TABLE}
                         </Label>
                         <Select
                           value={fk.referencedTable}
@@ -690,7 +694,8 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                         >
                           <SelectTrigger className="w-full">
                             <SelectValue>
-                              {fk.referencedTable || 'Select table'}
+                              {fk.referencedTable ||
+                                TABLE_FORM_MESSAGES.SELECT_REFERENCED_TABLE}
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent>
@@ -704,7 +709,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                       </div>
                       <div className="space-y-1">
                         <Label className="text-sm font-medium">
-                          Referenced Column
+                          {TABLE_FORM_MESSAGES.REFERENCED_COLUMN}
                         </Label>
                         <ReferencedColumnSelector
                           value={fk.referencedColumn}
@@ -732,7 +737,9 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                     {/* Second Row: On Delete | On Update | Remove Button */}
                     <div className="grid grid-cols-3 gap-4 items-end">
                       <div className="space-y-1">
-                        <Label className="text-sm font-medium">On Delete</Label>
+                        <Label className="text-sm font-medium">
+                          {TABLE_FORM_MESSAGES.ON_DELETE}
+                        </Label>
                         <Select
                           value={fk.onDelete}
                           onValueChange={(value: ForeignKeyAction | null) => {
@@ -761,7 +768,9 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                         </Select>
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-sm font-medium">On Update</Label>
+                        <Label className="text-sm font-medium">
+                          {TABLE_FORM_MESSAGES.ON_UPDATE}
+                        </Label>
                         <Select
                           value={fk.onUpdate}
                           onValueChange={(value: ForeignKeyAction | null) => {
@@ -807,7 +816,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                             icon={Trash2}
                             className="h-4 w-4 mr-2"
                           />
-                          Remove
+                          {TABLE_FORM_MESSAGES.REMOVE}
                         </Button>
                       </div>
                     </div>
@@ -833,7 +842,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                   }
                 >
                   <HugeiconsIcon icon={Plus} className="h-4 w-4 mr-2" />
-                  Add Foreign Key
+                  {TABLE_FORM_MESSAGES.ADD_FOREIGN_KEY}
                 </Button>
               </div>
             </div>
@@ -845,10 +854,12 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
               onClick={() => setOpen(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {TABLE_FORM_MESSAGES.CANCEL}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Creating...' : 'Create Table'}
+              {isSubmitting
+                ? TABLE_FORM_MESSAGES.CREATING
+                : TABLE_FORM_MESSAGES.CREATE_TABLE}
             </Button>
           </SheetFooter>
         </form>
