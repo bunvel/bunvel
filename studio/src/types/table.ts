@@ -46,16 +46,18 @@ export interface ColumnMetadata {
   foreign_column_name?: string
 }
 
+export interface ForeignKey {
+  constraint_name: string
+  column_name: string
+  foreign_table_schema: string
+  foreign_table_name: string
+  foreign_column_name: string
+}
+
 export interface TableMetadata {
   columns: ColumnMetadata[]
   primary_keys: string[]
-  foreign_keys: Array<{
-    constraint_name: string
-    column_name: string
-    foreign_table_schema: string
-    foreign_table_name: string
-    foreign_column_name: string
-  }>
+  foreign_keys: ForeignKey[]
   table_type: 'r' | 'v' | 'm'
 }
 

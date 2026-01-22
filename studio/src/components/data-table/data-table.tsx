@@ -14,8 +14,10 @@ import {
 import * as React from 'react'
 
 import { Checkbox } from '@/components/ui/checkbox'
+import { TableMetadata } from '@/types'
 import { formatCellValue } from '@/utils/format'
 import { Table, TableBody, TableCell, TableRow } from '../ui/table'
+import { DataTableCell } from './data-table-cell'
 import { DataTableHeader } from './data-table-header'
 import { DataTablePagination } from './data-table-pagination'
 import { DataTableSkeleton } from './data-table-skeleton'
@@ -23,6 +25,7 @@ import { DataTableSkeleton } from './data-table-skeleton'
 interface DataTableProps<TData, TValue = unknown> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  metadata: TableMetadata
   isLoading?: boolean
   error?: unknown
   enableRowSelection?: boolean
@@ -49,6 +52,7 @@ interface DataTableProps<TData, TValue = unknown> {
 export function DataTable<TData, TValue = unknown>({
   columns,
   data,
+  metadata,
   isLoading = false,
   error,
   enableRowSelection = false,
@@ -61,6 +65,17 @@ export function DataTable<TData, TValue = unknown>({
 }: DataTableProps<TData, TValue>) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
+
+  // Memoize foreign key column lookup for performance
+  const foreignKeyColumns = React.useMemo(() => {
+    const fkSet = new Set<string>()
+    metadata.columns.forEach((col) => {
+      if (col.is_foreign_key) {
+        fkSet.add(col.column_name)
+      }
+    })
+    return fkSet
+  }, [metadata.columns])
   // Add selection column if enabled
   const columnsWithSelection = React.useMemo(() => {
     if (!enableRowSelection) return columns
@@ -196,7 +211,7 @@ export function DataTable<TData, TValue = unknown>({
                           maxWidth: '350px',
                         }}
                       >
-                        <div className="text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                        <div className="text-sm">
                           {cell.column.id === 'select' ? (
                             <Checkbox
                               checked={cell.row.getIsSelected()}
@@ -207,7 +222,16 @@ export function DataTable<TData, TValue = unknown>({
                               onClick={(e) => e.stopPropagation()}
                             />
                           ) : (
-                            formatCellValue(cell.getValue())
+                            <DataTableCell
+                              value={formatCellValue(cell.getValue())}
+                              rawValue={cell.getValue()}
+                              isForeignKey={foreignKeyColumns.has(
+                                cell.column.id,
+                              )}
+                              columnMetadata={metadata.columns.find(
+                                (col) => col.column_name === cell.column.id,
+                              )}
+                            />
                           )}
                         </div>
                       </TableCell>

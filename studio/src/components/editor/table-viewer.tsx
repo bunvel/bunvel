@@ -249,6 +249,14 @@ export function TableViewer() {
         <DataTable
           columns={columns}
           data={tableData?.data || []}
+          metadata={
+            metadata || {
+              columns: [],
+              primary_keys: [],
+              foreign_keys: [],
+              table_type: 'r',
+            }
+          }
           isLoading={isLoading}
           error={error}
           enableRowSelection={true}
