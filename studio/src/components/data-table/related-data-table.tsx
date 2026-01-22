@@ -1,16 +1,10 @@
 import { TableDataResult, TableMetadata } from '@/types/table'
-import { formatCellValue, formatDataType } from '@/utils/format'
+import { formatCellValue } from '@/utils/format'
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import * as React from 'react'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../ui/table'
+import { CommonTableHeader } from '../common/common-table-header'
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table'
 import { DataTableSkeleton } from './data-table-skeleton'
 
 interface RelatedDataTableProps {
@@ -121,31 +115,11 @@ export const RelatedDataTable = React.memo(function RelatedDataTable({
           <TableHeader>
             <TableRow>
               {displayColumns.map((column) => (
-                <TableHead
+                <CommonTableHeader
                   key={column.column_name}
+                  column={column}
                   className="text-xs p-3 font-medium bg-muted/50 border-r border-b"
-                >
-                  <div className="flex items-center gap-2">
-                    <span>{column.column_name}</span>
-                    <div className="flex items-center gap-1">
-                      {column.is_primary_key && (
-                        <HugeiconsIcon
-                          icon={Key01Icon}
-                          className="h-3.5 w-3.5 text-amber-500"
-                        />
-                      )}
-                      {column.is_foreign_key && (
-                        <HugeiconsIcon
-                          icon={Link02Icon}
-                          className="h-3.5 w-3.5 text-blue-500"
-                        />
-                      )}
-                    </div>
-                    <span className="text-xs text-muted-foreground font-normal">
-                      {formatDataType(column.data_type)}
-                    </span>
-                  </div>
-                </TableHead>
+                />
               ))}
             </TableRow>
           </TableHeader>
