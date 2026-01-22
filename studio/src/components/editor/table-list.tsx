@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   SidebarGroup,
   SidebarMenu,
@@ -7,6 +6,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
 import { SchemaTable, Table } from '@/types'
@@ -131,8 +131,8 @@ export function TableList() {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="shrink-0 p-4 pb-2">
+    <div className="h-full flex flex-col min-h-0 relative">
+      <div className="p-4 pb-2 shrink-0">
         <div className="flex gap-1">
           <Input
             placeholder={PLACEHOLDERS.SEARCH_TABLES}
@@ -143,62 +143,60 @@ export function TableList() {
           <TableFormSheet schema={schema} />
         </div>
       </div>
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full w-full px-4">
-          {filteredTables.length === 0 ? (
-            <div
-              key="no-results"
-              className="py-4 text-center text-sm text-muted-foreground"
-            >
-              {searchQuery
-                ? `No tables found matching "${searchQuery}"`
-                : 'No tables found'}
-            </div>
-          ) : (
-            <div className="h-full">
-              <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-                <SidebarMenu className="space-y-1">
-                  {filteredTables.map((table) => {
-                    const isActive = search.table === table.name
-                    const isView = table.kind === 'VIEW'
-                    const isMaterializedView =
-                      table.kind === 'MATERIALIZED VIEW'
+      <ScrollArea
+        className="px-2 overflow-y-auto overflow-x-hidden absolute inset-x-0 bottom-0"
+        style={{ top: '0px' }}
+      >
+        {filteredTables.length === 0 ? (
+          <div
+            key="no-results"
+            className="py-4 text-center text-sm text-muted-foreground"
+          >
+            {searchQuery
+              ? `No tables found matching "${searchQuery}"`
+              : 'No tables found'}
+          </div>
+        ) : (
+          <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+            <SidebarMenu className="space-y-1">
+              {filteredTables.map((table) => {
+                const isActive = search.table === table.name
+                const isView = table.kind === 'VIEW'
+                const isMaterializedView = table.kind === 'MATERIALIZED VIEW'
 
-                    return (
-                      <SidebarMenuItem key={`${schema}.${table.name}`}>
-                        <SidebarMenuButton
-                          isActive={isActive}
-                          onClick={() => handleTableClick(table)}
-                        >
-                          <Tooltip>
-                            <TooltipTrigger
-                              render={
-                                <HugeiconsIcon
-                                  icon={
-                                    isView
-                                      ? EyeFreeIcons
-                                      : isMaterializedView
-                                        ? PropertyViewFreeIcons
-                                        : TableIcon
-                                  }
-                                  className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
-                                />
+                return (
+                  <SidebarMenuItem key={`${schema}.${table.name}`}>
+                    <SidebarMenuButton
+                      isActive={isActive}
+                      onClick={() => handleTableClick(table)}
+                    >
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <HugeiconsIcon
+                              icon={
+                                isView
+                                  ? EyeFreeIcons
+                                  : isMaterializedView
+                                    ? PropertyViewFreeIcons
+                                    : TableIcon
                               }
-                            ></TooltipTrigger>
-                            <TooltipContent>{table.kind}</TooltipContent>
-                          </Tooltip>
-                          {table.name}
-                        </SidebarMenuButton>
-                        <TableListAction schema={schema} table={table.name} />
-                      </SidebarMenuItem>
-                    )
-                  })}
-                </SidebarMenu>
-              </SidebarGroup>
-            </div>
-          )}
-        </ScrollArea>
-      </div>
+                              className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
+                            />
+                          }
+                        ></TooltipTrigger>
+                        <TooltipContent>{table.kind}</TooltipContent>
+                      </Tooltip>
+                      {table.name}
+                    </SidebarMenuButton>
+                    <TableListAction schema={schema} table={table.name} />
+                  </SidebarMenuItem>
+                )
+              })}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
+      </ScrollArea>
     </div>
   )
 }

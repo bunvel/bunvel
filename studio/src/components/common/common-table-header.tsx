@@ -21,7 +21,6 @@ export function CommonTableHeader({
   return (
     <TableHead key={column.column_name} className={className}>
       <div className="flex items-center gap-1 group">
-        <span>{column.column_name}</span>
         <div className="flex items-center gap-1">
           <Tooltip>
             <TooltipTrigger
@@ -62,6 +61,7 @@ export function CommonTableHeader({
             )}
           </Tooltip>
         </div>
+        <span>{column.column_name}</span>
         <span className="text-xs text-muted-foreground font-normal">
           {formatDataType(column.data_type)}
         </span>
