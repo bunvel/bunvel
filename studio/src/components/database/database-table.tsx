@@ -1,5 +1,4 @@
 import { SchemaSelector } from '@/components/editor/schema-selector'
-import { Input } from '@/components/ui/input'
 import {
   Table,
   TableBody,
@@ -14,7 +13,8 @@ import { Back, Loading03Icon, Search } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import * as React from 'react'
 import { Button } from '../ui/button'
-import { Card } from '../ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
 interface DatabaseTableProps<T = TableData> {
   columns: TableColumn[]
   data: T[]
@@ -120,37 +120,37 @@ export function DatabaseTable<T = TableData>({
   )
 
   return (
-    <Card className="p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          {showBack && (
-            <Button variant="outline" size="icon" onClick={onBack}>
-              <HugeiconsIcon icon={Back} />
-            </Button>
-          )}
-          {showSchema && (
-            <div className="w-48 -ml-4">
-              <SchemaSelector hideCreate={true} />
-            </div>
-          )}
-          <div className="relative w-64">
-            <HugeiconsIcon
-              icon={Search}
-              className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"
-            />
-            <Input
-              type="search"
-              placeholder={searchPlaceholder}
-              className="pl-8"
-              value={searchQuery}
-              onChange={handleSearch}
-              disabled={!searchable}
-            />
+    <Card className="p-0">
+      <CardHeader className="p-4 pb-0">
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            {showBack && (
+              <Button variant="outline" size="icon" onClick={onBack}>
+                <HugeiconsIcon icon={Back} />
+              </Button>
+            )}
+            {showSchema && (
+              <div className="w-48 -ml-4">
+                <SchemaSelector hideCreate={true} />
+              </div>
+            )}
+            <InputGroup className="w-60">
+              <InputGroupAddon>
+                <HugeiconsIcon icon={Search} />
+              </InputGroupAddon>
+              <InputGroupInput
+                type="search"
+                placeholder={searchPlaceholder}
+                value={searchQuery}
+                onChange={handleSearch}
+                disabled={!searchable}
+              />
+            </InputGroup>
           </div>
-        </div>
-        {leftActions}
-      </div>
-      <div className="rounded-md border">
+          {leftActions}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
         <Table>
           <TableHeader className="bg-secondary">
             {renderHeaderRow(columns)}
@@ -210,7 +210,7 @@ export function DatabaseTable<T = TableData>({
             )}
           </TableBody>
         </Table>
-      </div>
+      </CardContent>
     </Card>
   )
 }

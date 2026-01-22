@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import winston from "winston";
+import { env } from "../utils/config";
 
 const logger = winston.createLogger({
   level: "info",
@@ -15,7 +16,7 @@ const logger = winston.createLogger({
   ],
 });
 
-if (process.env.NODE_ENV !== "production") {
+if (env.NODE_ENV !== "production") {
   logger.add(
     new winston.transports.Console({
       format: winston.format.combine(
@@ -38,7 +39,7 @@ const queryLogger = winston.createLogger({
   transports: [new winston.transports.File({ filename: "logs/queries.log" })],
 });
 
-if (process.env.NODE_ENV !== "production") {
+if (env.NODE_ENV !== "production") {
   queryLogger.add(
     new winston.transports.Console({
       format: winston.format.combine(

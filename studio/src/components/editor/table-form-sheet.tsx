@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -525,12 +526,27 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                                 type="button"
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 p-0"
+                                className="h-8 w-8 p-0 relative"
                               >
                                 <HugeiconsIcon
                                   icon={Settings}
                                   className="h-4 w-4"
                                 />
+                                {(() => {
+                                  const checkedCount = [
+                                    column.isPrimaryKey,
+                                    column.nullable,
+                                    column.unique,
+                                  ].filter(Boolean).length
+                                  return checkedCount > 0 ? (
+                                    <Badge
+                                      variant="default"
+                                      className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs flex items-center justify-center"
+                                    >
+                                      {checkedCount}
+                                    </Badge>
+                                  ) : null
+                                })()}
                               </Button>
                             }
                           ></DropdownMenuTrigger>

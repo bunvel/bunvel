@@ -66,15 +66,13 @@ export function DataTable<TData, TValue = unknown>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
 
-  // Memoize foreign key column lookup for performance
-  const foreignKeyColumns = React.useMemo(() => {
-    const fkSet = new Set<string>()
+  // Memoize column lookup for performance
+  const columnLookup = React.useMemo(() => {
+    const lookup = new Map<string, (typeof metadata.columns)[0]>()
     metadata.columns.forEach((col) => {
-      if (col.is_foreign_key) {
-        fkSet.add(col.column_name)
-      }
+      lookup.set(col.column_name, col)
     })
-    return fkSet
+    return lookup
   }, [metadata.columns])
   // Add selection column if enabled
   const columnsWithSelection = React.useMemo(() => {
@@ -225,12 +223,11 @@ export function DataTable<TData, TValue = unknown>({
                             <DataTableCell
                               value={formatCellValue(cell.getValue())}
                               rawValue={cell.getValue()}
-                              isForeignKey={foreignKeyColumns.has(
-                                cell.column.id,
-                              )}
-                              columnMetadata={metadata.columns.find(
-                                (col) => col.column_name === cell.column.id,
-                              )}
+                              isForeignKey={
+                                columnLookup.get(cell.column.id)
+                                  ?.is_foreign_key ?? false
+                              }
+                              columnMetadata={columnLookup.get(cell.column.id)}
                             />
                           )}
                         </div>

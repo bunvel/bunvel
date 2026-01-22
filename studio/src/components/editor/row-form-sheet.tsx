@@ -457,17 +457,19 @@ export function RowFormSheet({ schema, table, disabled }: RowFormSheetProps) {
         }
       }}
     >
-      <SheetTrigger>
-        <Button
-          variant="default"
-          size="sm"
-          className="gap-1"
-          disabled={disabled}
-        >
-          <HugeiconsIcon icon={Plus} className="h-4 w-4" />
-          {BUTTON_LABELS.INSERT}
-        </Button>
-      </SheetTrigger>
+      <SheetTrigger
+        render={
+          <Button
+            variant="default"
+            size="sm"
+            className="gap-1"
+            disabled={disabled}
+          >
+            <HugeiconsIcon icon={Plus} className="h-4 w-4" />
+            {BUTTON_LABELS.INSERT}
+          </Button>
+        }
+      ></SheetTrigger>
       <SheetContent
         side="right"
         className="bg-card min-w-2xl flex flex-col overflow-visible"

@@ -18,7 +18,7 @@ export function useCreateSchema() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: reactQueryKeys.schemas.all(),
+        queryKey: reactQueryKeys.schemas.list(),
       })
     },
     onError: (error: Error) => {
