@@ -38,6 +38,7 @@ interface SortButtonProps {
   table: string
   onSortChange?: (sorts: SortConfig[]) => void
   initialSorts?: SortConfig[]
+  recordCount?: number
 }
 
 export function SortButton({
@@ -45,6 +46,7 @@ export function SortButton({
   table,
   onSortChange,
   initialSorts = [],
+  recordCount = 0,
 }: SortButtonProps) {
   const [sorts, setSorts] = useState<SortConfig[]>(initialSorts)
   const [pendingSorts, setPendingSorts] = useState<SortConfig[]>(initialSorts)
@@ -144,11 +146,16 @@ export function SortButton({
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger
         render={
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            disabled={recordCount === 0}
+          >
             <HugeiconsIcon icon={Sorting05Icon} size={16} />
             Sort
             {sorts.length > 0 && (
-              <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
+              <span className="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-xs font-medium">
                 {sorts.length}
               </span>
             )}

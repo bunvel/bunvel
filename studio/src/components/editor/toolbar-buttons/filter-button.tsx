@@ -45,6 +45,7 @@ interface FilterButtonProps {
   table: string
   onFilterChange?: (filters: Omit<FilterConfig, 'id'>[]) => void
   initialFilters?: Omit<FilterConfig, 'id'>[]
+  recordCount?: number
 }
 
 export function FilterButton({
@@ -52,6 +53,7 @@ export function FilterButton({
   table,
   onFilterChange,
   initialFilters = [],
+  recordCount = 0,
 }: FilterButtonProps) {
   // Filter out invalid filters from initial state
   const validInitialFilters = (initialFilters || []).filter(
@@ -189,11 +191,16 @@ export function FilterButton({
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger
         render={
-          <Button variant="outline" size="sm" className="gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            disabled={recordCount === 0}
+          >
             <HugeiconsIcon icon={Filter} size={16} />
             Filter
             {filters.length > 0 && (
-              <span className="rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
+              <span className="bg-primary text-primary-foreground rounded-full px-1.5 py-0.5 text-xs font-medium">
                 {filters.length}
               </span>
             )}

@@ -193,6 +193,7 @@ export function TableViewer() {
         onSortChange={handleSortChange}
         filters={tableState?.filters || []}
         onFilterChange={handleFilterChange}
+        recordCount={tableData?.data?.length || 0}
         onSelectionClear={handleSelectionClear}
       />
 

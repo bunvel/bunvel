@@ -18,6 +18,7 @@ export interface TableToolbarProps {
   primaryKeys?: string[]
   sorts?: Array<{ column: string; direction: 'asc' | 'desc' }>
   filters?: FilterConfig[]
+  recordCount?: number
   onSortChange?: (
     sorts: Array<{ column: string; direction: 'asc' | 'desc' }>,
   ) => void
@@ -33,6 +34,7 @@ export function TableToolbar({
   primaryKeys = [],
   sorts = [],
   filters = [],
+  recordCount = 0,
   onSortChange = () => {},
   onFilterChange = () => {},
   onSelectionClear,
@@ -73,12 +75,14 @@ export function TableToolbar({
               table={table}
               initialFilters={filters}
               onFilterChange={onFilterChange}
+              recordCount={recordCount}
             />
             <SortButton
               schema={schema}
               table={table}
               initialSorts={sorts}
               onSortChange={onSortChange}
+              recordCount={recordCount}
             />
           </div>
         </div>
