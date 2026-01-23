@@ -16,7 +16,7 @@ interface SqlTabsProviderProps {
 
 export function SqlTabsProvider({ children }: SqlTabsProviderProps) {
   const [tabs, setTabs] = useState<SqlTab[]>([])
-  const [activeTabId, setActiveTabId] = useState<string | undefined>()
+  const [activeTabId, setActiveTabId] = useState<string | null>(null)
 
   const addTab = useCallback((tab: SqlTab, maxTabs = 10) => {
     setTabs((prev) => {
@@ -45,7 +45,7 @@ export function SqlTabsProvider({ children }: SqlTabsProviderProps) {
           const nextIndex = Math.min(currentIndex, newTabs.length - 1)
           setActiveTabId(newTabs[nextIndex].id)
         } else if (newTabs.length === 0) {
-          setActiveTabId(undefined)
+          setActiveTabId(null)
         }
 
         return newTabs

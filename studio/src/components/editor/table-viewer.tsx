@@ -3,7 +3,7 @@ import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTables } from '@/hooks/queries/useTables'
 import { useTableStore } from '@/stores/table-store'
 import { SchemaTable, TableKind } from '@/types'
-import { FilterConfig } from '@/types/table'
+import { FilterConfig, TableRow } from '@/types/table'
 import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
 import { formatCellValue } from '@/utils/format'
 import { useSearch } from '@tanstack/react-router'
@@ -11,8 +11,6 @@ import { ColumnDef } from '@tanstack/react-table'
 import { useCallback, useEffect, useMemo } from 'react'
 import { DataTableHeaderCell } from '../data-table/data-table-header-cell'
 import { TableToolbar } from './table-toolbar'
-
-type TableRow = Record<string, unknown>
 
 export function TableViewer() {
   const { schema, table } = useSearch({ strict: false }) as SchemaTable
