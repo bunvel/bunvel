@@ -18,7 +18,7 @@ import { reactQueryKeys } from './react-query-keys'
 
 export function useTables(schema: string = 'public') {
   return useQuery<Table[]>({
-    queryKey: schema ? reactQueryKeys.tables.list(schema) : ['tables', null],
+    queryKey: reactQueryKeys.tables.list(schema),
     queryFn: async () => getTables({ data: { schema } }),
     enabled: !!schema,
     staleTime: 15 * 60 * 1000, // 15 minutes for table list
