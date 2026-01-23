@@ -3,6 +3,8 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseTableColumns } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
+import { Check, X } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(main)/database/tables/$oid')({
@@ -35,7 +37,13 @@ function RouteComponent() {
           )}
         </TableCell>
         <TableCell>{item.data_type}</TableCell>
-        <TableCell>{item.nullable ? 'Yes' : 'No'}</TableCell>
+        <TableCell>
+          {item.nullable ? (
+            <HugeiconsIcon icon={Check} className="text-green-500" />
+          ) : (
+            <HugeiconsIcon icon={X} className="text-red-500" />
+          )}
+        </TableCell>
         <TableCell>{item.position}</TableCell>
       </TableRow>
     )
