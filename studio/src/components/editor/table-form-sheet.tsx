@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/sheet'
 import { useCreateTable } from '@/hooks/mutations/useTableMutations'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
-import { useTables } from '@/hooks/queries/useTables'
+import { useDatabaseEnums, useTables } from '@/hooks/queries/useTables'
 import type {
   ColumnDefinition,
   ForeignKeyAction,
@@ -147,6 +147,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
   const [open, setOpen] = useState(false)
   const { mutate: createTable, isPending: isSubmitting } = useCreateTable()
   const { data: tables = [] } = useTables(schema)
+  const { data: enums = [] } = useDatabaseEnums(schema)
 
   const getDefaultColumns = () => [
     {
@@ -187,6 +188,23 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
   const availableTables = tables.filter(
     (table: Table) => table.name !== formValues.name && table.kind === 'TABLE',
   )
+
+  // Combine built-in data types with custom enum types
+  // Group enums by name to avoid duplicates
+  const uniqueEnums = enums.reduce((acc: any[], enum_: any) => {
+    if (!acc.find((e: any) => e.enum_name === enum_.enum_name)) {
+      acc.push(enum_)
+    }
+    return acc
+  }, [])
+
+  const allDataTypes = [
+    ...DATA_TYPES,
+    ...uniqueEnums.map((enum_: any) => ({
+      value: enum_.enum_name,
+      label: `${enum_.enum_name} (Custom Enum)`,
+    })),
+  ]
 
   const handleInputChange = (field: keyof FormValues, value: string) => {
     setFormValues((prev) => ({
@@ -491,8 +509,8 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                           <SelectTrigger className="w-full">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
-                            {DATA_TYPES.map(({ value, label }) => (
+                          <SelectContent className="w-60">
+                            {allDataTypes.map(({ value, label }) => (
                               <SelectItem key={value} value={value}>
                                 {label}
                               </SelectItem>
