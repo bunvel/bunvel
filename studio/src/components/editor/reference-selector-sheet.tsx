@@ -14,7 +14,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
-import { FilterConfig, SortConfig } from '@/types'
+import type { FilterConfig, SortConfig } from '@/types/table'
 import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
 import { formatCellValue } from '@/utils/format'
 import { ArrowLeft, ArrowRight } from '@hugeicons/core-free-icons'
@@ -32,14 +32,24 @@ interface ReferenceSelectorSheetProps {
 }
 
 export function ReferenceSelectorSheet({
+  foreignKeyColumn,
   open,
   onOpenChange,
-  foreignKeyColumn,
   onRecordSelect,
 }: ReferenceSelectorSheetProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [filters, setFilters] = useState<FilterConfig[]>([])
   const [sorts, setSorts] = useState<SortConfig[]>([])
+
+  const handleFilterChange = (newFilters: FilterConfig[]) => {
+    setFilters(newFilters)
+    setCurrentPage(1) // Reset to first page when filters change
+  }
+
+  const handleSortChange = (newSorts: SortConfig[]) => {
+    setSorts(newSorts)
+    setCurrentPage(1) // Reset to first page when sort changes
+  }
 
   const schema = foreignKeyColumn?.foreign_table_schema
   const table = foreignKeyColumn?.foreign_table_name
@@ -72,18 +82,6 @@ export function ReferenceSelectorSheet({
 
   const isLoading = isMetadataLoading || isTableDataLoading
 
-  // Handle filter change
-  const handleFilterChange = (newFilters: FilterConfig[]) => {
-    setFilters(newFilters)
-    setCurrentPage(1) // Reset to first page when filters change
-  }
-
-  // Handle sort change
-  const handleSortChange = (newSorts: SortConfig[]) => {
-    setSorts(newSorts)
-    setCurrentPage(1) // Reset to first page when sort changes
-  }
-
   // Handle record selection - directly select and close on row click
   const handleRecordClick = (record: any) => {
     onRecordSelect(record)
@@ -109,14 +107,16 @@ export function ReferenceSelectorSheet({
       <FilterButton
         schema={schema}
         table={table}
-        initialFilters={filters}
+        filters={filters}
         onFilterChange={handleFilterChange}
+        recordCount={tableData?.data?.length || 0}
       />
       <SortButton
         schema={schema}
         table={table}
-        initialSorts={sorts}
+        sorts={sorts}
         onSortChange={handleSortChange}
+        recordCount={tableData?.data?.length || 0}
       />
     </div>
   )

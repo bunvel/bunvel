@@ -1,5 +1,4 @@
-import { FilterConfig, TableKind } from '@/types'
-import { isReadonlySchema } from '@/utils/func'
+import { useTableManager } from '@/hooks/use-table-manager'
 import {
   CopyButton,
   DeleteButton,
@@ -10,80 +9,25 @@ import {
   SortButton,
 } from './toolbar-buttons'
 
-export interface TableToolbarProps {
-  selectedRows: any[]
-  schema: string
-  table: string
-  kind: TableKind | undefined
-  primaryKeys?: string[]
-  sorts?: Array<{ column: string; direction: 'asc' | 'desc' }>
-  filters?: FilterConfig[]
-  recordCount?: number
-  onSortChange?: (
-    sorts: Array<{ column: string; direction: 'asc' | 'desc' }>,
-  ) => void
-  onFilterChange?: (filters: FilterConfig[]) => void
-  onSelectionClear?: () => void
-}
-
-export function TableToolbar({
-  selectedRows,
-  schema,
-  table,
-  kind,
-  primaryKeys = [],
-  sorts = [],
-  filters = [],
-  recordCount = 0,
-  onSortChange = () => {},
-  onFilterChange = () => {},
-  onSelectionClear,
-}: TableToolbarProps) {
+export function TableToolbar() {
+  const { kind, selectedRows } = useTableManager()
   const hasSelection = selectedRows.length > 0
-  const isReadOnly = isReadonlySchema(schema)
 
   return (
     <div className="bg-muted/50 px-4 py-2 border-b">
       {hasSelection ? (
         <div className="flex items-center space-x-2">
-          {kind === 'TABLE' && (
-            <DeleteButton
-              selectRows={selectedRows}
-              disabled={isReadOnly}
-              schema={schema}
-              table={table}
-              primaryKeys={primaryKeys}
-              onSelectionClear={onSelectionClear}
-            />
-          )}
-          {kind === 'TABLE' && (
-            <EditButton selectRows={selectedRows} disabled={isReadOnly} />
-          )}
-          <CopyButton selectedRows={selectedRows} table={table} />
-          <ExportButton
-            selectedRows={selectedRows}
-            table={table}
-            schema={schema}
-          />
+          <DeleteButton />
+          <EditButton />
+          <CopyButton />
+          <ExportButton />
         </div>
       ) : (
         <div className="flex items-center justify-between space-x-2">
           <div className="flex items-center space-x-2">
-            {kind === 'TABLE' && <InsertButton disabled={isReadOnly} />}
-            <FilterButton
-              schema={schema}
-              table={table}
-              initialFilters={filters}
-              onFilterChange={onFilterChange}
-              recordCount={recordCount}
-            />
-            <SortButton
-              schema={schema}
-              table={table}
-              initialSorts={sorts}
-              onSortChange={onSortChange}
-              recordCount={recordCount}
-            />
+            {kind === 'TABLE' && <InsertButton />}
+            <FilterButton />
+            <SortButton />
           </div>
         </div>
       )}

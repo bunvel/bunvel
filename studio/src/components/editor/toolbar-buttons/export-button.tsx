@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useExport } from '@/hooks/use-export'
+import { useTableManager } from '@/hooks/use-table-manager'
 import {
   BUTTON_LABELS,
   DROPDOWN_LABELS,
@@ -20,24 +21,12 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
-interface ExportButtonProps {
-  selectedRows: any[]
-  table: string
-  schema: string
-}
-
-export function ExportButton({
-  selectedRows,
-  table,
-  schema,
-}: ExportButtonProps) {
+export function ExportButton() {
+  const { selectedRows, table, schema } = useTableManager()
   const { exportData } = useExport()
 
   const handleExport = async (format: ExportFormat) => {
-    await exportData(selectedRows, {
-      format,
-      tableName: `${schema}_${table}`,
-    })
+    await exportData(selectedRows, { format, tableName: table || '' })
   }
 
   return (

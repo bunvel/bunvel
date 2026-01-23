@@ -250,18 +250,20 @@ export function RowFormSheet({ schema, table, disabled }: RowFormSheetProps) {
           <div className="flex-1">{inputElement}</div>
           {isForeignKey && (
             <Tooltip>
-              <TooltipTrigger>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9"
-                  onClick={() => handleReferenceSelectorOpen(column)}
-                  disabled={isSubmitting || isDisabled}
-                >
-                  <HugeiconsIcon icon={Edit} className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
+              <TooltipTrigger
+                render={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9"
+                    onClick={() => handleReferenceSelectorOpen(column)}
+                    disabled={isSubmitting || isDisabled}
+                  >
+                    <HugeiconsIcon icon={Edit} className="h-4 w-4" />
+                  </Button>
+                }
+              ></TooltipTrigger>
               <TooltipContent>
                 <p>
                   Select a record from {column.foreign_table_schema}.

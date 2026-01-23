@@ -4,21 +4,21 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { useTableManager } from '@/hooks/use-table-manager'
 import { BUTTON_LABELS } from '@/utils/constant'
+import { isReadonlySchema } from '@/utils/func'
 import { Edit } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { toast } from 'sonner'
 
-interface EditButtonProps {
-  selectRows: any[]
-  disabled?: boolean
-}
-export function EditButton({ selectRows, disabled = false }: EditButtonProps) {
-  const isDisabled = selectRows.length !== 1 || disabled
+export function EditButton() {
+  const { selectedRows, schema } = useTableManager()
+  const isDisabled =
+    selectedRows.length !== 1 || (schema ? isReadonlySchema(schema) : false)
 
   const onClick = () => {
     toast.info('Edit functionality not yet implemented', {
-      description: `Selected row: ${JSON.stringify(selectRows[0] || {}, null, 2)}`,
+      description: `Selected row: ${JSON.stringify(selectedRows[0] || {}, null, 2)}`,
     })
   }
 

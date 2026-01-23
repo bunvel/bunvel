@@ -1,11 +1,12 @@
 import { Button } from '@/components/ui/button'
-import { SchemaTable } from '@/types'
+import { useTableManager } from '@/hooks/use-table-manager'
 import { BUTTON_LABELS } from '@/utils/constant'
-import { useSearch } from '@tanstack/react-router'
+import { isReadonlySchema } from '@/utils/func'
 import { RowFormSheet } from '../row-form-sheet'
 
-export function InsertButton({ disabled = false }: { disabled?: boolean }) {
-  const { schema, table } = useSearch({ strict: false }) as SchemaTable
+export function InsertButton() {
+  const { schema, table } = useTableManager()
+  const isDisabled = !schema || !table || isReadonlySchema(schema)
 
   if (!schema || !table) {
     return (
@@ -15,5 +16,5 @@ export function InsertButton({ disabled = false }: { disabled?: boolean }) {
     )
   }
 
-  return <RowFormSheet schema={schema} table={table} disabled={disabled} />
+  return <RowFormSheet schema={schema} table={table} disabled={isDisabled} />
 }

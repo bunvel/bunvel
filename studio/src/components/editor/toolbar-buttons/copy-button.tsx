@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useCopy } from '@/hooks/use-copy'
+import { useTableManager } from '@/hooks/use-table-manager'
 import {
   BUTTON_LABELS,
   DROPDOWN_LABELS,
@@ -20,16 +21,12 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
-interface CopyButtonProps {
-  selectedRows: Record<string, unknown>[]
-  table: string
-}
-
-export function CopyButton({ selectedRows, table }: CopyButtonProps) {
+export function CopyButton() {
+  const { selectedRows, table } = useTableManager()
   const { copyRows } = useCopy()
 
   const handleCopy = async (format: ExportFormat) => {
-    await copyRows(selectedRows, { format, tableName: table })
+    await copyRows(selectedRows, { format, tableName: table || '' })
   }
 
   return (

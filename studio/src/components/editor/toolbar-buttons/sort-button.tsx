@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
+import { useTableManager } from '@/hooks/use-table-manager'
 import type { SortConfig } from '@/types'
 import {
   DndContext,
@@ -34,22 +35,36 @@ import { useEffect, useState } from 'react'
 import { SortableItem } from './sortable-item'
 
 interface SortButtonProps {
-  schema: string
-  table: string
-  onSortChange?: (sorts: SortConfig[]) => void
-  initialSorts?: SortConfig[]
+  schema?: string
+  table?: string
+  sorts?: any[]
+  onSortChange?: (sorts: any[]) => void
   recordCount?: number
 }
 
 export function SortButton({
-  schema,
-  table,
-  onSortChange,
-  initialSorts = [],
-  recordCount = 0,
-}: SortButtonProps) {
-  const [sorts, setSorts] = useState<SortConfig[]>(initialSorts)
-  const [pendingSorts, setPendingSorts] = useState<SortConfig[]>(initialSorts)
+  schema: propSchema,
+  table: propTable,
+  sorts: propSorts,
+  onSortChange: propOnSortChange,
+  recordCount: propRecordCount,
+}: SortButtonProps = {}) {
+  // Use props if provided, otherwise use useTableManager
+  const {
+    schema: hookSchema,
+    table: hookTable,
+    sorts: hookSorts,
+    handleSortChange: hookHandleSortChange,
+    tableData: hookTableData,
+  } = useTableManager()
+
+  const schema = propSchema ?? hookSchema
+  const table = propTable ?? hookTable
+  const sorts = propSorts ?? hookSorts
+  const handleSortChange = propOnSortChange ?? hookHandleSortChange
+  const recordCount = propRecordCount ?? (hookTableData?.data?.length || 0)
+  const [localSorts, setLocalSorts] = useState<SortConfig[]>(sorts)
+  const [pendingSorts, setPendingSorts] = useState<SortConfig[]>(sorts)
   const [open, setOpen] = useState(false)
 
   const { data: tableMetadata } = useTableMetadata(schema, table)
@@ -62,10 +77,10 @@ export function SortButton({
     }
   }, [open, sorts])
 
-  // Sync sorts when initialSorts changes (table switch)
+  // Sync sorts when sorts changes (table switch)
   useEffect(() => {
-    setSorts(initialSorts)
-  }, [initialSorts])
+    setLocalSorts(sorts)
+  }, [sorts])
 
   const availableColumns = columns.filter(
     (col) => !pendingSorts.some((sort) => sort.column === col.column_name),
@@ -126,13 +141,13 @@ export function SortButton({
   }
 
   const handleApplySorting = () => {
-    setSorts(pendingSorts)
-    onSortChange?.(pendingSorts)
+    setLocalSorts(pendingSorts)
+    handleSortChange(pendingSorts)
     setOpen(false)
   }
 
   const handleCancel = () => {
-    setPendingSorts(sorts)
+    setPendingSorts(localSorts)
     setOpen(false)
   }
 
@@ -140,7 +155,7 @@ export function SortButton({
     setPendingSorts([])
   }
 
-  const hasChanges = JSON.stringify(sorts) !== JSON.stringify(pendingSorts)
+  const hasChanges = JSON.stringify(localSorts) !== JSON.stringify(pendingSorts)
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>

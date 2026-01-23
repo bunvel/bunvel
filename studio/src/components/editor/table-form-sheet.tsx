@@ -695,7 +695,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                               {fk.column || TABLE_FORM_MESSAGES.SELECT_COLUMN}
                             </SelectValue>
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="w-60">
                             {formValues.columns.map((col) => (
                               <SelectItem key={col.name} value={col.name}>
                                 {col.name}
@@ -732,7 +732,7 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
                                 TABLE_FORM_MESSAGES.SELECT_REFERENCED_TABLE}
                             </SelectValue>
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="w-60">
                             {availableTables.map((table: Table) => (
                               <SelectItem key={table.name} value={table.name}>
                                 {table.name}

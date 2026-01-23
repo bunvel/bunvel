@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
+import { useTableManager } from '@/hooks/use-table-manager'
 import { FilterConfig as BaseFilterConfig } from '@/types/table'
 import { FilterOperator, FilterOperatorLabels } from '@/utils/constant'
 import {
@@ -41,22 +42,36 @@ interface FilterConfig extends BaseFilterConfig {
 }
 
 interface FilterButtonProps {
-  schema: string
-  table: string
-  onFilterChange?: (filters: Omit<FilterConfig, 'id'>[]) => void
-  initialFilters?: Omit<FilterConfig, 'id'>[]
+  schema?: string
+  table?: string
+  filters?: any[]
+  onFilterChange?: (filters: any[]) => void
   recordCount?: number
 }
 
 export function FilterButton({
-  schema,
-  table,
-  onFilterChange,
-  initialFilters = [],
-  recordCount = 0,
-}: FilterButtonProps) {
+  schema: propSchema,
+  table: propTable,
+  filters: propFilters,
+  onFilterChange: propOnFilterChange,
+  recordCount: propRecordCount,
+}: FilterButtonProps = {}) {
+  // Use props if provided, otherwise use useTableManager
+  const {
+    schema: hookSchema,
+    table: hookTable,
+    filters: hookFilters,
+    handleFilterChange: hookHandleFilterChange,
+    tableData: hookTableData,
+  } = useTableManager()
+
+  const schema = propSchema ?? hookSchema
+  const table = propTable ?? hookTable
+  const filters = propFilters ?? hookFilters
+  const handleFilterChange = propOnFilterChange ?? hookHandleFilterChange
+  const recordCount = propRecordCount ?? (hookTableData?.data?.length || 0)
   // Filter out invalid filters from initial state
-  const validInitialFilters = (initialFilters || []).filter(
+  const validInitialFilters = (filters || []).filter(
     (filter) =>
       filter.operator === 'IS NULL' ||
       filter.operator === 'IS NOT NULL' ||
@@ -65,7 +80,7 @@ export function FilterButton({
         filter.value !== undefined),
   )
 
-  const [filters, setFilters] = useState<FilterConfig[]>(
+  const [localFilters, setLocalFilters] = useState<FilterConfig[]>(
     () =>
       validInitialFilters.map((f) => ({
         ...f,
@@ -160,14 +175,14 @@ export function FilterButton({
       )
     })
 
-    setFilters(validFilters)
+    setLocalFilters(validFilters)
     // Strip the id before passing to parent
-    onFilterChange?.(validFilters.map(({ id, ...rest }) => rest))
+    handleFilterChange(validFilters.map(({ id, ...rest }) => rest))
     setOpen(false)
   }
 
   const handleCancel = () => {
-    setPendingFilters(filters)
+    setPendingFilters(localFilters)
     setOpen(false)
   }
 
@@ -175,7 +190,8 @@ export function FilterButton({
     setPendingFilters([])
   }
 
-  const hasChanges = JSON.stringify(filters) !== JSON.stringify(pendingFilters)
+  const hasChanges =
+    JSON.stringify(localFilters) !== JSON.stringify(pendingFilters)
 
   // Check if there are invalid filters (empty values)
   const hasInvalidFilters = pendingFilters.some(

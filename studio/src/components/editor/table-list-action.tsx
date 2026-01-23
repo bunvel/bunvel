@@ -9,7 +9,7 @@ import {
 import { useDeleteTable } from '@/hooks/mutations/useDeleteTable'
 import { useTruncateTable } from '@/hooks/mutations/useTruncateTable'
 import { useCopyToClipboard } from '@/hooks/use-clipboard'
-import { useTableTabs } from '@/hooks/use-table-tabs'
+import { useTableManager } from '@/hooks/use-table-manager'
 import type { TableListActionProps } from '@/types'
 import {
   Copy01Icon,
@@ -25,7 +25,7 @@ import { SidebarMenuAction } from '../ui/sidebar'
 export function TableListAction({ schema, table }: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isTruncateDialogOpen, setIsTruncateDialogOpen] = useState(false)
-  const { removeTableBySchema } = useTableTabs()
+  const { removeTableBySchema } = useTableManager()
   const { mutate: deleteTable, isPending: isDeleting } = useDeleteTable({
     onTableDeleted: (deletedSchema, deletedTable) => {
       removeTableBySchema(deletedSchema, deletedTable)
