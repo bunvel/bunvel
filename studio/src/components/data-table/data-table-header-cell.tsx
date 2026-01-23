@@ -9,15 +9,15 @@ import { formatDataType } from '@/utils/format'
 import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
-interface CommonTableHeaderProps {
+interface DataTableHeaderCellProps {
   column: ColumnMetadata
   className?: string
 }
 
-export function CommonTableHeader({
+export function DataTableHeaderCell({
   column,
   className,
-}: CommonTableHeaderProps) {
+}: DataTableHeaderCellProps) {
   return (
     <div
       key={column.column_name}

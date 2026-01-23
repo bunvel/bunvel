@@ -20,7 +20,7 @@ import { formatCellValue } from '@/utils/format'
 import { ArrowLeft, ArrowRight } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
-import { CommonTableHeader } from '../common/common-table-header'
+import { DataTableHeaderCell } from '../data-table/data-table-header-cell'
 import { FilterButton } from './toolbar-buttons/filter-button'
 import { SortButton } from './toolbar-buttons/sort-button'
 
@@ -161,11 +161,16 @@ export function ReferenceSelectorSheet({
               <Table>
                 <TableHeader>
                   <TableRow>
-                    {metadata?.columns?.slice(0, 6).map((column) => (
-                      <CommonTableHeader
+                    <TableCell className="font-medium text-sm p-2 border">
+                      Select
+                    </TableCell>
+                    {metadata?.columns?.map((column) => (
+                      <TableCell
                         key={column.column_name}
-                        column={column}
-                      />
+                        className="font-medium text-sm p-2 border"
+                      >
+                        <DataTableHeaderCell column={column} />
+                      </TableCell>
                     ))}
                   </TableRow>
                 </TableHeader>
@@ -176,7 +181,10 @@ export function ReferenceSelectorSheet({
                       className="cursor-pointer hover:bg-muted/50"
                       onClick={() => handleRecordClick(row)}
                     >
-                      {metadata?.columns?.slice(0, 6).map((column) => (
+                      <TableCell className="border p-2">
+                        <div className="text-sm text-center">→</div>
+                      </TableCell>
+                      {metadata?.columns?.map((column) => (
                         <TableCell
                           key={column.column_name}
                           className="border p-2"

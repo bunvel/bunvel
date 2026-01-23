@@ -1,7 +1,6 @@
 import { TableDataResult, TableMetadata } from '@/types/table'
 import { formatCellValue } from '@/utils/format'
 import * as React from 'react'
-import { CommonTableHeader } from '../common/common-table-header'
 import { Spinner } from '../ui/spinner'
 import {
   Table,
@@ -11,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '../ui/table'
+import { DataTableHeaderCell } from './data-table-header-cell'
 
 interface RelatedDataTableProps {
   data: TableDataResult | undefined
@@ -74,7 +74,7 @@ export const RelatedDataTable = React.memo(function RelatedDataTable({
                         maxWidth: '350px',
                       }}
                     >
-                      <CommonTableHeader column={column} className="p-2" />
+                      <DataTableHeaderCell column={column} className="p-2" />
                     </TableHead>
                   ))}
                 </TableRow>

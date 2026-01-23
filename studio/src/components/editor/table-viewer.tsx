@@ -9,7 +9,7 @@ import { formatCellValue } from '@/utils/format'
 import { useSearch } from '@tanstack/react-router'
 import { ColumnDef } from '@tanstack/react-table'
 import { useCallback, useEffect, useMemo } from 'react'
-import { CommonTableHeader } from '../common/common-table-header'
+import { DataTableHeaderCell } from '../data-table/data-table-header-cell'
 import { TableToolbar } from './table-toolbar'
 
 type TableRow = Record<string, unknown>
@@ -158,7 +158,7 @@ export function TableViewer() {
 
     return metadata.columns.map((column) => ({
       id: column.column_name,
-      header: () => <CommonTableHeader column={column} className="p-2" />,
+      header: () => <DataTableHeaderCell column={column} className="p-2" />,
       accessorKey: column.column_name,
       cell: (info) => {
         return formatCellValue(info.getValue())
