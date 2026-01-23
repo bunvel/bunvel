@@ -30,6 +30,8 @@ import {
 } from '@/components/ui/tooltip'
 import { useCreateRow } from '@/hooks/mutations/useCreateRow'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
+import { useDatabaseEnums } from '@/hooks/queries/useTables'
+import type { DatabaseEnum } from '@/types/database'
 import { BUTTON_LABELS } from '@/utils/constant'
 import { CalendarDays, Edit, Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -70,6 +72,7 @@ export function RowFormSheet({ schema, table, disabled }: RowFormSheetProps) {
     useState<ColumnMetadata | null>(null)
   const { mutate: createRow, isPending: isSubmitting } = useCreateRow()
   const { data: metadata } = useTableMetadata(schema, table)
+  const { data: enums = [] } = useDatabaseEnums(schema)
 
   const [formValues, setFormValues] = useState<FormValues>({})
 
@@ -194,6 +197,26 @@ export function RowFormSheet({ schema, table, disabled }: RowFormSheetProps) {
 
     return { primaryKey, required, optional }
   }, [metadata])
+
+  // Group enum values by enum name for easy lookup
+  const enumValuesMap = useMemo(() => {
+    const grouped: Record<string, string[]> = {}
+    enums.forEach((item: DatabaseEnum) => {
+      if (!grouped[item.enum_name]) {
+        grouped[item.enum_name] = []
+      }
+      grouped[item.enum_name].push(item.enum_value)
+    })
+    return grouped
+  }, [enums])
+
+  // Check if a data_type is a custom enum
+  const isCustomEnum = useCallback(
+    (dataType: string) => {
+      return Object.keys(enumValuesMap).includes(dataType)
+    },
+    [enumValuesMap],
+  )
 
   const renderFormField = useCallback(
     (column: ColumnMetadata) => {
@@ -411,9 +434,52 @@ export function RowFormSheet({ schema, table, disabled }: RowFormSheetProps) {
         )
       }
 
+      // Handle custom enum types
+      if (isCustomEnum(column.data_type)) {
+        const enumValues = enumValuesMap[column.data_type] || []
+        return (
+          <div
+            key={column.column_name}
+            className="grid grid-cols-[200px_1fr] gap-4 items-start"
+          >
+            {renderFieldLabel()}
+            {renderInputWithForeignKey(
+              <Select
+                value={value?.toString() || ''}
+                onValueChange={(val) =>
+                  handleInputChange(column.column_name, val)
+                }
+                disabled={isSubmitting || isDisabled}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={`Select ${column.column_name}`} />
+                </SelectTrigger>
+                <SelectContent>
+                  {enumValues.map((enumValue) => (
+                    <SelectItem key={enumValue} value={enumValue}>
+                      {enumValue}
+                    </SelectItem>
+                  ))}
+                  {column.is_nullable === 'YES' && (
+                    <SelectItem value="">NULL</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>,
+            )}
+          </div>
+        )
+      }
+
       return null
     },
-    [formValues, isSubmitting, handleInputChange, handleReferenceSelectorOpen],
+    [
+      formValues,
+      isSubmitting,
+      handleInputChange,
+      handleReferenceSelectorOpen,
+      isCustomEnum,
+      enumValuesMap,
+    ],
   )
 
   const renderFieldSection = useCallback(
