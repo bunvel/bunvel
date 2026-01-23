@@ -1,6 +1,5 @@
 import { Elysia } from "elysia";
 import winston from "winston";
-import { env } from "../utils/config";
 
 const logger = winston.createLogger({
   level: "info",
@@ -16,17 +15,6 @@ const logger = winston.createLogger({
   ],
 });
 
-if (env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple(),
-      ),
-    }),
-  );
-}
-
 // Separate logger for queries
 const queryLogger = winston.createLogger({
   level: "info",
@@ -38,17 +26,6 @@ const queryLogger = winston.createLogger({
   defaultMeta: { service: "bunvel-queries" },
   transports: [new winston.transports.File({ filename: "logs/queries.log" })],
 });
-
-if (env.NODE_ENV !== "production") {
-  queryLogger.add(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple(),
-      ),
-    }),
-  );
-}
 
 export const loggingPlugin = new Elysia({ name: "Logging Plugin" })
   .onRequest(({ request, set }) => {
