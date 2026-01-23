@@ -21,16 +21,20 @@ export function useTableTabs(): UseTableTabsReturn {
     selectedTables,
     addTable: contextAddTable,
     removeTable: contextRemoveTable,
+    activeTableKey,
+    setActiveTable,
   } = useTableTabsContext()
 
-  const activeTable = schema && table ? `${schema}.${table}` : undefined
+  const activeTable =
+    schema && table ? `${schema}.${table}` : activeTableKey || undefined
 
   const handleTabChange = useCallback(
     (value: string) => {
       const [newSchema, newTable] = value.split('.')
+      setActiveTable(value)
       navigate({ search: { schema: newSchema, table: newTable } as any })
     },
-    [navigate],
+    [navigate, setActiveTable],
   )
 
   const removeTable = useCallback(
@@ -40,6 +44,8 @@ export function useTableTabs(): UseTableTabsReturn {
       if (tableKey === activeTable) {
         const remainingTables = selectedTables.filter((t) => t !== tableKey)
         const [newSchema, newTable] = remainingTables[0]?.split('.') || []
+        const newActiveTable = remainingTables[0] || null
+        setActiveTable(newActiveTable)
         navigate(
           newTable
             ? { search: { schema: newSchema, table: newTable } as any }
@@ -47,7 +53,7 @@ export function useTableTabs(): UseTableTabsReturn {
         )
       }
     },
-    [contextRemoveTable, selectedTables, activeTable, navigate],
+    [contextRemoveTable, selectedTables, activeTable, navigate, setActiveTable],
   )
 
   const removeTableBySchema = useCallback(
@@ -79,6 +85,21 @@ export function useTableTabs(): UseTableTabsReturn {
       addTable(schema, table)
     }
   }, [schema, table, addTable])
+
+  // Restore active table from store to URL when component mounts and URL has no table
+  useEffect(() => {
+    if (
+      !schema &&
+      !table &&
+      activeTableKey &&
+      selectedTables.includes(activeTableKey)
+    ) {
+      const [restoreSchema, restoreTable] = activeTableKey.split('.')
+      navigate({
+        search: { schema: restoreSchema, table: restoreTable } as any,
+      })
+    }
+  }, [schema, table, activeTableKey, selectedTables, navigate])
 
   return {
     selectedTables,
