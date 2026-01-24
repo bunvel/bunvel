@@ -7,10 +7,27 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
-import { Env } from '@/utils/func'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useProjectContext } from '@/contexts/project-context'
 import { Image } from '@unpic/react'
 
 export function SiteHeader() {
+  const { project, isLoading, error } = useProjectContext()
+
+  const getOrganizationName = () => {
+    if (isLoading) return <Skeleton className="h-4 w-24" />
+    if (error || !project)
+      return <span className="text-destructive">Error</span>
+    return project.organization.name
+  }
+
+  const getProjectName = () => {
+    if (isLoading) return <Skeleton className="h-4 w-32" />
+    if (error || !project)
+      return <span className="text-destructive">Error</span>
+    return project.name
+  }
+
   return (
     <header className="bg-sidebar sticky top-0 z-50 flex w-full items-center border-b px-4">
       <div className="flex h-(--header-height) w-full items-center justify-between gap-2">
@@ -23,11 +40,11 @@ export function SiteHeader() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href="#">{Env.DEFAULT_ORG}</BreadcrumbLink>
+              <BreadcrumbLink href="#">{getOrganizationName()}</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{Env.DEFAULT_PROJECT}</BreadcrumbPage>
+              <BreadcrumbPage>{getProjectName()}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

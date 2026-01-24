@@ -38,6 +38,9 @@ export const reactQueryKeys = {
   triggers: {
     list: (schema: string) => ['triggers', 'list', schema] as const,
   },
+  project: {
+    detail: () => ['project', 'detail'] as const,
+  },
 } as const
 
 export type ReactQueryKeys = typeof reactQueryKeys
