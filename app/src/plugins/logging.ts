@@ -1,38 +1,37 @@
+import pino from "pino";
+
+const logLevel = process.env.LOG_LEVEL || "info";
+
+export const logger = pino({
+  level: logLevel,
+  base: {
+    service: "bunvel-api",
+  },
+  timestamp: pino.stdTimeFunctions.isoTime,
+});
+
+export const queryLogger = logger.child({
+  service: "bunvel-queries",
+});
+
+export const errorLogger = logger.child({
+  service: "bunvel-errors",
+});
+
 import { Elysia } from "elysia";
-import winston from "winston";
 
-const logger = winston.createLogger({
-  level: "info",
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.errors({ stack: true }),
-    winston.format.json(),
-  ),
-  defaultMeta: { service: "bunvel-api" },
-  transports: [
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-    new winston.transports.File({ filename: "logs/routes.log" }),
-  ],
-});
+export const loggingPlugin = new Elysia({ name: "logging" })
 
-// Separate logger for queries
-const queryLogger = winston.createLogger({
-  level: "info",
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.errors({ stack: true }),
-    winston.format.json(),
-  ),
-  defaultMeta: { service: "bunvel-queries" },
-  transports: [new winston.transports.File({ filename: "logs/queries.log" })],
-});
-
-export const loggingPlugin = new Elysia({ name: "Logging Plugin" })
   .onRequest(({ request, set }) => {
     const start = Date.now();
-    set.headers["x-request-start"] = start.toString();
+    const correlationId = Bun.randomUUIDv7();
 
-    logger.info("Incoming request", {
+    set.headers["x-request-start"] = start.toString();
+    set.headers["x-correlation-id"] = correlationId;
+
+    logger.info({
+      event: "http.request.start",
+      correlationId,
       method: request.method,
       url: request.url,
       userAgent: request.headers.get("user-agent"),
@@ -40,37 +39,58 @@ export const loggingPlugin = new Elysia({ name: "Logging Plugin" })
         request.headers.get("x-forwarded-for") ||
         request.headers.get("x-real-ip") ||
         "unknown",
-      timestamp: new Date().toISOString(),
     });
   })
+
   .onAfterHandle(({ request, set }) => {
     const start = parseInt(String(set.headers["x-request-start"] || "0"));
     const duration = Date.now() - start;
+    const correlationId = set.headers["x-correlation-id"] as string;
 
-    logger.info("Request completed", {
+    logger.info({
+      event: "http.request.end",
+      correlationId,
       method: request.method,
       url: request.url,
-      statusCode: set.status || 200,
-      duration: `${duration}ms`,
-      timestamp: new Date().toISOString(),
+      statusCode: set.status ?? 200,
+      duration,
     });
   })
+
   .onError(({ error, request, set }) => {
     const start = parseInt(String(set.headers["x-request-start"] || "0"));
     const duration = Date.now() - start;
+    const correlationId = set.headers["x-correlation-id"] as string;
 
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    const errorStack = error instanceof Error ? error.stack : undefined;
+    let errorMessage: string | undefined;
+    let errorStack: string | undefined;
+    let errorName: string | undefined;
 
-    logger.error("Request failed", {
+    if (error && typeof error === "object") {
+      if ("message" in error) {
+        errorMessage = String(error.message);
+      }
+      if ("stack" in error) {
+        errorStack = String(error.stack);
+      }
+      if ("name" in error) {
+        errorName = String(error.name);
+      }
+    } else {
+      errorMessage = String(error);
+    }
+
+    errorLogger.error({
+      event: "http.request.error",
+      correlationId,
       method: request.method,
       url: request.url,
-      statusCode: set.status || 500,
-      error: errorMessage,
-      stack: errorStack,
-      duration: `${duration}ms`,
-      timestamp: new Date().toISOString(),
+      statusCode: set.status ?? 500,
+      duration,
+      error: {
+        message: errorMessage,
+        stack: errorStack,
+        name: errorName,
+      },
     });
   });
-
-export { logger, queryLogger };

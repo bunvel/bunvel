@@ -34,11 +34,11 @@ export const restService = new Elysia({
     ).toString();
     const targetWithQuery = url.search ? `${target}${url.search}` : target;
 
-    logger.info("Proxying REST request", {
+    logger.info({
+      event: "rest.request.proxying",
       method: request.method,
       originalUrl: request.url,
       targetUrl: targetWithQuery,
-      timestamp: new Date().toISOString(),
     });
 
     const headers = new Headers(request.headers);
@@ -59,22 +59,22 @@ export const restService = new Elysia({
       ? response.json()
       : response.text();
 
-    logger.info("REST proxy request completed", {
+    logger.info({
+      event: "rest.request.completed",
       method: request.method,
       originalUrl: request.url,
       targetUrl: targetWithQuery,
       statusCode: response.status,
-      timestamp: new Date().toISOString(),
     });
 
     return result;
   } catch (error) {
-    logger.error("REST proxy request failed", {
+    logger.error({
+      event: "rest.request.failed",
       method: request.method,
       url: request.url,
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-      timestamp: new Date().toISOString(),
     });
 
     set.status = 500;

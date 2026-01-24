@@ -23,9 +23,9 @@ services:
       - VITE_BUNVEL_STUDIO_URL=${VITE_BUNVEL_STUDIO_URL}
       - DEFAULT_ORGANIZATION=${DEFAULT_ORGANIZATION}
       - DEFAULT_PROJECT=${DEFAULT_PROJECT}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
     volumes:
       - ./app:/app
-      - ./app/logs:/app/logs
     networks:
       - bunvel-network
     depends_on:

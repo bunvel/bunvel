@@ -20,10 +20,9 @@ services:
       - VITE_BUNVEL_STUDIO_URL=${VITE_BUNVEL_STUDIO_URL}
       - DEFAULT_ORGANIZATION=${DEFAULT_ORGANIZATION}
       - DEFAULT_PROJECT=${DEFAULT_PROJECT}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
     networks:
       - bunvel-network
-    volumes:
-      - ./app/logs:/app/logs
     depends_on:
       postgres:
         condition: service_healthy

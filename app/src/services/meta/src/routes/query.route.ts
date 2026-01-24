@@ -36,8 +36,8 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
     }
 
     try {
-      queryLogger.info("SQL query executed", {
-        timestamp: new Date().toISOString(),
+      queryLogger.info({
+        event: "sql.query.executed",
         query: query,
         params: body.params,
       });
@@ -59,8 +59,8 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
       }
 
       const resultCount = Array.isArray(result) ? result.length : 1;
-      queryLogger.info("SQL query completed", {
-        timestamp: new Date().toISOString(),
+      queryLogger.info({
+        event: "sql.query.completed",
         query: query,
         resultCount: resultCount,
       });
@@ -72,8 +72,8 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
           ? `Query execution failed: ${error.message}`
           : "An unexpected error occurred while executing the query";
 
-      queryLogger.error("SQL query failed", {
-        timestamp: new Date().toISOString(),
+      queryLogger.error({
+        event: "sql.query.failed",
         query: query,
         params: body.params,
         error: error instanceof Error ? error.message : String(error),
