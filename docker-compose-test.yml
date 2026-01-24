@@ -21,6 +21,8 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGREST_URL=http://rest:8001
       - VITE_BUNVEL_STUDIO_URL=${VITE_BUNVEL_STUDIO_URL}
+      - DEFAULT_ORGANIZATION=${DEFAULT_ORGANIZATION}
+      - DEFAULT_PROJECT=${DEFAULT_PROJECT}
     networks:
       - bunvel-network
     volumes:

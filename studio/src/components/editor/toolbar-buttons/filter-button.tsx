@@ -17,7 +17,11 @@ import {
 import { useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTableManager } from '@/hooks/use-table-manager'
 import { FilterConfig as BaseFilterConfig } from '@/types/table'
-import { FilterOperator, FilterOperatorLabels } from '@/utils/constant'
+import {
+  FilterOperator,
+  FilterOperatorLabels,
+  FilterSqlOperators,
+} from '@/utils/constant'
 import {
   DndContext,
   DragEndEvent,
@@ -36,6 +40,26 @@ import { Filter, Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
 import { SortableItem } from './sortable-item'
+
+// Utility function to validate filter configuration
+const isFilterValid = (filter: BaseFilterConfig): boolean => {
+  const operatorConfig = FilterSqlOperators[filter.operator]
+  if (!operatorConfig.requiresParameter) {
+    return true // IS NULL, IS NOT NULL don't need values
+  }
+  // Other operators must have non-empty values
+  return (
+    filter.value !== null && filter.value !== '' && filter.value !== undefined
+  )
+}
+
+// Utility function to generate unique filter ID
+const generateFilterId = (filter: BaseFilterConfig): string =>
+  `${filter.column}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+
+// Utility function to process filters with IDs
+const processFiltersWithIds = (filters: BaseFilterConfig[]): FilterConfig[] =>
+  filters.filter(isFilterValid).map((f) => ({ ...f, id: generateFilterId(f) }))
 
 interface FilterConfig extends BaseFilterConfig {
   id: string
@@ -70,29 +94,12 @@ export function FilterButton({
   const filters = propFilters ?? hookFilters
   const handleFilterChange = propOnFilterChange ?? hookHandleFilterChange
   const recordCount = propRecordCount ?? (hookTableData?.data?.length || 0)
-  // Filter out invalid filters from initial state
-  const validInitialFilters = (filters || []).filter(
-    (filter) =>
-      filter.operator === 'IS NULL' ||
-      filter.operator === 'IS NOT NULL' ||
-      (filter.value !== null &&
-        filter.value !== '' &&
-        filter.value !== undefined),
+  // Process initial filters with validation
+  const [localFilters, setLocalFilters] = useState<FilterConfig[]>(() =>
+    processFiltersWithIds(filters || []),
   )
-
-  const [localFilters, setLocalFilters] = useState<FilterConfig[]>(
-    () =>
-      validInitialFilters.map((f) => ({
-        ...f,
-        id: `${f.column}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      })) || [],
-  )
-  const [pendingFilters, setPendingFilters] = useState<FilterConfig[]>(
-    () =>
-      validInitialFilters.map((f) => ({
-        ...f,
-        id: `${f.column}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      })) || [],
+  const [pendingFilters, setPendingFilters] = useState<FilterConfig[]>(() =>
+    processFiltersWithIds(filters || []),
   )
   const [open, setOpen] = useState(false)
 
@@ -106,16 +113,7 @@ export function FilterButton({
   // Sync pending filters when dropdown opens
   useEffect(() => {
     if (open) {
-      // Filter out invalid filters when syncing to pending state
-      const validFilters = filters.filter(
-        (filter) =>
-          filter.operator === 'IS NULL' ||
-          filter.operator === 'IS NOT NULL' ||
-          (filter.value !== null &&
-            filter.value !== '' &&
-            filter.value !== undefined),
-      )
-      setPendingFilters(validFilters)
+      setPendingFilters(processFiltersWithIds(filters || []))
     }
   }, [open, filters])
 
@@ -125,8 +123,6 @@ export function FilterButton({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   )
-
-  // Removed handleAddFilter as it's no longer needed
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -160,20 +156,7 @@ export function FilterButton({
   }
 
   const handleApplyFilters = () => {
-    // Only include filters that are valid:
-    // - IS NULL and IS NOT NULL don't need values
-    // - Other operators must have non-empty values
-    const validFilters = pendingFilters.filter((filter: FilterConfig) => {
-      if (filter.operator === 'IS NULL' || filter.operator === 'IS NOT NULL') {
-        return true // These operators don't need values
-      }
-      // For other operators, value must be provided and not empty
-      return (
-        filter.value !== null &&
-        filter.value !== '' &&
-        filter.value !== undefined
-      )
-    })
+    const validFilters = pendingFilters.filter(isFilterValid)
 
     setLocalFilters(validFilters)
     // Strip the id before passing to parent
@@ -191,16 +174,12 @@ export function FilterButton({
   }
 
   const hasChanges =
-    JSON.stringify(localFilters) !== JSON.stringify(pendingFilters)
+    JSON.stringify(localFilters.map(({ id, ...rest }) => rest)) !==
+    JSON.stringify(pendingFilters.map(({ id, ...rest }) => rest))
 
   // Check if there are invalid filters (empty values)
   const hasInvalidFilters = pendingFilters.some(
-    (filter: FilterConfig) =>
-      filter.operator !== 'IS NULL' &&
-      filter.operator !== 'IS NOT NULL' &&
-      (filter.value === null ||
-        filter.value === '' ||
-        filter.value === undefined),
+    (filter: BaseFilterConfig) => !isFilterValid(filter),
   )
 
   return (
