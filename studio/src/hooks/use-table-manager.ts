@@ -1,6 +1,5 @@
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTables } from '@/hooks/queries/useTables'
-import { useTableTabs } from '@/hooks/use-table-tabs'
 import { useTableStore } from '@/stores/table-store'
 import { SchemaTable, TableKind } from '@/types'
 import {
@@ -9,8 +8,8 @@ import {
   SortConfig,
   TableRow,
 } from '@/types/table'
-import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
-import { useSearch } from '@tanstack/react-router'
+import { DEFAULT_PAGE_SIZE, MAX_TABLE_TABS } from '@/utils/constant'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo } from 'react'
 
 export interface UseTableManagerReturn {
@@ -64,11 +63,18 @@ export interface UseTableManagerReturn {
 
 export function useTableManager(): UseTableManagerReturn {
   const { schema, table } = useSearch({ strict: false }) as SchemaTable
+  const navigate = useNavigate()
 
-  // Use existing tab management
-  const tabManager = useTableTabs()
+  // Zustand store hooks for tab management
+  const tabs = useTableStore((state) => state.tabs)
+  const addTable = useTableStore((state) => state.addTable)
+  const removeTable = useTableStore((state) => state.removeTable)
+  const removeTableBySchema = useTableStore(
+    (state) => state.removeTableBySchema,
+  )
+  const setActiveTable = useTableStore((state) => state.setActiveTable)
 
-  // Zustand store hooks
+  // Zustand store hooks for table state
   const setTableState = useTableStore((state) => state.setTableState)
   const setSelectedRows = useTableStore((state) => state.setSelectedRows)
   const setRowSelection = useTableStore((state) => state.setRowSelection)
@@ -94,12 +100,67 @@ export function useTableManager(): UseTableManagerReturn {
     }
   }, [currentTableKey, setTableState])
 
-  // Tab management functions - using existing tab manager
-  const handleTabChange = tabManager.handleTabChange
-  const handleTabClose = tabManager.handleTabClose
-  const removeTable = tabManager.removeTable
-  const removeTableBySchema = tabManager.removeTableBySchema
-  const addTable = tabManager.addTable
+  // Update selected tables when URL changes
+  useEffect(() => {
+    if (schema && table) {
+      addTable(schema, table, MAX_TABLE_TABS)
+    }
+  }, [schema, table, addTable])
+
+  // Restore active table from store to URL when component mounts and URL has no table
+  useEffect(() => {
+    if (
+      !schema &&
+      !table &&
+      tabs.activeTableKey &&
+      tabs.selectedTables.includes(tabs.activeTableKey)
+    ) {
+      const [restoreSchema, restoreTable] = tabs.activeTableKey.split('.')
+      navigate({
+        search: { schema: restoreSchema, table: restoreTable } as any,
+      })
+    }
+  }, [schema, table, tabs.activeTableKey, tabs.selectedTables, navigate])
+
+  // Tab management functions - direct Zustand implementation
+  const handleTabChange = useCallback(
+    (value: string) => {
+      const [newSchema, newTable] = value.split('.')
+      setActiveTable(value)
+      navigate({ search: { schema: newSchema, table: newTable } as any })
+    },
+    [navigate, setActiveTable],
+  )
+
+  const handleTabClose = useCallback(
+    (e: React.MouseEvent, tableKey: string) => {
+      e.stopPropagation()
+      removeTable(tableKey)
+
+      // If removing active table, navigate to next available table
+      if (tabs.activeTableKey === tableKey && tabs.selectedTables.length > 1) {
+        const remainingTables = tabs.selectedTables.filter(
+          (t) => t !== tableKey,
+        )
+        const [newSchema, newTable] = remainingTables[0]?.split('.') || []
+        const newActiveTable = remainingTables[0] || null
+        setActiveTable(newActiveTable)
+        navigate(
+          newTable
+            ? { search: { schema: newSchema, table: newTable } as any }
+            : { search: {} as any },
+        )
+      }
+    },
+    [removeTable, tabs, navigate, setActiveTable],
+  )
+
+  const handleAddTable = useCallback(
+    (newSchema: string, newTable: string) => {
+      addTable(newSchema, newTable, MAX_TABLE_TABS)
+    },
+    [addTable],
+  )
 
   // Selection management
   const handleRowSelectionChange = useCallback(
@@ -224,9 +285,10 @@ export function useTableManager(): UseTableManagerReturn {
   const sorts = tableState?.sorts || []
   const filters = tableState?.filters || []
 
-  // Tab state from tab manager
-  const selectedTables = tabManager.selectedTables
-  const activeTable = tabManager.activeTable
+  // Tab state from Zustand store
+  const selectedTables = tabs.selectedTables
+  const activeTable =
+    schema && table ? `${schema}.${table}` : tabs.activeTableKey || undefined
 
   return {
     // Current table info
@@ -251,7 +313,7 @@ export function useTableManager(): UseTableManagerReturn {
     handleTabClose,
     removeTable,
     removeTableBySchema,
-    addTable,
+    addTable: handleAddTable,
 
     // Selection management
     selectedRows,

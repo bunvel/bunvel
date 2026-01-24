@@ -1,9 +1,8 @@
 import { useExecuteSqlQuery } from '@/hooks/mutations/useExecuteSqlQuery'
-import { useSqlTabs } from '@/hooks/use-sql-tabs'
+import { useSqlManager } from '@/hooks/use-sql-manager'
 import { cn } from '@/lib/utils'
 import { Alert, Check, Info } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { useEffect, useState } from 'react'
 import { ToggleSidebar } from '../common/toggle-sidebar'
 import { Spinner } from '../ui/spinner'
 import { QueryResultActions } from './query-result-actions'
@@ -11,46 +10,18 @@ import { QueryResultTable } from './query-result-table'
 import { SqlQueryForm } from './sql-query-form'
 import { SqlTabs } from './sql-tabs'
 
-interface SqlEditorProps {
-  showSidebar?: boolean
-  onToggleSidebar?: () => void
-  onAddToHistory?: (query: string, success: boolean) => void
-  className?: string
-  initialQuery?: string
-}
-
-export function SqlEditor({
-  showSidebar = true,
-  onToggleSidebar,
-  onAddToHistory,
-  className,
-  initialQuery = '',
-}: SqlEditorProps) {
-  const { activeTab, updateTabQuery, updateTabExecution } = useSqlTabs()
-  const [query, setQuery] = useState(initialQuery)
-
-  // Update query state when active tab changes
-  useEffect(() => {
-    if (activeTab) {
-      setQuery(activeTab.query)
-    }
-  }, [activeTab])
-
-  // Update query state when initialQuery changes
-  useEffect(() => {
-    if (initialQuery !== undefined && !activeTab) {
-      setQuery(initialQuery)
-    }
-  }, [initialQuery, activeTab])
+export function SqlEditor() {
+  const {
+    activeTab,
+    query,
+    setQuery,
+    updateTabExecution,
+    addToHistory,
+    showSidebar,
+    handleToggleSidebar,
+  } = useSqlManager()
 
   const { mutate: executeQuery } = useExecuteSqlQuery()
-
-  const handleQueryChange = (newQuery: string) => {
-    setQuery(newQuery)
-    if (activeTab) {
-      updateTabQuery(activeTab.id, newQuery)
-    }
-  }
 
   const handleExecute = () => {
     if (!query.trim() || !activeTab) return
@@ -61,11 +32,11 @@ export function SqlEditor({
     executeQuery(query, {
       onSuccess: (result) => {
         updateTabExecution(activeTab.id, result, undefined, false, query)
-        onAddToHistory?.(query, true)
+        addToHistory(query, true)
       },
       onError: (error) => {
         updateTabExecution(activeTab.id, undefined, error, false, query)
-        onAddToHistory?.(query, false)
+        addToHistory(query, false)
       },
     })
   }
@@ -77,10 +48,10 @@ export function SqlEditor({
   const lastExecutedQuery = activeTab?.lastExecutedQuery || ''
 
   return (
-    <div className={cn('h-full flex flex-col', className)}>
+    <div className={cn('h-full flex flex-col')}>
       <div className="flex items-center gap-2 border-b">
         <ToggleSidebar
-          onToggleSidebar={onToggleSidebar}
+          onToggleSidebar={handleToggleSidebar}
           showSidebar={showSidebar}
         />
         <SqlTabs />
@@ -89,7 +60,7 @@ export function SqlEditor({
         <div className="h-[350px] border-b overflow-y-auto">
           <SqlQueryForm
             query={query}
-            onQueryChange={handleQueryChange}
+            onQueryChange={setQuery}
             onExecute={handleExecute}
           />
         </div>
@@ -113,27 +84,28 @@ export function SqlEditor({
             </div>
           ) : error ? (
             <div className="flex items-center p-4 text-destructive bg-destructive/10">
-              <HugeiconsIcon
-                icon={Alert}
-                className="h-4 w-4 mr-1 text-destructive"
-              />
-              <p className="text-sm">{error.message}</p>
+              <HugeiconsIcon icon={Alert} className="h-4 w-4 mr-1" />
+              <span className="font-medium">Error:</span>
+              <span className="ml-2 text-sm">
+                {error.message || 'Unknown error occurred'}
+              </span>
             </div>
-          ) : queryResult?.data.length === 0 ? (
-            <div className="flex items-center gap-2 p-4 text-muted-foreground bg-secondary">
-              <HugeiconsIcon
-                icon={Check}
-                className="h-4 w-4 mr-1 text-green-500"
+          ) : queryResult ? (
+            <div className="h-full">
+              <div className="flex items-center gap-2 p-4 text-green-700 bg-green-50 dark:text-green-300 dark:bg-green-950/50 border-b">
+                <HugeiconsIcon icon={Check} className="h-4 w-4" />
+                <span className="font-medium">Query executed successfully</span>
+                <span className="text-sm text-muted-foreground">
+                  ({queryResult.rowCount} rows returned)
+                </span>
+              </div>
+              <QueryResultTable
+                result={queryResult}
+                isExecuting={isExecuting}
+                error={error}
               />
-              <span>Query executed successfully. No rows returned.</span>
             </div>
-          ) : (
-            <QueryResultTable
-              result={queryResult}
-              isExecuting={isExecuting}
-              error={error}
-            />
-          )}
+          ) : null}
         </div>
       </div>
     </div>

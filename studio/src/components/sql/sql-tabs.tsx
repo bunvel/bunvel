@@ -1,24 +1,28 @@
 import { BunvelTab } from '@/components/common/bunvel-tab'
 import { Tabs, TabsList } from '@/components/ui/tabs'
-import { useSqlTabs } from '@/hooks/use-sql-tabs'
+import { useSqlManager } from '@/hooks/use-sql-manager'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Button } from '../ui/button'
 
 export function SqlTabs() {
-  const {
-    tabs,
-    activeTabId,
-    handleTabChange,
-    handleTabClose,
-    createNewQueryTab,
-  } = useSqlTabs()
+  const { tabs, activeTabId, setActiveTab, removeTab, createNewQueryTab } =
+    useSqlManager()
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+  }
+
+  const handleTabClose = (e: React.MouseEvent, value: string) => {
+    e.stopPropagation()
+    removeTab(value)
+  }
 
   if (!tabs.length) return null
 
   return (
     <div className="flex items-center">
-      <Tabs value={activeTabId} onValueChange={handleTabChange}>
+      <Tabs value={activeTabId || ''} onValueChange={handleTabChange}>
         <TabsList className="inline-flex justify-start rounded-none bg-card p-0">
           {tabs.map((tab) => (
             <BunvelTab
