@@ -66,12 +66,10 @@ export const DataTableCell = React.memo(function DataTableCell({
       rawValue !== '' ? (
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger
-            render={
-              <Button variant="secondary" size="icon-xs">
-                <HugeiconsIcon icon={ArrowRight} />
-              </Button>
-            }
-          ></PopoverTrigger>
+            render={<Button variant="secondary" size="icon-xs" />}
+          >
+            <HugeiconsIcon icon={ArrowRight} />
+          </PopoverTrigger>
           <PopoverContent
             align="center"
             className="p-0"

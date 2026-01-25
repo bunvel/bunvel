@@ -88,19 +88,19 @@ export function TableListAction({ schema, table }: TableListActionProps) {
               icon={Edit03Icon}
               className="text-muted-foreground"
             />
-            <span>Edit</span>
+            <span>Edit Table</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setIsTruncateDialogOpen(true)}>
             <HugeiconsIcon icon={Trash2} className="text-muted-foreground" />
-            <span>Truncate</span>
+            <span>Truncate Table</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setIsDeleteDialogOpen(true)}
             className="text-destructive focus:text-destructive"
           >
             <HugeiconsIcon icon={Trash2} className="text-destructive" />
-            <span>Delete</span>
+            <span>Delete Table</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
