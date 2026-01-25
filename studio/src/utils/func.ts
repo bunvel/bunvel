@@ -20,6 +20,11 @@ export function escapeIdentifier(identifier: string): string {
 }
 
 export function formatDefaultValue(value: string, type: string): string {
+  // Handle empty or undefined values
+  if (!value || value.trim() === '') {
+    throw new Error('Default value cannot be empty')
+  }
+
   const lowerType = type.toLowerCase()
   const lowerValue = value.toLowerCase().trim()
 

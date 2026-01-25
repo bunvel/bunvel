@@ -50,6 +50,12 @@ export interface DeleteTableParams {
   cascade: boolean
 }
 
+export interface CreateEnumParams {
+  schema: string
+  enumName: string
+  values: string[]
+}
+
 export interface DatabaseTables {
   oid: string
   name: string

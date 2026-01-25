@@ -1,6 +1,7 @@
 import { DatabaseTable } from '@/components/database/database-table'
+import { EnumFormSheet } from '@/components/editor/enum-form-sheet'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { useDatabaseEnums } from '@/hooks/queries/useTables'
+import { useDatabaseEnums } from '@/hooks/queries/useEnums'
 import type { TableColumn } from '@/types'
 import { SchemaTable } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
@@ -19,13 +20,9 @@ const columns: TableColumn[] = [
 
 function RouteComponent() {
   const search = useSearch({ strict: false }) as Partial<SchemaTable>
-  const { schema } = search
+  const schema = search.schema || 'public'
 
-  const {
-    data: enums = [],
-    isLoading,
-    error,
-  } = useDatabaseEnums(schema || 'public')
+  const { data: enums = [], isLoading, error } = useDatabaseEnums(schema)
 
   // Group enum values by enum name
   const groupedEnums = enums.reduce<
@@ -72,6 +69,7 @@ function RouteComponent() {
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}
+        leftActions={<EnumFormSheet schema={schema} />}
       />
     </div>
   )

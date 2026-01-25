@@ -24,8 +24,9 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useCreateTable } from '@/hooks/mutations/useTableMutations'
+import { useDatabaseEnums } from '@/hooks/queries/useEnums'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
-import { useDatabaseEnums, useTables } from '@/hooks/queries/useTables'
+import { useTables } from '@/hooks/queries/useTables'
 import type {
   ColumnDefinition,
   ForeignKeyAction,

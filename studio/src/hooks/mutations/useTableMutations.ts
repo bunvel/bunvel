@@ -14,6 +14,9 @@ export function useCreateTable() {
       queryClient.invalidateQueries({
         queryKey: reactQueryKeys.tables.list(schema),
       })
+      queryClient.invalidateQueries({
+        queryKey: reactQueryKeys.databaseTables.list(schema),
+      })
       toast.success('Table created successfully')
     },
     onError: (error: unknown) => {

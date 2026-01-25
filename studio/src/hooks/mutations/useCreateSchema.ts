@@ -16,12 +16,9 @@ export function useCreateSchema() {
       })
       return result
     },
-    onSuccess: (_, { name }) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: reactQueryKeys.schemas.list(),
-      })
-      queryClient.invalidateQueries({
-        queryKey: reactQueryKeys.databaseTables.list(name),
       })
     },
     onError: (error: Error) => {

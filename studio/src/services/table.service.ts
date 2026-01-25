@@ -1,6 +1,5 @@
 import type {
   CreateTableParams,
-  DatabaseEnum,
   DatabaseFunction,
   DatabaseTableColumns,
   DatabaseTableIndexes,
@@ -104,29 +103,6 @@ export const getDatabaseTableIndexes = createServerFn({ method: 'POST' })
       return response.data as DatabaseTableIndexes[]
     } catch (error) {
       console.error('Error fetching table indexes:', error)
-      handleApiError(error)
-    }
-  })
-
-export const getDatabaseEnums = createServerFn({ method: 'POST' })
-  .inputValidator((data: { schema: string }) => {
-    if (!data?.schema) {
-      throw new Error('Schema name is required')
-    }
-    return data
-  })
-  .handler(async ({ data }) => {
-    try {
-      const response = await apiClient.post<DatabaseEnum[]>(
-        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_ENUMS,
-        {
-          query: SQL_QUERIES.GET_ENUMS,
-          params: [data.schema],
-        },
-      )
-      return response.data as DatabaseEnum[]
-    } catch (error) {
-      console.error('Error fetching enums:', error)
       handleApiError(error)
     }
   })
@@ -260,9 +236,23 @@ export const createTable = createServerFn({ method: 'POST' })
       // Handle default values (skip if already handled for UUID PK)
       if (
         col.defaultValue !== undefined &&
+        col.defaultValue.trim() !== '' &&
         !(col.isPrimaryKey && hasSinglePK && lowerType === 'uuid')
       ) {
-        def += ` DEFAULT ${formatDefaultValue(col.defaultValue, col.type)}`
+        try {
+          const formattedDefault = formatDefaultValue(
+            col.defaultValue,
+            col.type,
+          )
+          def += ` DEFAULT ${formattedDefault}`
+        } catch (error) {
+          // Skip default value if formatting fails
+          console.warn(
+            `Invalid default value for column ${col.name}:`,
+            col.defaultValue,
+            error,
+          )
+        }
       }
 
       return def

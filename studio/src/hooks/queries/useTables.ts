@@ -1,5 +1,4 @@
 import {
-  getDatabaseEnums,
   getDatabaseFunctions,
   getDatabaseTableColumns,
   getDatabaseTableIndexes,
@@ -53,16 +52,6 @@ export function useDatabaseIndexes(schema: string) {
     enabled: !!schema,
     staleTime: 10 * 60 * 1000, // 10 minutes for indexes
     gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
-  })
-}
-
-export const useDatabaseEnums = (schema: string) => {
-  return useQuery({
-    queryKey: reactQueryKeys.enums.list(schema),
-    queryFn: () => getDatabaseEnums({ data: { schema } }),
-    enabled: !!schema,
-    staleTime: 20 * 60 * 1000, // 20 minutes for enums (rarely change)
-    gcTime: 40 * 60 * 1000, // 40 minutes garbage collection
   })
 }
 

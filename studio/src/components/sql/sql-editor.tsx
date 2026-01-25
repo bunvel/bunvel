@@ -90,22 +90,18 @@ export function SqlEditor() {
                 {error.message || 'Unknown error occurred'}
               </span>
             </div>
-          ) : queryResult ? (
-            <div className="h-full">
-              <div className="flex items-center gap-2 p-4 text-green-700 bg-green-50 dark:text-green-300 dark:bg-green-950/50 border-b">
-                <HugeiconsIcon icon={Check} className="h-4 w-4" />
-                <span className="font-medium">Query executed successfully</span>
-                <span className="text-sm text-muted-foreground">
-                  ({queryResult.rowCount} rows returned)
-                </span>
-              </div>
-              <QueryResultTable
-                result={queryResult}
-                isExecuting={isExecuting}
-                error={error}
-              />
+          ) : queryResult.data.length == 0 ? (
+            <div className="flex items-center p-4 text-sm text-muted-foreground bg-secondary gap-2">
+              <HugeiconsIcon icon={Check} className="h-4 w-4" />
+              <span className="font-medium">Success. No rows returned</span>
             </div>
-          ) : null}
+          ) : (
+            <QueryResultTable
+              result={queryResult}
+              isExecuting={isExecuting}
+              error={error}
+            />
+          )}
         </div>
       </div>
     </div>

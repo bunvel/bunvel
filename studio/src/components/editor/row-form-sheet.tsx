@@ -29,8 +29,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { useCreateRow } from '@/hooks/mutations/useCreateRow'
+import { useDatabaseEnums } from '@/hooks/queries/useEnums'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
-import { useDatabaseEnums } from '@/hooks/queries/useTables'
 import type { DatabaseEnum } from '@/types/database'
 import { BUTTON_LABELS } from '@/utils/constant'
 import { CalendarDays, Edit, Plus } from '@hugeicons/core-free-icons'
