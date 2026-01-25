@@ -56,6 +56,14 @@ docker compose up -d
 
 The backend will be available at `http://localhost:8000` and the studio at `http://localhost:3000`.
 
+### REST API Access
+
+The auto-generated REST API is accessible at `http://localhost:8000/rest`.
+
+For detailed API usage and capabilities, refer to the [PostgREST documentation](https://docs.postgrest.org/en/v14/).
+
+**Note:** As of now, there is no authentication implemented, so all endpoints are publicly accessible.
+
 ## 📚 Documentation
 
 - [Architecture Overview](./docs/architecture.md)
