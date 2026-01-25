@@ -144,7 +144,7 @@ type FormValues = {
   foreignKeys: ForeignKeyDefinition[]
 }
 
-export function TableFormSheet({ schema }: TableFormSheetProps) {
+export function TableFormSheet({ schema, children }: TableFormSheetProps) {
   const [open, setOpen] = useState(false)
   const { mutate: createTable, isPending: isSubmitting } = useCreateTable()
   const { data: tables = [] } = useTables(schema)
@@ -394,12 +394,11 @@ export function TableFormSheet({ schema }: TableFormSheetProps) {
       }}
     >
       <SheetTrigger
-        render={
-          <Button size="icon" variant="outline">
-            <HugeiconsIcon icon={Plus} className="h-4 w-4" />
-          </Button>
-        }
-      ></SheetTrigger>
+        render={<Button size={children ? 'sm' : 'icon'} variant="outline" />}
+      >
+        <HugeiconsIcon icon={Plus} className="h-4 w-4" />
+        {children}
+      </SheetTrigger>
       <SheetContent side="right" className="bg-card min-w-2xl flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <SheetHeader className="border-b p-4">

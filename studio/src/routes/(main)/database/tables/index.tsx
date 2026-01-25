@@ -1,3 +1,4 @@
+import { TableKindIcon } from '@/components/common/table-kind-icon'
 import { DatabaseTable } from '@/components/database/database-table'
 import { TableFormSheet } from '@/components/editor/table-form-sheet'
 import { Button } from '@/components/ui/button'
@@ -6,12 +7,7 @@ import { useDatabaseTables } from '@/hooks/queries/useTables'
 import type { DatabaseTables, TableColumn } from '@/types'
 import { SchemaTable } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
-import {
-  EyeFreeIcons,
-  LayoutTwoColumnIcon,
-  PropertyViewFreeIcons,
-  TableIcon,
-} from '@hugeicons/core-free-icons'
+import { LayoutTwoColumnIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
 
@@ -41,23 +37,12 @@ function RouteComponent() {
   // Custom body row
   const bodyRow = (item: DatabaseTables, index: number) => {
     const isTable = item.kind === 'TABLE'
-    const isView = item.kind === 'VIEW'
-    const isMaterializedView = item.kind === 'MATERIALIZED VIEW'
 
     return (
       <TableRow key={index}>
         <TableCell className="font-medium">
           <p className="flex">
-            <HugeiconsIcon
-              icon={
-                isView
-                  ? EyeFreeIcons
-                  : isMaterializedView
-                    ? PropertyViewFreeIcons
-                    : TableIcon
-              }
-              className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
-            />
+            <TableKindIcon kind={item.kind} />
             <span className="truncate">{item.name}</span>
           </p>
         </TableCell>
@@ -97,7 +82,9 @@ function RouteComponent() {
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}
-        leftActions={<TableFormSheet schema={schema!} />}
+        leftActions={
+          <TableFormSheet schema={schema!} children={<p>Create Table</p>} />
+        }
       />
     </div>
   )

@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 
 interface EnumFormSheetProps {
   schema: string
+  children?: React.ReactNode
 }
 
 type FormValues = {
@@ -25,7 +26,7 @@ type FormValues = {
   values: string[]
 }
 
-export function EnumFormSheet({ schema }: EnumFormSheetProps) {
+export function EnumFormSheet({ schema, children }: EnumFormSheetProps) {
   const [open, setOpen] = useState(false)
   const { mutate: createEnum, isPending: isSubmitting } = useCreateEnum()
 
@@ -134,13 +135,16 @@ export function EnumFormSheet({ schema }: EnumFormSheetProps) {
         }
       }}
     >
-      <SheetTrigger render={<Button size="icon" variant="outline" />}>
+      <SheetTrigger
+        render={<Button size={children ? 'sm' : 'icon'} variant="outline" />}
+      >
         <HugeiconsIcon icon={Plus} className="h-4 w-4" />
+        {children}
       </SheetTrigger>
       <SheetContent side="right" className="bg-card min-w-xl flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <SheetHeader className="border-b p-4">
-            <SheetTitle>Create New Enum</SheetTitle>
+            <SheetTitle>Create a new enumerated type</SheetTitle>
           </SheetHeader>
           <div className="flex-1 overflow-auto">
             <div className="p-6 space-y-6">
@@ -229,7 +233,6 @@ export function EnumFormSheet({ schema }: EnumFormSheetProps) {
                       size="sm"
                       onClick={addValue}
                       disabled={isSubmitting}
-                      className="w-full"
                     >
                       <HugeiconsIcon icon={Plus} className="h-4 w-4 mr-2" />
                       Add Value

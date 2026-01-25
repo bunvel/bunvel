@@ -69,7 +69,9 @@ function RouteComponent() {
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}
-        leftActions={<EnumFormSheet schema={schema} />}
+        leftActions={
+          <EnumFormSheet schema={schema} children={<p>Create Type</p>} />
+        }
       />
     </div>
   )

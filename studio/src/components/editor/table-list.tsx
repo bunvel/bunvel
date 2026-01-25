@@ -11,16 +11,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
 import { SchemaTable, Table } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
-import {
-  EyeFreeIcons,
-  PropertyViewFreeIcons,
-  TableIcon,
-} from '@hugeicons/core-free-icons'
+import { TableIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
+import { TableKindIcon } from '../common/table-kind-icon'
 import { Input } from '../ui/input'
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip'
 import { TableFormSheet } from './table-form-sheet'
 import { TableListAction } from './table-list-action'
 
@@ -161,8 +157,6 @@ export function TableList() {
             <SidebarMenu className="space-y-1">
               {filteredTables.map((table) => {
                 const isActive = search.table === table.name
-                const isView = table.kind === 'VIEW'
-                const isMaterializedView = table.kind === 'MATERIALIZED VIEW'
 
                 return (
                   <SidebarMenuItem key={`${schema}.${table.name}`}>
@@ -170,23 +164,7 @@ export function TableList() {
                       isActive={isActive}
                       onClick={() => handleTableClick(table)}
                     >
-                      <Tooltip>
-                        <TooltipTrigger
-                          render={
-                            <HugeiconsIcon
-                              icon={
-                                isView
-                                  ? EyeFreeIcons
-                                  : isMaterializedView
-                                    ? PropertyViewFreeIcons
-                                    : TableIcon
-                              }
-                              className="mr-2 h-4 w-4 shrink-0 text-muted-foreground"
-                            />
-                          }
-                        ></TooltipTrigger>
-                        <TooltipContent>{table.kind}</TooltipContent>
-                      </Tooltip>
+                      <TableKindIcon kind={table.kind} />
                       {table.name}
                     </SidebarMenuButton>
                     <TableListAction schema={schema} table={table.name} />
