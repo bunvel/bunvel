@@ -1,4 +1,5 @@
 import { DatabaseTable } from '@/components/database/database-table'
+import { IndexFormSheet } from '@/components/editor/index-form-sheet'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -88,6 +89,7 @@ function RouteComponent() {
         bodyRow={bodyRow}
         isLoading={isLoading}
         error={error}
+        leftActions={<IndexFormSheet children={<p>Create Index</p>} />}
       />
     </div>
   )

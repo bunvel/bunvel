@@ -50,6 +50,14 @@ export interface DeleteTableParams {
   cascade: boolean
 }
 
+export interface CreateIndexParams {
+  schema: string
+  table: string
+  columns: string[]
+  unique?: boolean
+  indexType?: 'btree' | 'hash' | 'gist' | 'spgist' | 'gin' | 'brin'
+}
+
 export interface CreateEnumParams {
   schema: string
   enumName: string

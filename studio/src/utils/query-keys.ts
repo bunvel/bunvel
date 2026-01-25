@@ -19,6 +19,7 @@ export const QUERY_OPERATION_KEYS = {
   GET_DATABASE_ENUMS: 'database-enums',
   GET_DATABASE_FUNCTIONS: 'database-functions',
   GET_DATABASE_TRIGGERS: 'database-triggers',
+  CREATE_INDEX: 'create-index',
 
   // Row operations
   CREATE_ROW: 'create-row',

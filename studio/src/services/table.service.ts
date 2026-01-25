@@ -2,7 +2,6 @@ import type {
   CreateTableParams,
   DatabaseFunction,
   DatabaseTableColumns,
-  DatabaseTableIndexes,
   DatabaseTables,
   DatabaseTrigger,
   DeleteTableParams,
@@ -84,29 +83,6 @@ export const getDatabaseTableColumns = createServerFn({ method: 'POST' })
     }
   })
 
-export const getDatabaseTableIndexes = createServerFn({ method: 'POST' })
-  .inputValidator((data: { schema: string }) => {
-    if (!data?.schema) {
-      throw new Error('Schema name is required')
-    }
-    return data
-  })
-  .handler(async ({ data }) => {
-    try {
-      const response = await apiClient.post<DatabaseTableIndexes[]>(
-        '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_INDEXES,
-        {
-          query: SQL_QUERIES.GET_TABLE_INDEXES,
-          params: [data.schema],
-        },
-      )
-      return response.data as DatabaseTableIndexes[]
-    } catch (error) {
-      console.error('Error fetching table indexes:', error)
-      handleApiError(error)
-    }
-  })
-
 export const getDatabaseTriggers = createServerFn({ method: 'POST' })
   .inputValidator((data: { schema: string }) => ({
     schema: data.schema || 'public',
@@ -160,7 +136,10 @@ export const deleteTable = createServerFn({ method: 'POST' })
       const cascadeClause = cascade ? ' CASCADE' : ''
       const query = `DROP TABLE IF EXISTS "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}"${cascadeClause}`
 
-      await apiClient.post('/meta/query', { query })
+      await apiClient.post(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.DELETE_TABLE,
+        { query },
+      )
       return { success: true }
     } catch (error) {
       console.error('Error deleting table:', error)
@@ -180,7 +159,10 @@ export const truncateTable = createServerFn({ method: 'POST' })
       const { schema, table } = data
       const query = `TRUNCATE TABLE "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}" CASCADE`
 
-      await apiClient.post('/meta/query', { query })
+      await apiClient.post(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.TRUNCATE_TABLE,
+        { query },
+      )
       return { success: true }
     } catch (error) {
       console.error('Error truncating table:', error)
@@ -291,7 +273,10 @@ export const createTable = createServerFn({ method: 'POST' })
 
     try {
       // Execute as a single query
-      await apiClient.post('/meta/query', { query })
+      await apiClient.post(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.CREATE_TABLE,
+        { query },
+      )
       return { success: true }
     } catch (error) {
       console.error('Error creating table:', error)

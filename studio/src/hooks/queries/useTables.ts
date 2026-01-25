@@ -1,7 +1,7 @@
+import { getDatabaseTableIndexes } from '@/services/index.service'
 import {
   getDatabaseFunctions,
   getDatabaseTableColumns,
-  getDatabaseTableIndexes,
   getDatabaseTables,
   getDatabaseTriggers,
   getTables,
