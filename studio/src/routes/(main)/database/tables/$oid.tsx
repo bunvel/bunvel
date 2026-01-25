@@ -17,7 +17,6 @@ const columns: TableColumn[] = [
   { key: 'description', header: 'DESCRIPTION' },
   { key: 'data_type', header: 'DATA TYPE' },
   { key: 'nullable', header: 'NULLABLE' },
-  { key: 'position', header: 'POSITION' },
 ]
 
 function RouteComponent() {
@@ -39,12 +38,11 @@ function RouteComponent() {
         <TableCell>{item.data_type}</TableCell>
         <TableCell>
           {item.nullable ? (
-            <HugeiconsIcon icon={Check} className="text-green-500" />
+            <HugeiconsIcon icon={Check} className="text-green-500 w-4 h-4" />
           ) : (
-            <HugeiconsIcon icon={X} className="text-red-500" />
+            <HugeiconsIcon icon={X} className="text-red-500 w-4 h-4" />
           )}
         </TableCell>
-        <TableCell>{item.position}</TableCell>
       </TableRow>
     )
   }

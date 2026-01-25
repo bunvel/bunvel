@@ -144,8 +144,7 @@ export const SQL_QUERIES = {
     a.attname AS name,
     pg_catalog.col_description(c.oid, a.attnum) AS description,
     pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type,
-    NOT a.attnotnull AS nullable,
-    a.attnum AS position
+    NOT a.attnotnull AS nullable
   FROM
     pg_catalog.pg_attribute a
     JOIN pg_catalog.pg_class c ON c.oid = a.attrelid

@@ -28,12 +28,10 @@ export function DataTableHeaderCell({
           <Tooltip>
             <TooltipTrigger
               render={
-                <span>
-                  <HugeiconsIcon
-                    icon={Key01Icon}
-                    className="h-3.5 w-3.5 text-amber-500"
-                  />
-                </span>
+                <HugeiconsIcon
+                  icon={Key01Icon}
+                  className="h-3.5 w-3.5 text-amber-500"
+                />
               }
             ></TooltipTrigger>
             <TooltipContent>

@@ -8,6 +8,7 @@ import { SchemaTable } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
 import {
   EyeFreeIcons,
+  LayoutTwoColumnIcon,
   PropertyViewFreeIcons,
   TableIcon,
 } from '@hugeicons/core-free-icons'
@@ -76,6 +77,7 @@ function RouteComponent() {
             render={
               <Link to="/database/tables/$oid" params={{ oid: item.oid }}>
                 {item.column_count} columns
+                <HugeiconsIcon icon={LayoutTwoColumnIcon} />
               </Link>
             }
           ></Button>
