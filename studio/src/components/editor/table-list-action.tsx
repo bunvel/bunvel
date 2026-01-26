@@ -11,12 +11,7 @@ import { useTruncateTable } from '@/hooks/mutations/useTruncateTable'
 import { useCopyToClipboard } from '@/hooks/use-clipboard'
 import { useTableManager } from '@/hooks/use-table-manager'
 import type { TableListActionProps } from '@/types'
-import {
-  Copy01Icon,
-  Edit03Icon,
-  MoreVertical,
-  Trash2,
-} from '@hugeicons/core-free-icons'
+import { Copy01Icon, MoreVertical, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -74,21 +69,6 @@ export function TableListAction({ schema, table }: TableListActionProps) {
               className="text-muted-foreground"
             />
             <span>Copy Name</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => {
-              toast.info('Edit functionality not yet implemented', {
-                description:
-                  'Editing tables will be available in a future update',
-              })
-            }}
-          >
-            <HugeiconsIcon
-              icon={Edit03Icon}
-              className="text-muted-foreground"
-            />
-            <span>Edit Table</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setIsTruncateDialogOpen(true)}>

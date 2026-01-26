@@ -1,19 +1,10 @@
 import { DatabaseTable } from '@/components/database/database-table'
-import { Button } from '@/components/ui/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseFunctions } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types'
 import { DatabaseFunction, SchemaTable } from '@/types'
 import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { useState } from 'react'
 
 export const Route = createFileRoute('/(main)/database/functions/')({
   component: RouteComponent,
@@ -25,12 +16,9 @@ const columns: TableColumn[] = [
   { key: 'arguments', header: 'Arguments' },
   { key: 'return_type', header: 'Return Type' },
   { key: 'security_type', header: 'Security' },
-  { key: 'actions', header: '' },
 ]
 
 function RouteComponent() {
-  const [selectedFunction, setSelectedFunction] =
-    useState<DatabaseFunction | null>(null)
   const search = useSearch({ strict: false }) as Partial<SchemaTable>
   const { schema } = search
 
@@ -53,32 +41,6 @@ function RouteComponent() {
         <TableCell className="font-mono text-sm">{func.return_type}</TableCell>
         <TableCell>
           {func.security_type === 'SECURITY DEFINER' ? 'Definer' : 'Invoker'}
-        </TableCell>
-        <TableCell>
-          <Sheet
-            onOpenChange={(open) =>
-              open ? setSelectedFunction(func) : setSelectedFunction(null)
-            }
-          >
-            <SheetTrigger
-              render={
-                <Button variant="outline" size="sm">
-                  View Details
-                </Button>
-              }
-            ></SheetTrigger>
-            <SheetContent
-              side="right"
-              className="bg-card min-w-2xl flex flex-col"
-            >
-              <SheetHeader className="border-b p-4">
-                <SheetTitle>{selectedFunction?.function_name}</SheetTitle>
-              </SheetHeader>
-              <div className="flex-1 p-4 overflow-auto">
-                <p>Definition detail not yet implemented</p>
-              </div>
-            </SheetContent>
-          </Sheet>
         </TableCell>
       </TableRow>
     )
