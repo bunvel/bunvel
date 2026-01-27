@@ -5,6 +5,7 @@ import {
   SchemaTable,
   TableDataParams,
 } from '@/types'
+import { UpdateRowParams } from '@/types/database'
 import { DEFAULT_PAGE_SIZE, FilterSqlOperators } from '@/utils/constant'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
@@ -284,14 +285,28 @@ export const insertRow = createServerFn({ method: 'POST' })
     }
     return data
   })
-  .handler(async ({ data }) => {
+  .handler(async ({ data }: { data: CreateRowParams }) => {
     try {
       const { schema, table, row } = data
       const tableRef = `"${schema}"."${table}"`
 
+      // Process fields for PostgreSQL
+      const processedRow: Record<string, any> = {}
+      for (const [key, value] of Object.entries(row)) {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          // Stringify objects (JSON/JSONB columns)
+          processedRow[key] = JSON.stringify(value)
+        } else if (Array.isArray(value)) {
+          // Convert arrays to PostgreSQL array format
+          processedRow[key] = `{${value.map((v) => `"${v}"`).join(',')}}`
+        } else {
+          processedRow[key] = value
+        }
+      }
+
       // Build INSERT query
-      const columns = Object.keys(row)
-      const values = Object.values(row)
+      const columns = Object.keys(processedRow)
+      const values = Object.values(processedRow)
 
       if (columns.length === 0) {
         throw new Error('At least one column value is required')
@@ -315,6 +330,84 @@ export const insertRow = createServerFn({ method: 'POST' })
       }
     } catch (error) {
       console.error('Error in insertRow:', error)
+      handleApiError(error)
+    }
+  })
+
+export const updateRow = createServerFn({ method: 'POST' })
+  .inputValidator((data: UpdateRowParams) => {
+    if (!data?.schema || !data?.table) {
+      throw new Error('Schema and table names are required')
+    }
+    if (!data?.row) {
+      throw new Error('Row data is required')
+    }
+    if (!data?.primaryKeys?.length) {
+      throw new Error('Primary keys are required for update')
+    }
+    return data
+  })
+  .handler(async ({ data }: { data: UpdateRowParams }) => {
+    try {
+      const { schema, table, row, primaryKeys } = data
+
+      // Process fields for PostgreSQL
+      const processedRow: Record<string, any> = {}
+      for (const [key, value] of Object.entries(row)) {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          // Stringify objects (JSON/JSONB columns)
+          processedRow[key] = JSON.stringify(value)
+        } else if (Array.isArray(value)) {
+          // Convert arrays to PostgreSQL array format
+          processedRow[key] = `{${value.map((v) => `"${v}"`).join(',')}}`
+        } else {
+          processedRow[key] = value
+        }
+      }
+
+      const tableRef = `"${schema}"."${table}"`
+
+      // Build SET clause
+      const setColumns = Object.keys(processedRow).filter(
+        (key) => !primaryKeys.includes(key),
+      )
+      const setValues = setColumns.map((key) => processedRow[key])
+
+      if (setColumns.length === 0) {
+        throw new Error('At least one non-primary key column must be updated')
+      }
+
+      const setClause = setColumns
+        .map((col, index) => `"${col}" = $${index + 1}`)
+        .join(', ')
+
+      // Build WHERE clause for primary keys
+      const whereConditions = primaryKeys.map((pk: string, index: number) => {
+        const paramIndex = setValues.length + index + 1
+        return `"${pk}" = $${paramIndex}`
+      })
+
+      const whereClause = `WHERE ${whereConditions.join(' AND ')}`
+
+      // Combine all parameters
+      const allParams = [
+        ...setValues,
+        ...primaryKeys.map((pk: string) => processedRow[pk]),
+      ]
+
+      const query = `UPDATE ${tableRef} SET ${setClause} ${whereClause} RETURNING *`
+
+      const result = await apiClient.post<Array<Record<string, any>>>(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.UPDATE_ROW,
+        { query, params: allParams },
+      )
+
+      return {
+        success: true,
+        data: result.data?.[0] || null,
+      }
+    } catch (error) {
+      console.error('Error in updateRow:', error)
       handleApiError(error)
     }
   })

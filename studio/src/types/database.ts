@@ -44,6 +44,13 @@ export interface CreateRowParams {
   row: Record<string, any>
 }
 
+export interface UpdateRowParams {
+  schema: string
+  table: string
+  row: Record<string, any>
+  primaryKeys: string[]
+}
+
 export interface DeleteTableParams {
   schema: string
   table: string
