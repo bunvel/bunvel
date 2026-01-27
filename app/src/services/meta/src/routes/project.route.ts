@@ -1,4 +1,4 @@
-import Elysia from "elysia";
+import Elysia, { t } from "elysia";
 import { env } from "../../../../utils/config";
 
 export const projectRoutes = new Elysia({ prefix: "/project" }).get(
@@ -13,6 +13,16 @@ export const projectRoutes = new Elysia({ prefix: "/project" }).get(
       },
     };
 
-    return Response.json(defaultProject);
+    return defaultProject;
+  },
+  {
+    response: t.Object({
+      id: t.String(),
+      name: t.String(),
+      organization: t.Object({
+        id: t.String(),
+        name: t.String(),
+      }),
+    }),
   },
 );

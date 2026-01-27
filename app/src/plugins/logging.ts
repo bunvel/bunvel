@@ -1,13 +1,10 @@
 import pino from "pino";
-
-const logLevel = process.env.LOG_LEVEL || "info";
+import { LOGGING_CONFIG } from "../utils/constant";
 
 export const logger = pino({
-  level: logLevel,
-  base: {
-    service: "bunvel-api",
-  },
-  timestamp: pino.stdTimeFunctions.isoTime,
+  level: LOGGING_CONFIG.level,
+  base: LOGGING_CONFIG.base,
+  timestamp: pino.stdTimeFunctions[LOGGING_CONFIG.timestamp],
 });
 
 export const queryLogger = logger.child({

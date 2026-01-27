@@ -12,26 +12,29 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
     // Validate query
     if (!body.query || body.query.length > MAX_QUERY_LENGTH) {
       set.status = 400;
-      return Response.json({
+      return {
+        error: "Query validation failed",
         message: `Query exceeds maximum allowed length of ${MAX_QUERY_LENGTH} characters. Please shorten your query and try again.`,
-      });
+      };
     }
 
     const query = body.query.trim();
     if (!query) {
       set.status = 400;
-      return Response.json({
+      return {
+        error: "Query validation failed",
         message: "Query cannot be empty. Please provide a valid SQL query.",
-      });
+      };
     }
 
     // Validate parameters if provided
     if (body.params !== undefined) {
       if (JSON.stringify(body.params).length > MAX_PARAMS_LENGTH) {
         set.status = 400;
-        return Response.json({
+        return {
+          error: "Parameter validation failed",
           message: `Query parameters exceed maximum allowed size of ${MAX_PARAMS_LENGTH} characters. Please reduce the size of your parameters.`,
-        });
+        };
       }
     }
 
@@ -55,7 +58,7 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
         Array.isArray(result[0]) &&
         result[0].length === 0
       ) {
-        return Response.json([]);
+        return [];
       }
 
       const resultCount = Array.isArray(result) ? result.length : 1;
@@ -65,7 +68,7 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
         resultCount: resultCount,
       });
 
-      return Response.json(result);
+      return result;
     } catch (error) {
       const message =
         error instanceof Error
@@ -81,7 +84,10 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
       });
 
       set.status = 400;
-      return Response.json({ message });
+      return {
+        error: "Query execution failed",
+        message,
+      };
     }
   },
   {
@@ -98,5 +104,12 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
         }),
       ),
     }),
+    response: t.Union([
+      t.Array(t.Any()),
+      t.Object({
+        error: t.String(),
+        message: t.String(),
+      }),
+    ]),
   },
 );

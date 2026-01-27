@@ -29,7 +29,7 @@ new Elysia()
   .use(httpExceptionPlugin())
 
   // Root endpoint
-  .get("/", () => Response.json("Welcome to Bunvel"))
+  .get("/", () => Response.json({ message: "Welcome to Bunvel" }))
 
   // Application routes
   .use(restService)

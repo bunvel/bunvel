@@ -11,10 +11,10 @@
     "elysia-http-exception": "^0.1.5",
     "elysia-rate-limit": "^4.4.2",
     "pino": "^10.3.0",
-    "zod": "^4.3.5"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "bun-types": "^1.3.6"
+    "bun-types": "^1.3.7"
   },
   "module": "src/index.js"
 }

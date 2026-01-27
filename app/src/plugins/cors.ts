@@ -1,6 +1,7 @@
 import { cors } from "@elysiajs/cors";
 import Elysia from "elysia";
 import { env } from "../utils/config";
+import { CORS_CONFIG } from "../utils/constant";
 
 export const corsPlugin = new Elysia().use(
   cors({
@@ -11,10 +12,6 @@ export const corsPlugin = new Elysia().use(
       }
       return false;
     },
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    exposeHeaders: ["Content-Length"],
-    credentials: true,
-    maxAge: 86400, // 24 hours
-  })
+    ...CORS_CONFIG,
+  }),
 );
