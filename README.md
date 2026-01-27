@@ -2,20 +2,22 @@
 
 **The fastest open-source backend platform**
 
-Bunvel is a unified Backend-as-a-Service (BaaS) platform that combines authentication, real-time subscriptions, storage, and REST APIs into a single, high-performance service built on [Elysia](https://elysiajs.com) and [Bun](https://bun.sh).
+Bunvel is a Backend-as-a-Service (BaaS) platform that combines authentication, real-time subscriptions, storage, and REST APIs. Built on [Elysia](https://elysiajs.com) and [Bun](https://bun.sh), it delivers high performance with lightweight containers and minimal resource usage.
 
 > **Note:** This is currently a hobby project for learning and understanding backend concepts. It is not yet production-ready, but with community contributions, it may evolve into a production-ready solution in the future.
 
 ## ✨ Features
 
-- 🔐 **Authentication** - Auth with email/password
-- 💾 **Storage** - File upload/download with bucket management and CDN integration
-- ⚡ **Realtime** - WebSocket subscriptions for live data updates
+- 🔐 **Authentication** - Auth with email/password (coming soon)
+- 💾 **Storage** - File upload/download with bucket management (coming soon)
+- ⚡ **Realtime** - WebSocket subscriptions for live data updates (coming soon)
 - 🔌 **REST API** - Auto-generated REST APIs from your database schema
 - 🎨 **Studio** - Beautiful admin dashboard built with TanStack Start
 - 🚀 **Single Service** - Everything runs in one unified application for maximum performance
 
-![Bunvel Dashboard](./dashboard.png)
+![Table Editor](./1.png)
+![SQL editor](./2.png)
+![Tables List](./3.png)
 
 ## 🏗️ Architecture
 
@@ -31,9 +33,18 @@ Bunvel consists of two main components:
 - [Bun](https://bun.sh) >= 1.3.5
 - PostgreSQL >= 18
 
-### Development Setup
+### Development
 
-1. **Get the code**
+```bash
+git clone https://github.com/bunvel/bunvel.git
+
+cd bunvel
+
+# Start the services
+docker compose -f docker-compose-dev.yml up --build
+```
+
+### Self Host
 
 ```bash
 git clone --depth 1 https://github.com/bunvel/bunvel.git
