@@ -1,4 +1,7 @@
 import { useTableManager } from '@/hooks/use-table-manager'
+import { X } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Button } from '../ui/button'
 import {
   CopyButton,
   DeleteButton,
@@ -10,7 +13,7 @@ import {
 } from './toolbar-buttons'
 
 export function TableToolbar() {
-  const { kind, selectedRows } = useTableManager()
+  const { kind, selectedRows, handleSelectionClear } = useTableManager()
   const hasSelection = selectedRows.length > 0
 
   return (
@@ -21,6 +24,10 @@ export function TableToolbar() {
           <EditButton />
           <CopyButton />
           <ExportButton />
+          <Button size="sm" variant="ghost" onClick={handleSelectionClear}>
+            <HugeiconsIcon icon={X} />
+            Clear Selection
+          </Button>
         </div>
       ) : (
         <div className="flex items-center justify-between space-x-2">
