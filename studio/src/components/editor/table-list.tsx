@@ -110,18 +110,11 @@ export function TableList() {
           icon={TableIcon}
           className="mb-2 h-8 w-8 text-muted-foreground/50"
         />
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground my-1">
           No tables or views found in schema{' '}
           <span className="font-medium text-foreground">{schema}</span>
         </p>
-        <TableFormSheet
-          schema={schema}
-          children={
-            <Button className="mt-2" size="sm" variant="outline">
-              Create Table
-            </Button>
-          }
-        />
+        <TableFormSheet schema={schema} children={<p>Create Table</p>} />
       </div>
     )
   }
