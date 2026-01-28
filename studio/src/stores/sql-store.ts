@@ -2,6 +2,33 @@ import type { QueryHistoryItem, SqlTab } from '@/types'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 
+// Local storage keys
+const QUERY_HISTORY_KEY = 'bunvel-query-history'
+
+// Load query history from localStorage
+const loadQueryHistory = (): QueryHistoryItem[] => {
+  if (typeof window === 'undefined') return []
+
+  try {
+    const stored = window.localStorage.getItem(QUERY_HISTORY_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch (error) {
+    console.error('Failed to load query history from localStorage:', error)
+    return []
+  }
+}
+
+// Save query history to localStorage
+const saveQueryHistory = (history: QueryHistoryItem[]) => {
+  if (typeof window === 'undefined') return
+
+  try {
+    window.localStorage.setItem(QUERY_HISTORY_KEY, JSON.stringify(history))
+  } catch (error) {
+    console.error('Failed to save query history to localStorage:', error)
+  }
+}
+
 export interface SqlStore {
   // SQL tabs state
   tabs: SqlTab[]
@@ -45,7 +72,7 @@ export const useSqlStore = create<SqlStore>()(
     // Initial state
     tabs: [],
     activeTabId: null,
-    queryHistory: [],
+    queryHistory: loadQueryHistory(), // Load from localStorage
     showSidebar: true,
     selectedQuery: '',
 
@@ -136,11 +163,12 @@ export const useSqlStore = create<SqlStore>()(
     // Query history actions
     setQueryHistory: (history: QueryHistoryItem[]) => {
       set({ queryHistory: history })
+      saveQueryHistory(history)
     },
 
     addToHistory: (query: string, success: boolean) => {
-      set((prev) => ({
-        queryHistory: [
+      set((prev) => {
+        const newHistory = [
           {
             id: `history-${Date.now()}`,
             query,
@@ -148,12 +176,15 @@ export const useSqlStore = create<SqlStore>()(
             success,
           },
           ...prev.queryHistory.slice(0, 99), // Keep last 100 items
-        ],
-      }))
+        ]
+        saveQueryHistory(newHistory)
+        return { queryHistory: newHistory }
+      })
     },
 
     clearHistory: () => {
       set({ queryHistory: [] })
+      saveQueryHistory([])
     },
 
     selectFromHistory: (query: string) => {
