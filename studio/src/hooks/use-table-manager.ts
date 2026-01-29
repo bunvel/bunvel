@@ -10,7 +10,7 @@ import {
 } from '@/types/table'
 import { DEFAULT_PAGE_SIZE, MAX_TABLE_TABS } from '@/utils/constant'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
 export interface UseTableManagerReturn {
   // Current table info
@@ -83,9 +83,7 @@ export function useTableManager(): UseTableManagerReturn {
   const setFilters = useTableStore((state) => state.setFilters)
 
   // Get current table key
-  const currentTableKey = useMemo(() => {
-    return schema && table ? `${schema}.${table}` : null
-  }, [schema, table])
+  const currentTableKey = schema && table ? `${schema}.${table}` : null
 
   // Get current table state with proper subscription
   const tableState = useTableStore((state) =>
@@ -123,127 +121,101 @@ export function useTableManager(): UseTableManagerReturn {
   }, [schema, table, tabs.activeTableKey, tabs.selectedTables, navigate])
 
   // Tab management functions - direct Zustand implementation
-  const handleTabChange = useCallback(
-    (value: string) => {
-      const [newSchema, newTable] = value.split('.')
-      setActiveTable(value)
-      navigate({ search: { schema: newSchema, table: newTable } as any })
-    },
-    [navigate, setActiveTable],
-  )
+  const handleTabChange = (value: string) => {
+    const [newSchema, newTable] = value.split('.')
+    setActiveTable(value)
+    navigate({ search: { schema: newSchema, table: newTable } as any })
+  }
 
-  const handleTabClose = useCallback(
-    (e: React.MouseEvent, tableKey: string) => {
-      e.stopPropagation()
-      removeTable(tableKey)
+  const handleTabClose = (e: React.MouseEvent, tableKey: string) => {
+    e.stopPropagation()
+    removeTable(tableKey)
 
-      // If removing active table, navigate to next available table
-      if (tabs.activeTableKey === tableKey && tabs.selectedTables.length > 1) {
-        const remainingTables = tabs.selectedTables.filter(
-          (t) => t !== tableKey,
-        )
-        const [newSchema, newTable] = remainingTables[0]?.split('.') || []
-        const newActiveTable = remainingTables[0] || null
-        setActiveTable(newActiveTable)
-        navigate(
-          newTable
-            ? { search: { schema: newSchema, table: newTable } as any }
-            : { search: {} as any },
-        )
-      }
-    },
-    [removeTable, tabs, navigate, setActiveTable],
-  )
+    // If removing active table, navigate to next available table
+    if (tabs.activeTableKey === tableKey && tabs.selectedTables.length > 1) {
+      const remainingTables = tabs.selectedTables.filter((t) => t !== tableKey)
+      const [newSchema, newTable] = remainingTables[0]?.split('.') || []
+      const newActiveTable = remainingTables[0] || null
+      setActiveTable(newActiveTable)
+      navigate(
+        newTable
+          ? { search: { schema: newSchema, table: newTable } as any }
+          : { search: {} as any },
+      )
+    }
+  }
 
-  const handleAddTable = useCallback(
-    (newSchema: string, newTable: string) => {
-      addTable(newSchema, newTable, MAX_TABLE_TABS)
-    },
-    [addTable],
-  )
+  const handleAddTable = (newSchema: string, newTable: string) => {
+    addTable(newSchema, newTable, MAX_TABLE_TABS)
+  }
 
   // Selection management
-  const handleRowSelectionChange = useCallback(
-    (newSelectedRows: TableRow[]) => {
-      if (currentTableKey) {
-        setSelectedRows(currentTableKey, newSelectedRows)
-      }
-    },
-    [currentTableKey, setSelectedRows],
-  )
+  const handleRowSelectionChange = (newSelectedRows: TableRow[]) => {
+    if (currentTableKey) {
+      setSelectedRows(currentTableKey, newSelectedRows)
+    }
+  }
 
-  const handleRowSelectionStateChange = useCallback(
-    (
-      updaterOrValue:
-        | Record<string, boolean>
-        | ((old: Record<string, boolean>) => Record<string, boolean>),
-    ) => {
-      if (currentTableKey) {
-        const currentRowSelection = tableState?.rowSelection || {}
-        const newRowSelection =
-          typeof updaterOrValue === 'function'
-            ? updaterOrValue(currentRowSelection)
-            : updaterOrValue
-        setRowSelection(currentTableKey, newRowSelection)
-      }
-    },
-    [currentTableKey, tableState?.rowSelection, setRowSelection],
-  )
+  const handleRowSelectionStateChange = (
+    updaterOrValue:
+      | Record<string, boolean>
+      | ((old: Record<string, boolean>) => Record<string, boolean>),
+  ) => {
+    if (currentTableKey) {
+      const currentRowSelection = tableState?.rowSelection || {}
+      const newRowSelection =
+        typeof updaterOrValue === 'function'
+          ? updaterOrValue(currentRowSelection)
+          : updaterOrValue
+      setRowSelection(currentTableKey, newRowSelection)
+    }
+  }
 
-  const handleSelectionClear = useCallback(() => {
+  const handleSelectionClear = () => {
     if (currentTableKey) {
       setSelectedRows(currentTableKey, [])
       setRowSelection(currentTableKey, {})
     }
-  }, [currentTableKey, setSelectedRows, setRowSelection])
+  }
 
   // Sorting management
-  const handleSortChange = useCallback(
-    (newSorts: SortConfig[]) => {
-      if (currentTableKey) {
-        setSorts(currentTableKey, newSorts)
-        // Reset to first page when sort changes
-        const currentPagination = tableState?.pagination || {
-          pageIndex: 0,
-          pageSize: DEFAULT_PAGE_SIZE,
-        }
-        setPagination(currentTableKey, {
-          ...currentPagination,
-          pageIndex: 0,
-        })
+  const handleSortChange = (newSorts: SortConfig[]) => {
+    if (currentTableKey) {
+      setSorts(currentTableKey, newSorts)
+      // Reset to first page when sort changes
+      const currentPagination = tableState?.pagination || {
+        pageIndex: 0,
+        pageSize: DEFAULT_PAGE_SIZE,
       }
-    },
-    [currentTableKey, tableState?.pagination, setSorts, setPagination],
-  )
+      setPagination(currentTableKey, {
+        ...currentPagination,
+        pageIndex: 0,
+      })
+    }
+  }
 
   // Filtering management
-  const handleFilterChange = useCallback(
-    (newFilters: FilterConfig[]) => {
-      if (currentTableKey) {
-        setFilters(currentTableKey, newFilters)
-        // Reset to first page when filters change
-        const currentPagination = tableState?.pagination || {
-          pageIndex: 0,
-          pageSize: DEFAULT_PAGE_SIZE,
-        }
-        setPagination(currentTableKey, {
-          ...currentPagination,
-          pageIndex: 0,
-        })
+  const handleFilterChange = (newFilters: FilterConfig[]) => {
+    if (currentTableKey) {
+      setFilters(currentTableKey, newFilters)
+      // Reset to first page when filters change
+      const currentPagination = tableState?.pagination || {
+        pageIndex: 0,
+        pageSize: DEFAULT_PAGE_SIZE,
       }
-    },
-    [currentTableKey, tableState?.pagination, setFilters, setPagination],
-  )
+      setPagination(currentTableKey, {
+        ...currentPagination,
+        pageIndex: 0,
+      })
+    }
+  }
 
   // Pagination management
-  const handlePaginationChange = useCallback(
-    (newPagination: PaginationConfig) => {
-      if (currentTableKey) {
-        setPagination(currentTableKey, newPagination)
-      }
-    },
-    [currentTableKey, setPagination],
-  )
+  const handlePaginationChange = (newPagination: PaginationConfig) => {
+    if (currentTableKey) {
+      setPagination(currentTableKey, newPagination)
+    }
+  }
 
   // Get table metadata for columns
   const { data: metadata, isLoading: isMetadataLoading } = useTableMetadata(

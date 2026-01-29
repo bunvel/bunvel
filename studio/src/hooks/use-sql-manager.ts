@@ -1,6 +1,6 @@
 import { useSqlStore } from '@/stores/sql-store'
 import type { QueryHistoryItem, SqlTab } from '@/types'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
 export interface UseSqlManagerReturn {
   // Current tab state
@@ -69,91 +69,62 @@ export function useSqlManager(): UseSqlManagerReturn {
   const setSelectedQuery = useSqlStore((state) => state.setSelectedQuery)
 
   // Computed values
-  const activeTab = useMemo(() => {
-    return tabs.find((tab) => tab.id === activeTabId) || null
-  }, [tabs, activeTabId])
-
-  const query = useMemo(() => {
-    return activeTab?.query || selectedQuery || ''
-  }, [activeTab, selectedQuery])
+  const activeTab = tabs.find((tab) => tab.id === activeTabId) || null
+  const query = activeTab?.query || selectedQuery || ''
 
   const hasActiveTab = Boolean(activeTab)
   const isModified = activeTab?.isModified || false
   const canExecute = Boolean(query.trim())
 
   // Tab management functions
-  const handleSetActiveTab = useCallback(
-    (tabId: string) => {
-      setActiveTabId(tabId)
-    },
-    [setActiveTabId],
-  )
+  const handleSetActiveTab = (tabId: string) => {
+    setActiveTabId(tabId)
+  }
 
-  const handleUpdateTabQuery = useCallback(
-    (tabId: string, newQuery: string) => {
-      updateTabQuery(tabId, newQuery)
-    },
-    [updateTabQuery],
-  )
+  const handleUpdateTabQuery = (tabId: string, newQuery: string) => {
+    updateTabQuery(tabId, newQuery)
+  }
 
-  const handleUpdateTabExecution = useCallback(
-    (
-      tabId: string,
-      result: any,
-      error: any,
-      isExecuting: boolean,
-      lastExecutedQuery: string,
-    ) => {
-      updateTabExecution(tabId, result, error, isExecuting, lastExecutedQuery)
-    },
-    [updateTabExecution],
-  )
+  const handleUpdateTabExecution = (
+    tabId: string,
+    result: any,
+    error: any,
+    isExecuting: boolean,
+    lastExecutedQuery: string,
+  ) => {
+    updateTabExecution(tabId, result, error, isExecuting, lastExecutedQuery)
+  }
 
-  const handleRemoveTab = useCallback(
-    (tabId: string) => {
-      removeTab(tabId)
-    },
-    [removeTab],
-  )
+  const handleRemoveTab = (tabId: string) => {
+    removeTab(tabId)
+  }
 
   // Query history functions
-  const handleAddToHistory = useCallback(
-    (query: string, success: boolean) => {
-      addToHistory(query, success)
-    },
-    [addToHistory],
-  )
+  const handleAddToHistory = (query: string, success: boolean) => {
+    addToHistory(query, success)
+  }
 
-  const handleSelectFromHistory = useCallback(
-    (query: string) => {
-      selectFromHistory(query)
-    },
-    [selectFromHistory],
-  )
+  const handleSelectFromHistory = (query: string) => {
+    selectFromHistory(query)
+  }
 
   // UI management functions
-  const handleToggleSidebar = useCallback(() => {
+  const handleToggleSidebar = () => {
     setShowSidebar(!showSidebar)
-  }, [showSidebar, setShowSidebar])
+  }
 
-  const handleSetSelectedQuery = useCallback(
-    (query: string) => {
-      setSelectedQuery(query)
-    },
-    [setSelectedQuery],
-  )
+  const handleSetSelectedQuery = (query: string) => {
+    setSelectedQuery(query)
+  }
 
   // Query management
-  const handleSetQuery = useCallback(
-    (newQuery: string) => {
-      if (activeTab) {
-        handleUpdateTabQuery(activeTab.id, newQuery)
-      } else {
-        handleSetSelectedQuery(newQuery)
-      }
-    },
-    [activeTab, handleUpdateTabQuery, handleSetSelectedQuery],
-  )
+  const handleSetQuery = (newQuery: string) => {
+    if (activeTab) {
+      handleUpdateTabQuery(activeTab.id, newQuery)
+    } else {
+      handleSetSelectedQuery(newQuery)
+    }
+  }
 
   // Create default query tab on mount
   useEffect(() => {

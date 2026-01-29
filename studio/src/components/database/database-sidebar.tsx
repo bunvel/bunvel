@@ -7,7 +7,6 @@ import {
 import { ListTodo } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Link, useMatches } from '@tanstack/react-router'
-import { useCallback } from 'react'
 
 type MenuItem = {
   id: string
@@ -46,12 +45,9 @@ const menuItems: MenuItem[] = [
 export function DatabaseSidebar() {
   const matches = useMatches()
 
-  const isActive = useCallback(
-    (to: string) => {
-      return matches.some((match) => match.pathname.startsWith(to))
-    },
-    [matches],
-  )
+  const isActive = (to: string) => {
+    return matches.some((match) => match.pathname.startsWith(to))
+  }
 
   return (
     <div className="flex flex-col h-full w-full gap-2">

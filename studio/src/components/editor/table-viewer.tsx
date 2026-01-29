@@ -3,7 +3,6 @@ import { useTableManager } from '@/hooks/use-table-manager'
 import { TableRow } from '@/types/table'
 import { formatCellValue } from '@/utils/format'
 import { ColumnDef } from '@tanstack/react-table'
-import { useMemo } from 'react'
 import { DataTableHeaderCell } from '../data-table/data-table-header-cell'
 import { TableToolbar } from './table-toolbar'
 
@@ -22,21 +21,19 @@ export function TableViewer() {
     handlePaginationChange,
   } = useTableManager()
 
-  const columns = useMemo<ColumnDef<TableRow>[]>(() => {
-    if (!metadata?.columns) return []
-
-    return metadata.columns.map((column: any) => ({
-      id: column.column_name,
-      header: () => <DataTableHeaderCell column={column} className="p-2" />,
-      accessorKey: column.column_name,
-      cell: (info: any) => {
-        return formatCellValue(info.getValue())
-      },
-      meta: {
-        dataType: column.data_type,
-      },
-    }))
-  }, [metadata])
+  const columns: ColumnDef<TableRow>[] = !metadata?.columns
+    ? []
+    : metadata.columns.map((column: any) => ({
+        id: column.column_name,
+        header: () => <DataTableHeaderCell column={column} className="p-2" />,
+        accessorKey: column.column_name,
+        cell: (info: any) => {
+          return formatCellValue(info.getValue())
+        },
+        meta: {
+          dataType: column.data_type,
+        },
+      }))
 
   // Show message when no table is selected
   if (!schema || !table) {

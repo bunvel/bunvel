@@ -12,7 +12,7 @@ import {
   useSearch,
   type NavigateOptions,
 } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
 import { CreateSchemaSheet } from './create-schema-sheet'
@@ -28,17 +28,21 @@ export function SchemaSelector({ hideCreate = true }: { hideCreate: boolean }) {
   )
   const defaultSchema = hasPublicSchema ? 'public' : ''
 
-  // Handle navigation effect
+  // Handle navigation effect with latest navigate function
+  const handleAutoNavigate = useEffectEvent((schema: string) => {
+    navigate({
+      search: (prev: SchemaTable) => ({
+        ...prev,
+        schema,
+      }),
+    } as NavigateOptions)
+  })
+
   useEffect(() => {
     if (defaultSchema && !search.schema) {
-      navigate({
-        search: (prev: SchemaTable) => ({
-          ...prev,
-          schema: defaultSchema,
-        }),
-      } as NavigateOptions)
+      handleAutoNavigate(defaultSchema)
     }
-  }, [defaultSchema, search.schema, navigate])
+  }, [defaultSchema, search.schema])
 
   // Loading state
   if (isFetching) {

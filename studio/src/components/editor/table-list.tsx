@@ -14,7 +14,7 @@ import { PLACEHOLDERS } from '@/utils/constant'
 import { TableIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { TableKindIcon } from '../common/table-kind-icon'
 import { Input } from '../ui/input'
 import { TableFormSheet } from './table-form-sheet'
@@ -27,11 +27,11 @@ export function TableList() {
   const { data: tables = [], isLoading, error, refetch } = useTables(schema)
   const [searchQuery, setSearchQuery] = useState('')
 
-  const filteredTables = useMemo(() => {
-    if (!searchQuery) return tables
-    const query = searchQuery.toLowerCase()
-    return tables.filter((table) => table.name.toLowerCase().includes(query))
-  }, [tables, searchQuery])
+  const filteredTables = !searchQuery
+    ? tables
+    : tables.filter((table) =>
+        table.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
 
   const handleTableClick = (table: Table) => {
     navigate({

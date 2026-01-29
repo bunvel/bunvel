@@ -172,17 +172,17 @@ export function RowFormSheet({
     }
   }, [mode, initialData])
 
-  const handleInputChange = useCallback((column: string, value: any) => {
+  const handleInputChange = (column: string, value: any) => {
     setFormValues((prev) => ({
       ...prev,
       [column]: value,
     }))
-  }, [])
+  }
 
-  const handleReferenceSelectorOpen = useCallback((column: ColumnMetadata) => {
+  const handleReferenceSelectorOpen = (column: ColumnMetadata) => {
     setSelectedForeignKeyColumn(column)
     setReferenceSelectorOpen(true)
-  }, [])
+  }
 
   const handleRecordSelect = useCallback(
     (record: any) => {

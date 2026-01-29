@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils'
 import type { QueryHistoryItem } from '@/types'
 import { SqlIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { useMemo } from 'react'
 
 interface QueryHistoryProps {
   history: QueryHistoryItem[]
@@ -26,7 +25,7 @@ export function QueryHistory({
   className,
 }: QueryHistoryProps) {
   // Remove duplicates and keep only the latest version of each query
-  const uniqueHistory = useMemo(() => {
+  const uniqueHistory = (() => {
     const uniqueQueries = new Map<string, QueryHistoryItem>()
     // Process in reverse to keep the latest occurrence of each query
     ;[...history].reverse().forEach((item) => {
@@ -35,7 +34,7 @@ export function QueryHistory({
       }
     })
     return Array.from(uniqueQueries.values()).reverse()
-  }, [history])
+  })()
 
   return (
     <div className={cn('flex flex-col h-full', className)}>

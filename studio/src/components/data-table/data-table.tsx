@@ -1,3 +1,6 @@
+import { Checkbox } from '@/components/ui/checkbox'
+import { TableMetadata } from '@/types'
+import { formatCellValue } from '@/utils/format'
 import {
   getCoreRowModel,
   getFacetedRowModel,
@@ -11,11 +14,7 @@ import {
   type SortingState,
   type VisibilityState,
 } from '@tanstack/react-table'
-import * as React from 'react'
-
-import { Checkbox } from '@/components/ui/checkbox'
-import { TableMetadata } from '@/types'
-import { formatCellValue } from '@/utils/format'
+import { useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { Table, TableBody, TableCell, TableRow } from '../ui/table'
 import { DataTableCell } from './data-table-cell'
 import { DataTableHeader } from './data-table-header'
@@ -63,11 +62,10 @@ export function DataTable<TData, TValue = unknown>({
   pageCount,
   state,
 }: DataTableProps<TData, TValue>) {
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
   // Memoize column lookup for performance
-  const columnLookup = React.useMemo(() => {
+  const columnLookup = useMemo(() => {
     const lookup = new Map<string, (typeof metadata.columns)[0]>()
     metadata.columns.forEach((col) => {
       lookup.set(col.column_name, col)
@@ -75,7 +73,7 @@ export function DataTable<TData, TValue = unknown>({
     return lookup
   }, [metadata.columns])
   // Add selection column if enabled
-  const columnsWithSelection = React.useMemo(() => {
+  const columnsWithSelection = useMemo(() => {
     if (!enableRowSelection) return columns
 
     const selectionColumn: ColumnDef<TData> = {
@@ -106,15 +104,6 @@ export function DataTable<TData, TValue = unknown>({
     return [selectionColumn, ...columns]
   }, [columns, enableRowSelection])
 
-  // Handle row selection changes
-  React.useEffect(() => {
-    if (onRowSelectionChange && state.rowSelection) {
-      const selectedRows =
-        table?.getSelectedRowModel().flatRows.map((row) => row.original) || []
-      onRowSelectionChange(selectedRows)
-    }
-  }, [state.rowSelection, onRowSelectionChange])
-
   const table = useReactTable({
     data,
     columns: enableRowSelection ? columnsWithSelection : columns,
@@ -142,6 +131,23 @@ export function DataTable<TData, TValue = unknown>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
+
+  // Handle row selection changes without re-running effect unnecessarily
+  const onRowSelectionChangeHandler = useEffectEvent(
+    (selectedRows: TData[]) => {
+      if (onRowSelectionChange) {
+        onRowSelectionChange(selectedRows)
+      }
+    },
+  )
+
+  useEffect(() => {
+    if (state.rowSelection) {
+      const selectedRows =
+        table?.getSelectedRowModel().flatRows.map((row) => row.original) || []
+      onRowSelectionChangeHandler(selectedRows)
+    }
+  }, [state.rowSelection, table])
 
   // Show skeleton loading state when loading
   if (isLoading) {

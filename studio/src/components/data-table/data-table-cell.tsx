@@ -15,7 +15,7 @@ interface DataTableCellProps {
   columnMetadata?: ColumnMetadata
 }
 
-export const DataTableCell = React.memo(function DataTableCell({
+export const DataTableCell = function DataTableCell({
   value,
   rawValue,
   isForeignKey,
@@ -51,11 +51,11 @@ export const DataTableCell = React.memo(function DataTableCell({
     shouldFetch ? columnMetadata?.foreign_table_name : undefined,
   )
 
-  const handleKeyDown = React.useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       setIsPopoverOpen(false)
     }
-  }, [])
+  }
 
   return (
     <div className="flex items-center justify-between gap-4 w-full whitespace-nowrap">
@@ -88,4 +88,4 @@ export const DataTableCell = React.memo(function DataTableCell({
       ) : null}
     </div>
   )
-})
+}

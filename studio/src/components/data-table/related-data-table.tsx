@@ -1,6 +1,5 @@
 import { TableDataResult, TableMetadata } from '@/types/table'
 import { formatCellValue } from '@/utils/format'
-import * as React from 'react'
 import { Spinner } from '../ui/spinner'
 import {
   Table,
@@ -21,7 +20,7 @@ interface RelatedDataTableProps {
   schemaName: string
 }
 
-export const RelatedDataTable = React.memo(function RelatedDataTable({
+export const RelatedDataTable = function RelatedDataTable({
   data,
   metadata,
   isLoading,
@@ -106,4 +105,4 @@ export const RelatedDataTable = React.memo(function RelatedDataTable({
       </div>
     </div>
   )
-})
+}
