@@ -9,6 +9,7 @@ import {
   ExportButton,
   FilterButton,
   InsertButton,
+  JsonViewButton,
   SortButton,
 } from './toolbar-buttons'
 
@@ -24,6 +25,7 @@ export function TableToolbar() {
           <EditButton />
           <CopyButton />
           <ExportButton />
+          <JsonViewButton />
           <Button size="sm" variant="ghost" onClick={handleSelectionClear}>
             <HugeiconsIcon icon={X} />
             Clear Selection

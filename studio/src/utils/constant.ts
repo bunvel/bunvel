@@ -162,6 +162,7 @@ export const BUTTON_LABELS = {
   APPLY_SORTING: 'Apply Sorting',
   APPLY_FILTERS: 'Apply Filters',
   CLEAR_ALL: 'Clear All',
+  JSON_VIEW: 'JSON View',
 } as const
 
 // Common dropdown menu item labels
