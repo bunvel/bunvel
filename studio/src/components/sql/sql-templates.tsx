@@ -16,7 +16,7 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useMemo, useState } from 'react'
-import { SQL_TEMPLATE_QUERIES } from './sql-template-queries'
+import { SQL_TEMPLATE_QUERIES } from '../../utils/sql/sql-template-queries'
 
 const sqlTemplates: SqlTemplate[] = [
   {
