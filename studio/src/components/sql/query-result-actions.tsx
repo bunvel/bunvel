@@ -1,52 +1,55 @@
 import { Button } from '@/components/ui/button'
+import { useExecuteSqlQuery } from '@/hooks/mutations/useExecuteSqlQuery'
+import { useSqlManager } from '@/hooks/use-sql-manager'
 import { Spinner } from '../ui/spinner'
 import { ExportButton } from './export-button'
 
-interface QueryResultActionsProps {
-  result?: {
-    data: any[]
-    columns: string[]
-    rowCount: number
-    executionTime?: number
-  }
-  isExecuting?: boolean
-  onExecute?: () => void
-  query?: string
-}
+export function QueryResultActions() {
+  const { query, activeTab, updateTabExecution, addToHistory } = useSqlManager()
+  const { mutate: executeQuery, isPending: isExecuting } = useExecuteSqlQuery()
+  const queryResult = activeTab?.result
 
-export function QueryResultActions({
-  result,
-  isExecuting,
-  onExecute,
-  query,
-}: QueryResultActionsProps) {
+  const handleExecute = () => {
+    if (!query.trim() || !activeTab) return
+
+    updateTabExecution(activeTab.id, undefined, undefined, true, query)
+
+    executeQuery(query, {
+      onSuccess: (result: any) => {
+        updateTabExecution(activeTab.id, result, undefined, false, query)
+        addToHistory(query, true)
+      },
+      onError: (error: any) => {
+        updateTabExecution(activeTab.id, undefined, error, false, query)
+        addToHistory(query, false)
+      },
+    })
+  }
   return (
     <div className="bg-card px-4 py-2 flex items-center justify-between w-full border-b">
       <div className="flex items-center space-x-1">
         <h1 className="mr-2 text-sm">Result</h1>
         <span className="text-muted">|</span>
-        {result?.data && result.data.length > 0 && (
-          <ExportButton selectedRows={result.data} />
+        {queryResult?.data && queryResult.data.length > 0 && (
+          <ExportButton selectedRows={queryResult.data} />
         )}
       </div>
 
-      {onExecute && (
-        <Button
-          onClick={onExecute}
-          disabled={isExecuting || !query?.trim()}
-          size="sm"
-          variant="default"
-        >
-          {isExecuting ? (
-            <>
-              <Spinner />
-              Executing...
-            </>
-          ) : (
-            'Execute (Ctrl+Enter)'
-          )}
-        </Button>
-      )}
+      <Button
+        onClick={handleExecute}
+        disabled={isExecuting || !query?.trim()}
+        size="sm"
+        variant="default"
+      >
+        {isExecuting ? (
+          <>
+            <Spinner />
+            Executing...
+          </>
+        ) : (
+          'Execute (Ctrl+Enter)'
+        )}
+      </Button>
     </div>
   )
 }

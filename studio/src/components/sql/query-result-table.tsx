@@ -1,24 +1,24 @@
-import type { QueryResult, TableMetadata } from '@/types'
+import { useSqlManager } from '@/hooks/use-sql-manager'
+import type { TableMetadata } from '@/types'
+import { Alert, Check, Info } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { ColumnDef, Row } from '@tanstack/react-table'
 import { useCallback, useMemo, useState } from 'react'
 import { DataTable } from '../data-table/data-table'
+import { Spinner } from '../ui/spinner'
 
-interface QueryResultTableProps {
-  result?: QueryResult | null
-  isExecuting: boolean
-  error: Error | null
-}
+export function QueryResultTable() {
+  const { activeTab } = useSqlManager()
+  const lastExecutedQuery = activeTab?.lastExecutedQuery || ''
+  const queryResult = activeTab?.result
+  const error = activeTab?.error
+  const isExecuting = activeTab?.isExecuting || false
 
-export function QueryResultTable({
-  result,
-  isExecuting,
-  error,
-}: QueryResultTableProps) {
   // Generate columns dynamically from the query result
   const columns = useMemo<ColumnDef<Record<string, any>>[]>(() => {
-    if (!result?.columns) return []
+    if (!queryResult?.columns) return []
 
-    return result.columns.map((column) => ({
+    return queryResult.columns.map((column: string) => ({
       accessorKey: column,
       header: column,
       cell: ({ row }: { row: Row<Record<string, any>> }) => {
@@ -30,7 +30,7 @@ export function QueryResultTable({
         )
       },
     }))
-  }, [result?.columns])
+  }, [queryResult?.columns])
 
   // Table state with pagination only
   const [pagination, setPagination] = useState({
@@ -46,7 +46,10 @@ export function QueryResultTable({
   )
 
   // Use query result data directly, empty states are handled in JSX
-  const displayData = useMemo(() => result?.data || [], [result?.data])
+  const displayData = useMemo(
+    () => queryResult?.data || [],
+    [queryResult?.data],
+  )
 
   // Create minimal metadata for query results (no foreign keys or detailed column info)
   const metadata: TableMetadata = useMemo(
@@ -58,6 +61,47 @@ export function QueryResultTable({
     }),
     [],
   )
+
+  // Handle different states
+  if (!lastExecutedQuery?.trim()) {
+    return (
+      <div className="flex items-center p-4 text-sm text-muted-foreground bg-secondary">
+        <HugeiconsIcon icon={Info} className="h-4 w-4 mr-1" />
+        Enter your SQL query and click
+        <span className="font-medium"> Run</span> to execute it
+      </div>
+    )
+  }
+
+  if (isExecuting) {
+    return (
+      <div className="flex items-center gap-2 p-4 text-muted-foreground bg-secondary">
+        <Spinner />
+        <span>Executing query...</span>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center p-4 text-destructive bg-destructive/10">
+        <HugeiconsIcon icon={Alert} className="h-4 w-4 mr-1" />
+        <span className="font-medium">Error:</span>
+        <span className="ml-2 text-sm">
+          {error.message || 'Unknown error occurred'}
+        </span>
+      </div>
+    )
+  }
+
+  if (!queryResult?.data || queryResult.data.length === 0) {
+    return (
+      <div className="flex items-center p-4 text-sm text-muted-foreground bg-secondary gap-2">
+        <HugeiconsIcon icon={Check} className="h-4 w-4" />
+        <span className="font-medium">Success. No rows returned</span>
+      </div>
+    )
+  }
 
   return (
     <DataTable
