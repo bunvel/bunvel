@@ -12,11 +12,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { useCopy } from '@/hooks/use-copy'
 import { BUTTON_LABELS } from '@/utils/constant'
 import { ArrowDown, ArrowRight, Code, Copy } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import React, { useState } from 'react'
-import { toast } from 'sonner'
 
 interface JsonViewSheetProps {
   schema: string
@@ -132,20 +132,16 @@ export function JsonViewSheet({
   const [open, setOpen] = useState(false)
   const [expandAll, setExpandAll] = useState(false)
   const [collapseAll, setCollapseAll] = useState(false)
+  const { copyRows } = useCopy()
 
-  const handleCopyJson = () => {
-    try {
-      const jsonString = JSON.stringify(data, null, 2)
-      navigator.clipboard.writeText(jsonString)
-      toast.success('JSON copied to clipboard', {
-        description: `Copied ${data.length} records from ${schema}.${table}`,
-      })
-    } catch (error) {
-      toast.error('Failed to copy JSON', {
-        description:
-          error instanceof Error ? error.message : 'Unknown error occurred',
-      })
-    }
+  // Ensure data is always an array
+  const dataArray = Array.isArray(data) ? data : []
+
+  const handleCopyJson = async () => {
+    await copyRows(dataArray, {
+      format: 'json',
+      tableName: `${schema}.${table}`,
+    })
   }
 
   const handleExpandAll = () => {
@@ -166,14 +162,8 @@ export function JsonViewSheet({
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         render={
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1"
-            disabled={disabled}
-          >
+          <Button variant="outline" size="sm" disabled={disabled}>
             <HugeiconsIcon icon={Code} className="h-4 w-4" />
-            {BUTTON_LABELS.JSON_VIEW}
           </Button>
         }
       ></SheetTrigger>
@@ -186,8 +176,8 @@ export function JsonViewSheet({
         <div className="flex-1 overflow-auto p-4">
           <div className="mb-4 flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Showing {data.length} record
-              {data.length !== 1 ? 's' : ''}
+              Showing {dataArray.length} record
+              {dataArray.length !== 1 ? 's' : ''}
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={handleExpandAll}>
@@ -203,9 +193,11 @@ export function JsonViewSheet({
           </div>
           <div className="rounded-md p-4">
             <pre className="text-sm font-mono">
-              {data.length === 1 ? (
+              {dataArray.length === 0 ? (
+                <span className="text-gray-500">No data to display</span>
+              ) : dataArray.length === 1 ? (
                 <JsonNode
-                  data={data[0]}
+                  data={dataArray[0]}
                   isLast={true}
                   expandAll={expandAll}
                   collapseAll={collapseAll}
@@ -214,11 +206,11 @@ export function JsonViewSheet({
                 <>
                   <span className="text-gray-400">[</span>
                   <div className="ml-4">
-                    {data.map((record, index) => (
+                    {dataArray.map((record, index) => (
                       <div key={index} className="py-1">
                         <JsonNode
                           data={record}
-                          isLast={index === data.length - 1}
+                          isLast={index === dataArray.length - 1}
                           expandAll={expandAll}
                           collapseAll={collapseAll}
                         />

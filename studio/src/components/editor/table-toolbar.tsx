@@ -18,28 +18,32 @@ export function TableToolbar() {
   const hasSelection = selectedRows.length > 0
 
   return (
-    <div className="bg-muted/50 px-4 py-2 border-b">
-      {hasSelection ? (
-        <div className="flex items-center space-x-2">
-          <DeleteButton />
-          <EditButton />
-          <CopyButton />
-          <ExportButton />
-          <JsonViewButton />
-          <Button size="sm" variant="ghost" onClick={handleSelectionClear}>
-            <HugeiconsIcon icon={X} />
-            Clear Selection
-          </Button>
-        </div>
-      ) : (
-        <div className="flex items-center justify-between space-x-2">
+    <div className="bg-muted/50 px-4 py-2 border-b flex flex-row justify-between">
+      <div className="flex items-center">
+        {hasSelection ? (
           <div className="flex items-center space-x-2">
-            {kind === 'TABLE' && <InsertButton />}
-            <FilterButton />
-            <SortButton />
+            <DeleteButton />
+            <EditButton />
+            <CopyButton />
+            <ExportButton />
+            <Button size="sm" variant="ghost" onClick={handleSelectionClear}>
+              <HugeiconsIcon icon={X} />
+              Clear Selection
+            </Button>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="flex items-center justify-between space-x-2">
+            <div className="flex items-center space-x-2">
+              {kind === 'TABLE' && <InsertButton />}
+              <FilterButton />
+              <SortButton />
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="flex items-center space-x-2">
+        <JsonViewButton />
+      </div>
     </div>
   )
 }
