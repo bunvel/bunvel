@@ -32,7 +32,7 @@ const navMain = [
   },
   {
     title: 'Database',
-    url: '/database/tables',
+    url: '/database/schemas',
     icon: Database,
   },
 ]

@@ -16,6 +16,11 @@ type MenuItem = {
 
 const menuItems: MenuItem[] = [
   {
+    id: 'schemas',
+    name: 'Schema Diagram',
+    url: '/database/schemas',
+  },
+  {
     id: 'tables',
     name: 'Tables',
     url: '/database/tables',

@@ -7,6 +7,9 @@ export const reactQueryKeys = {
   schemas: {
     list: () => ['schemas', 'list'] as const,
   },
+  schemaDiagram: {
+    detail: (schema: string) => ['schemaDiagram', 'detail', schema] as const,
+  },
   tables: {
     list: (schema: string) => ['tables', 'list', schema] as const,
     metadata: (schema: string, table: string) =>

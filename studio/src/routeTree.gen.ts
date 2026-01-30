@@ -17,6 +17,7 @@ import { Route as mainEditorIndexRouteImport } from './routes/(main)/editor/inde
 import { Route as mainDatabaseTypesIndexRouteImport } from './routes/(main)/database/types/index'
 import { Route as mainDatabaseTriggersIndexRouteImport } from './routes/(main)/database/triggers/index'
 import { Route as mainDatabaseTablesIndexRouteImport } from './routes/(main)/database/tables/index'
+import { Route as mainDatabaseSchemasIndexRouteImport } from './routes/(main)/database/schemas/index'
 import { Route as mainDatabaseIndexesIndexRouteImport } from './routes/(main)/database/indexes/index'
 import { Route as mainDatabaseFunctionsIndexRouteImport } from './routes/(main)/database/functions/index'
 import { Route as mainDatabaseTablesOidRouteImport } from './routes/(main)/database/tables/$oid'
@@ -61,6 +62,12 @@ const mainDatabaseTablesIndexRoute = mainDatabaseTablesIndexRouteImport.update({
   path: '/tables/',
   getParentRoute: () => mainDatabaseRouteRoute,
 } as any)
+const mainDatabaseSchemasIndexRoute =
+  mainDatabaseSchemasIndexRouteImport.update({
+    id: '/schemas/',
+    path: '/schemas/',
+    getParentRoute: () => mainDatabaseRouteRoute,
+  } as any)
 const mainDatabaseIndexesIndexRoute =
   mainDatabaseIndexesIndexRouteImport.update({
     id: '/indexes/',
@@ -87,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/database/tables/$oid': typeof mainDatabaseTablesOidRoute
   '/database/functions/': typeof mainDatabaseFunctionsIndexRoute
   '/database/indexes/': typeof mainDatabaseIndexesIndexRoute
+  '/database/schemas/': typeof mainDatabaseSchemasIndexRoute
   '/database/tables/': typeof mainDatabaseTablesIndexRoute
   '/database/triggers/': typeof mainDatabaseTriggersIndexRoute
   '/database/types/': typeof mainDatabaseTypesIndexRoute
@@ -99,6 +107,7 @@ export interface FileRoutesByTo {
   '/database/tables/$oid': typeof mainDatabaseTablesOidRoute
   '/database/functions': typeof mainDatabaseFunctionsIndexRoute
   '/database/indexes': typeof mainDatabaseIndexesIndexRoute
+  '/database/schemas': typeof mainDatabaseSchemasIndexRoute
   '/database/tables': typeof mainDatabaseTablesIndexRoute
   '/database/triggers': typeof mainDatabaseTriggersIndexRoute
   '/database/types': typeof mainDatabaseTypesIndexRoute
@@ -113,6 +122,7 @@ export interface FileRoutesById {
   '/(main)/database/tables/$oid': typeof mainDatabaseTablesOidRoute
   '/(main)/database/functions/': typeof mainDatabaseFunctionsIndexRoute
   '/(main)/database/indexes/': typeof mainDatabaseIndexesIndexRoute
+  '/(main)/database/schemas/': typeof mainDatabaseSchemasIndexRoute
   '/(main)/database/tables/': typeof mainDatabaseTablesIndexRoute
   '/(main)/database/triggers/': typeof mainDatabaseTriggersIndexRoute
   '/(main)/database/types/': typeof mainDatabaseTypesIndexRoute
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/database/tables/$oid'
     | '/database/functions/'
     | '/database/indexes/'
+    | '/database/schemas/'
     | '/database/tables/'
     | '/database/triggers/'
     | '/database/types/'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/database/tables/$oid'
     | '/database/functions'
     | '/database/indexes'
+    | '/database/schemas'
     | '/database/tables'
     | '/database/triggers'
     | '/database/types'
@@ -152,6 +164,7 @@ export interface FileRouteTypes {
     | '/(main)/database/tables/$oid'
     | '/(main)/database/functions/'
     | '/(main)/database/indexes/'
+    | '/(main)/database/schemas/'
     | '/(main)/database/tables/'
     | '/(main)/database/triggers/'
     | '/(main)/database/types/'
@@ -219,6 +232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainDatabaseTablesIndexRouteImport
       parentRoute: typeof mainDatabaseRouteRoute
     }
+    '/(main)/database/schemas/': {
+      id: '/(main)/database/schemas/'
+      path: '/schemas'
+      fullPath: '/database/schemas/'
+      preLoaderRoute: typeof mainDatabaseSchemasIndexRouteImport
+      parentRoute: typeof mainDatabaseRouteRoute
+    }
     '/(main)/database/indexes/': {
       id: '/(main)/database/indexes/'
       path: '/indexes'
@@ -247,6 +267,7 @@ interface mainDatabaseRouteRouteChildren {
   mainDatabaseTablesOidRoute: typeof mainDatabaseTablesOidRoute
   mainDatabaseFunctionsIndexRoute: typeof mainDatabaseFunctionsIndexRoute
   mainDatabaseIndexesIndexRoute: typeof mainDatabaseIndexesIndexRoute
+  mainDatabaseSchemasIndexRoute: typeof mainDatabaseSchemasIndexRoute
   mainDatabaseTablesIndexRoute: typeof mainDatabaseTablesIndexRoute
   mainDatabaseTriggersIndexRoute: typeof mainDatabaseTriggersIndexRoute
   mainDatabaseTypesIndexRoute: typeof mainDatabaseTypesIndexRoute
@@ -256,6 +277,7 @@ const mainDatabaseRouteRouteChildren: mainDatabaseRouteRouteChildren = {
   mainDatabaseTablesOidRoute: mainDatabaseTablesOidRoute,
   mainDatabaseFunctionsIndexRoute: mainDatabaseFunctionsIndexRoute,
   mainDatabaseIndexesIndexRoute: mainDatabaseIndexesIndexRoute,
+  mainDatabaseSchemasIndexRoute: mainDatabaseSchemasIndexRoute,
   mainDatabaseTablesIndexRoute: mainDatabaseTablesIndexRoute,
   mainDatabaseTriggersIndexRoute: mainDatabaseTriggersIndexRoute,
   mainDatabaseTypesIndexRoute: mainDatabaseTypesIndexRoute,
