@@ -2,6 +2,15 @@ services:
   app:
     container_name: bunvel-app
     image: bunvel/app:0.2.0
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
     ports:
       - "8000:8000"
     environment:
@@ -20,7 +29,7 @@ services:
       - VITE_BUNVEL_STUDIO_URL=${VITE_BUNVEL_STUDIO_URL}
       - DEFAULT_ORGANIZATION=${DEFAULT_ORGANIZATION}
       - DEFAULT_PROJECT=${DEFAULT_PROJECT}
-      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_LEVEL=${LOG_LEVEL}
     networks:
       - bunvel-network
     depends_on:
@@ -30,6 +39,15 @@ services:
   studio:
     container_name: bunvel-studio
     image: bunvel/studio:0.2.0
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
     ports:
       - "3000:3000"
     environment:
@@ -47,6 +65,15 @@ services:
     container_name: bunvel-postgres
     image: postgres:18.1
     shm_size: 128mb
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -67,7 +94,15 @@ services:
   rest:
     container_name: bunvel-rest
     image: postgrest/postgrest:v14.3
-    restart: always
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
     environment:
       PGRST_DB_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       PGRST_DB_SCHEMA: public
