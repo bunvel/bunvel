@@ -1,4 +1,8 @@
 import Elysia, { t } from "elysia";
+import {
+  InternalServerErrorException,
+  MethodNotAllowedException,
+} from "elysia-http-exception";
 import { logger } from "../../plugins/logging";
 import { env } from "../../utils/config";
 import { ALLOWED_METHODS, JSON_CONTENT_TYPE } from "../../utils/constant";
@@ -15,8 +19,7 @@ export const restService = new Elysia({
   async ({ request, set }) => {
     try {
       if (!ALLOWED_METHODS.has(request.method)) {
-        set.status = 405;
-        return { error: "Method not allowed" };
+        throw new MethodNotAllowedException("Method not allowed");
       }
 
       const url = new URL(request.url);
@@ -70,19 +73,20 @@ export const restService = new Elysia({
         url: request.url,
       });
 
-      set.status = 500;
-      return {
+      throw new InternalServerErrorException({
         error: "Internal server error",
         details: error instanceof Error ? error.message : String(error),
-      };
+      });
     }
   },
   {
     response: t.Union([
       t.Any(),
       t.Object({
-        error: t.String(),
+        statusCode: t.Number(),
+        error: t.Optional(t.String()),
         details: t.Optional(t.String()),
+        message: t.Optional(t.Union([t.String(), t.Any()])),
       }),
     ]),
   },

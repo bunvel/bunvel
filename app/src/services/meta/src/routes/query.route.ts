@@ -1,4 +1,8 @@
 import Elysia, { t } from "elysia";
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from "elysia-http-exception";
 import { db } from "../../../../database";
 import { queryLogger } from "../../../../plugins/logging";
 import {
@@ -11,30 +15,27 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
   async ({ body, set }) => {
     // Validate query
     if (!body.query || body.query.length > MAX_QUERY_LENGTH) {
-      set.status = 400;
-      return {
+      throw new BadRequestException({
         error: "Query validation failed",
         message: `Query exceeds maximum allowed length of ${MAX_QUERY_LENGTH} characters. Please shorten your query and try again.`,
-      };
+      });
     }
 
     const query = body.query.trim();
     if (!query) {
-      set.status = 400;
-      return {
+      throw new BadRequestException({
         error: "Query validation failed",
         message: "Query cannot be empty. Please provide a valid SQL query.",
-      };
+      });
     }
 
     // Validate parameters if provided
     if (body.params !== undefined) {
       if (JSON.stringify(body.params).length > MAX_PARAMS_LENGTH) {
-        set.status = 400;
-        return {
+        throw new BadRequestException({
           error: "Parameter validation failed",
           message: `Query parameters exceed maximum allowed size of ${MAX_PARAMS_LENGTH} characters. Please reduce the size of your parameters.`,
-        };
+        });
       }
     }
 
@@ -83,11 +84,10 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
         stack: error instanceof Error ? error.stack : undefined,
       });
 
-      set.status = 400;
-      return {
+      throw new InternalServerErrorException({
         error: "Query execution failed",
         message,
-      };
+      });
     }
   },
   {
@@ -107,8 +107,9 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
     response: t.Union([
       t.Array(t.Any()),
       t.Object({
-        error: t.String(),
-        message: t.String(),
+        statusCode: t.Number(),
+        error: t.Optional(t.String()),
+        message: t.Optional(t.Union([t.String(), t.Any()])),
       }),
     ]),
   },
