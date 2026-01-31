@@ -1,5 +1,5 @@
 # --- Development Stage ---
-FROM oven/bun:1.3.7
+FROM oven/bun:1.3.8
 
 WORKDIR /app
 
