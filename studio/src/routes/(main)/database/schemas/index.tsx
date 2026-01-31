@@ -1,4 +1,4 @@
-import { SchemaSelectorDiagram } from '@/components/database/schema-selector-diagram'
+import { SchemaLayout } from '@/components/database/schema-layout'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(main)/database/schemas/')({
@@ -6,5 +6,5 @@ export const Route = createFileRoute('/(main)/database/schemas/')({
 })
 
 function RouteComponent() {
-  return <SchemaSelectorDiagram />
+  return <SchemaLayout />
 }
