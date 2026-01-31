@@ -1,9 +1,6 @@
 import { FilterConfig } from '@/types/table'
 
 export const reactQueryKeys = {
-  sql: {
-    query: (query: string) => ['sqlQuery', query] as const,
-  },
   schemas: {
     list: () => ['schemas', 'list'] as const,
   },

@@ -1,7 +1,7 @@
 import type { DatabaseTables, TableKind } from '@/types'
 import { createServerFn } from '@tanstack/react-start'
-import { apiClient, handleApiError } from './api-client'
-import { SQL_QUERIES } from './sql-queries'
+import { apiClient, handleApiError } from '../lib/api-client'
+import { SQL_QUERIES } from '../lib/sql-queries'
 
 export interface TableNode {
   id: string

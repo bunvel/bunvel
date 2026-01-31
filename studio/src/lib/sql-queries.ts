@@ -75,7 +75,7 @@ export const SQL_QUERIES = {
       e.enumsortorder;
   `,
   // Get all non-system schemas
-  GET_SCHEMAS: `
+  GET_ALL_SCHEMAS: `
     SELECT 
       n.nspname AS schema_name
     FROM 
@@ -88,7 +88,7 @@ export const SQL_QUERIES = {
   `,
 
   // Get all tables and views in a schema with basic info
-  GET_TABLES: `
+  GET_ALL_TABLES: `
     SELECT 
       CASE c.relkind
         WHEN 'r' THEN 'TABLE'

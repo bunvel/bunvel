@@ -2,8 +2,8 @@ import type { CreateEnumParams, DatabaseEnum } from '@/types'
 import { escapeIdentifier } from '@/utils/func'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
-import { apiClient, handleApiError } from './api-client'
-import { SQL_QUERIES } from './sql-queries'
+import { apiClient, handleApiError } from '../lib/api-client'
+import { SQL_QUERIES } from '../lib/sql-queries'
 
 export const getDatabaseEnums = createServerFn({ method: 'POST' })
   .inputValidator((data: { schema: string }) => {

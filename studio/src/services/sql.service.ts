@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { apiClient, handleApiError } from './api-client'
+import { apiClient, handleApiError } from '../lib/api-client'
 
 export const executeQuery = createServerFn({ method: 'POST' })
   .inputValidator((d: string) => d)
