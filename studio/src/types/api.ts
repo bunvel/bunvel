@@ -1,5 +1,3 @@
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
-
 export interface ApiResponse<T = any> {
   data: T
   status: number

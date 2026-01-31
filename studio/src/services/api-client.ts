@@ -1,93 +1,54 @@
-import type { ApiError, ApiResponse, HttpMethod } from '@/types'
+import type { ApiError, ApiResponse } from '@/types'
 import { API_URL } from '@/utils/constant'
 
 class ApiClient {
-  private baseUrl: string
-  private defaultHeaders: Headers
-
-  constructor(baseUrl: string = API_URL || '') {
-    this.baseUrl = baseUrl
-    this.defaultHeaders = new Headers({
-      'Content-Type': 'application/json',
-    })
-  }
+  constructor(private baseUrl: string = API_URL || '') {}
 
   async request<T = any>(
     endpoint: string,
-    method: HttpMethod = 'GET',
-    data?: any,
-    customHeaders: HeadersInit = {},
+    options: RequestInit = {},
   ): Promise<ApiResponse<T>> {
-    let url = `${this.baseUrl}${endpoint}`
-    const headers = new Headers(this.defaultHeaders)
-
-    // Add custom headers
-    const customHeadersObj = new Headers(customHeaders)
-    customHeadersObj.forEach((value, key) => {
-      headers.set(key, value)
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      headers: { 'Content-Type': 'application/json', ...options.headers },
+      credentials: 'include',
+      ...options,
     })
 
-    const config: RequestInit = {
-      method,
-      headers,
-      credentials: 'include',
+    const data = await this.parseResponse(response)
+
+    if (!response.ok) {
+      throw this.createError(response, data)
     }
 
-    if (data) {
-      if (method === 'GET') {
-        const params = new URLSearchParams()
-        Object.entries(data).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            params.append(key, String(value))
-          }
-        })
-        const queryString = params.toString()
-        if (queryString) {
-          url = `${url}?${queryString}`
-        }
-      } else if (headers.get('content-type')?.includes('application/json')) {
-        config.body = JSON.stringify(data)
-      } else {
-        config.body = data
-      }
-    }
-
-    try {
-      const response = await fetch(url, config)
-      const responseData = await this.parseResponse(response)
-
-      if (!response.ok) {
-        throw this.createError(response, responseData)
-      }
-
-      return {
-        data: responseData,
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        throw this.enhanceError(error as ApiError)
-      }
-      throw this.enhanceError(new Error('An unknown error occurred'))
+    return {
+      data,
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
     }
   }
 
-  get<T = any>(endpoint: string, params?: any, headers?: HeadersInit) {
-    return this.request<T>(endpoint, 'GET', params, headers)
+  get<T = any>(endpoint: string, params?: Record<string, any>) {
+    const url = params ? `${endpoint}?${new URLSearchParams(params)}` : endpoint
+    return this.request<T>(url)
   }
 
-  post<T = any>(endpoint: string, data?: any, headers?: HeadersInit) {
-    return this.request<T>(endpoint, 'POST', data, headers)
+  post<T = any>(endpoint: string, data?: any) {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined,
+    })
   }
 
-  put<T = any>(endpoint: string, data?: any, headers?: HeadersInit) {
-    return this.request<T>(endpoint, 'PUT', data, headers)
+  put<T = any>(endpoint: string, data?: any) {
+    return this.request<T>(endpoint, {
+      method: 'PUT',
+      body: data ? JSON.stringify(data) : undefined,
+    })
   }
 
-  delete<T = any>(endpoint: string, data?: any, headers?: HeadersInit) {
-    return this.request<T>(endpoint, 'DELETE', data, headers)
+  delete<T = any>(endpoint: string) {
+    return this.request<T>(endpoint, { method: 'DELETE' })
   }
 
   private async parseResponse(response: Response): Promise<any> {
@@ -99,15 +60,12 @@ class ApiClient {
   }
 
   private createError(response: Response, data: any): ApiError {
-    const error: ApiError = new Error(data?.message || response.statusText)
+    const error: ApiError = new Error(
+      data?.message || data?.error || response.statusText,
+    )
     error.status = response.status
-    error.code = data?.code
+    error.code = data?.code || data?.error
     error.details = data?.details
-    return error
-  }
-
-  private enhanceError(error: ApiError): ApiError {
-    console.error('API Error:', error.message, error)
     return error
   }
 }
@@ -124,9 +82,3 @@ export function handleApiError(error: unknown): never {
   unknownError.code = 'UNKNOWN_ERROR'
   throw unknownError
 }
-
-export const createEndpoint = (path: string) => ({
-  list: () => `${path}`,
-  detail: (id: string | number) => `${path}/${id}`,
-  action: (action: string) => `${path}/${action}`,
-})
