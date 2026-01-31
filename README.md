@@ -1,8 +1,19 @@
-# Bunvel
+<p align=center>
+ <img src=./banner.png alt="Bunvel Banner" />
+</p>
 
-**The fastest open-source backend platform**
+<h3 align=center>Bunvel</h3>
+<p align=center>The fastest open-source backend platform</p>
 
-Bunvel is a Backend-as-a-Service (BaaS) platform that combines authentication, real-time subscriptions, storage, and REST APIs. Built on [Elysia](https://elysiajs.com) and [Bun](https://bun.sh), it delivers high performance with lightweight containers and minimal resource usage.
+<p align=center>
+    <a href=https://bunvel.com/docs>Documentation</a> | <a href=https://discord.gg/YKa9jqbh>Discord</a> | <a href=https://twitter.com/bunvelhq>Twitter</a>
+</p>
+
+<br>
+
+<p align=center>Bunvel is a Backend-as-a-Service (BaaS) platform that combines authentication, real-time subscriptions, storage, and REST APIs. Built on [Elysia](https://elysiajs.com) and [Bun](https://bun.sh), it delivers high performance with lightweight containers and minimal resource usage.</p>
+
+<br>
 
 > **Note:** This is currently a hobby project for learning and understanding backend concepts. It is not yet production-ready, but with community contributions, it may evolve into a production-ready solution in the future.
 
@@ -13,11 +24,12 @@ Bunvel is a Backend-as-a-Service (BaaS) platform that combines authentication, r
 - ⚡ **Realtime** - WebSocket subscriptions for live data updates (coming soon)
 - 🔌 **REST API** - Auto-generated REST APIs from your database schema
 - 🎨 **Studio** - Beautiful admin dashboard built with TanStack Start
-- 🚀 **Single Service** - Everything runs in one unified application for maximum performance
 
-![Table Editor](./1.png)
-![SQL editor](./2.png)
-![Tables List](./3.png)
+<p align=center>
+ <img src="./1.png" alt="Table Editor" />
+ <img src="./2.png" alt="SQL Editor" />
+ <img src="./3.png" alt="Tables List" />
+</p>
 
 ## 🏗️ Architecture
 
@@ -30,7 +42,7 @@ Bunvel consists of two main components:
 
 ### Prerequisites
 
-- [Bun](https://bun.sh) >= 1.3.5
+- Bun >= 1.3.5
 - PostgreSQL >= 18
 
 ### Development
@@ -75,34 +87,8 @@ For detailed API usage and capabilities, refer to the [PostgREST documentation](
 
 **Note:** As of now, there is no authentication implemented, so all endpoints are publicly accessible.
 
-## 📚 Documentation
-
-- [Architecture Overview](./docs/architecture.md)
-- [API Documentation](./docs/api.md)
-- [Development Guide](./docs/development.md)
-
-## 🤝 Contributing
-
-We love contributions! Please read our [Contributing Guide](./CONTRIBUTING.md) to get started.
-
-## 🔒 Security
-
-Please review our [Security Policy](./SECURITY.md) for reporting vulnerabilities.
-
-## 📝 License
-
-Bunvel is licensed under the [Apache License 2.0](./LICENSE).
-
 ## 🌟 Inspiration
 
 Bunvel is inspired by [Supabase](https://supabase.com) but takes a different architectural approach by consolidating all services into a single, unified application for improved performance and simpler deployment.
-
-## 💬 Community
-
-- [GitHub Discussions](https://github.com/bunvel/bunvel/discussions)
-- [Discord](https://discord.gg/YKa9jqbh)
-- [Twitter](https://twitter.com/bunvelhq)
-
----
 
 Built with ❤️ using [Bun](https://bun.sh), [Elysia](https://elysiajs.com), and [TanStack Start](https://tanstack.com/start)
