@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.0.50",
+  "version": "0.0.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts"
@@ -9,7 +9,7 @@
     "@elysiajs/cors": "^1.4.1",
     "elysia": "^1.4.22",
     "elysia-http-exception": "^0.1.5",
-    "elysia-rate-limit": "^4.4.2",
+    "elysia-rate-limit": "^4.5.0",
     "pino": "^10.3.0",
     "zod": "^4.3.6"
   },
