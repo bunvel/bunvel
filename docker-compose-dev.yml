@@ -23,7 +23,7 @@ services:
       - VITE_BUNVEL_STUDIO_URL=${VITE_BUNVEL_STUDIO_URL}
       - DEFAULT_ORGANIZATION=${DEFAULT_ORGANIZATION}
       - DEFAULT_PROJECT=${DEFAULT_PROJECT}
-      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_LEVEL=${LOG_LEVEL}
     volumes:
       - ./app:/app
     networks:
@@ -55,7 +55,7 @@ services:
 
   postgres:
     container_name: bunvel-postgres
-    image: postgres:18.1
+    image: postgres:18.1-bookworm
     shm_size: 128mb
     ports:
       - "5432:5432"
@@ -77,7 +77,7 @@ services:
       start_period: 5s
 
   rest:
-    image: postgrest/postgrest:v14.3
+    image: postgrest/postgrest:v14.4
     container_name: bunvel-rest
     restart: always
     environment:

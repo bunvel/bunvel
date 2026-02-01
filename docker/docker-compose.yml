@@ -63,7 +63,7 @@ services:
 
   postgres:
     container_name: bunvel-postgres
-    image: postgres:18.1
+    image: postgres:18.1-bookworm
     shm_size: 128mb
     restart: unless-stopped
     deploy:
@@ -93,7 +93,7 @@ services:
 
   rest:
     container_name: bunvel-rest
-    image: postgrest/postgrest:v14.3
+    image: postgrest/postgrest:v14.4
     restart: unless-stopped
     deploy:
       resources:
