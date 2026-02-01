@@ -4,9 +4,15 @@ import { ColumnMetadata } from '@/types/table'
 import { ArrowRight } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import * as React from 'react'
-import { Button } from '../ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { RelatedDataTable } from './related-data-table'
+
+import { Button } from '@/components/ui/button'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface DataTableCellProps {
   value: React.ReactNode
@@ -68,7 +74,18 @@ export const DataTableCell = function DataTableCell({
           <PopoverTrigger
             render={<Button variant="secondary" size="icon-xs" />}
           >
-            <HugeiconsIcon icon={ArrowRight} />
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button variant="secondary" size="icon-xs">
+                    <HugeiconsIcon icon={ArrowRight} />
+                  </Button>
+                }
+              />
+              <TooltipContent>
+                <p>View related data</p>
+              </TooltipContent>
+            </Tooltip>
           </PopoverTrigger>
           <PopoverContent
             align="center"

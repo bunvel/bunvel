@@ -1,12 +1,12 @@
 import { Skeleton } from '@/components/ui/skeleton'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
-
-// Helper component for skeleton cell with consistent height
-const SkeletonCell = () => (
-  <div className="flex items-center">
-    <Skeleton className="h-4 w-full" />
-  </div>
-)
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../ui/table'
 
 interface DataTableSkeletonProps {
   columns: number
@@ -21,7 +21,7 @@ export function DataTableSkeleton({
 }: DataTableSkeletonProps) {
   // Adjust columns count based on row selection
   const columnCount = enableRowSelection ? columns + 1 : columns
-  
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 flex flex-col min-h-0">
@@ -43,18 +43,22 @@ export function DataTableSkeleton({
             </TableHeader>
             <TableBody className="overflow-y-auto">
               {Array.from({ length: rows }).map((_, rowIndex) => (
-                <TableRow key={rowIndex} className={rowIndex < rows - 1 ? "border-b h-10" : "border-b h-10"}>
+                <TableRow
+                  key={rowIndex}
+                  className={
+                    rowIndex < rows - 1 ? 'border-b h-10' : 'border-b h-10'
+                  }
+                >
                   {enableRowSelection && (
                     <TableCell className="w-12 border">
                       <Skeleton className="h-4 w-4 mx-auto" />
                     </TableCell>
                   )}
                   {Array.from({ length: columnCount }).map((_, cellIndex) => (
-                    <TableCell 
-                      key={cellIndex} 
-                      className="border"
-                    >
-                      <SkeletonCell />
+                    <TableCell key={cellIndex} className="border">
+                      <div className="flex items-center">
+                        <Skeleton className="h-4 w-full" />
+                      </div>
                     </TableCell>
                   ))}
                 </TableRow>

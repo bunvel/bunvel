@@ -161,12 +161,10 @@ export function JsonViewSheet({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
-        render={
-          <Button variant="outline" size="sm" disabled={disabled}>
-            <HugeiconsIcon icon={Code} className="h-4 w-4" />
-          </Button>
-        }
-      ></SheetTrigger>
+        render={<Button variant="outline" size="sm" disabled={disabled} />}
+      >
+        <HugeiconsIcon icon={Code} className="h-4 w-4" />
+      </SheetTrigger>
       <SheetContent side="right" className="bg-card min-w-2xl flex flex-col">
         <SheetHeader className="border-b p-4">
           <SheetTitle>

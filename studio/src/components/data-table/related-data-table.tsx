@@ -60,7 +60,7 @@ export const RelatedDataTable = function RelatedDataTable({
               </div>
             </div>
           ) : (
-            <Table className="w-auto">
+            <Table>
               <TableHeader className="sticky top-0 z-10 bg-secondary">
                 <TableRow className="border-b">
                   {metadata?.columns.map((column) => (
