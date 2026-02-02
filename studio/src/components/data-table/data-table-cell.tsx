@@ -8,11 +8,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { RelatedDataTable } from './related-data-table'
 
 import { Button } from '@/components/ui/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
 
 interface DataTableCellProps {
   value: React.ReactNode
@@ -70,23 +65,12 @@ export const DataTableCell = function DataTableCell({
       rawValue !== null &&
       rawValue !== undefined &&
       rawValue !== '' ? (
-        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <Popover>
           <PopoverTrigger
-            render={
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button variant="secondary" size="icon-xs">
-                      <HugeiconsIcon icon={ArrowRight} />
-                    </Button>
-                  }
-                />
-                <TooltipContent>
-                  <p>View related data</p>
-                </TooltipContent>
-              </Tooltip>
-            }
-          ></PopoverTrigger>
+            render={<Button variant="secondary" size="icon-xs" />}
+          >
+            <HugeiconsIcon icon={ArrowRight} />
+          </PopoverTrigger>
           <PopoverContent
             align="center"
             className="p-0"
