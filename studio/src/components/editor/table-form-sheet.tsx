@@ -25,112 +25,19 @@ import {
 } from '@/components/ui/sheet'
 import { useCreateTable } from '@/hooks/mutations/useTableMutations'
 import { useDatabaseEnums } from '@/hooks/queries/useEnums'
-import { useTableMetadata } from '@/hooks/queries/useTableData'
-import { useTables } from '@/hooks/queries/useTables'
-import type {
-  ColumnDefinition,
-  ForeignKeyAction,
-  ForeignKeyDefinition,
-  Table,
-} from '@/types'
+import type { ColumnDefinition, ForeignKeyDefinition } from '@/types'
 import {
   DATA_TYPES,
   DEFAULT_COLUMN,
-  DEFAULT_FOREIGN_KEY,
-  FOREIGN_KEY_ACTIONS,
   PLACEHOLDERS,
   TABLE_FORM_MESSAGES,
 } from '@/utils/constant'
-import { Plus, Settings, Trash2 } from '@hugeicons/core-free-icons'
+import { Edit, Plus, Settings, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Separator } from '../ui/separator'
-
-// ReferencedColumnSelector component
-interface ReferencedColumnSelectorProps {
-  value: string
-  onChange: (value: string | null) => void
-  schema: string
-  table: string
-  disabled?: boolean
-  localColumn?: ColumnDefinition // Add local column for type checking
-}
-
-function ReferencedColumnSelector({
-  value,
-  onChange,
-  schema,
-  table,
-  disabled,
-  localColumn,
-}: ReferencedColumnSelectorProps) {
-  const { data: metadata } = useTableMetadata(schema, table)
-
-  if (!table) {
-    return (
-      <Select disabled value="">
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder={TABLE_FORM_MESSAGES.SELECT_TABLE_FIRST} />
-        </SelectTrigger>
-      </Select>
-    )
-  }
-
-  const getColumnTypeCompatibility = (refColumnType: string) => {
-    if (!localColumn) return { compatible: true, warning: '' }
-
-    const localType = localColumn.type.toLowerCase()
-    const refType = refColumnType.toLowerCase()
-
-    const isCompatible =
-      localType === refType ||
-      (localType.includes('int') && refType.includes('int')) ||
-      (localType.includes('varchar') && refType.includes('varchar')) ||
-      (localType.includes('text') && refType.includes('text')) ||
-      (localType.includes('char') && refType.includes('char')) ||
-      (localType === 'uuid' && refType === 'uuid') ||
-      (localType.includes('timestamp') && refType.includes('timestamp'))
-
-    return {
-      compatible: isCompatible,
-      warning: isCompatible
-        ? ''
-        : `⚠️ Type mismatch: ${localColumn.type} → ${refColumnType}`,
-    }
-  }
-
-  return (
-    <Select value={value} onValueChange={onChange} disabled={disabled}>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder={TABLE_FORM_MESSAGES.SELECT_COLUMN} />
-      </SelectTrigger>
-      <SelectContent>
-        {metadata?.columns?.map((column) => {
-          const compatibility = getColumnTypeCompatibility(column.data_type)
-          return (
-            <SelectItem
-              key={column.column_name}
-              value={column.column_name}
-              disabled={!compatibility.compatible}
-            >
-              <div className="flex flex-col">
-                <span>
-                  {column.column_name} ({column.data_type})
-                </span>
-                {!compatibility.compatible && (
-                  <span className="text-xs text-amber-600">
-                    {compatibility.warning}
-                  </span>
-                )}
-              </div>
-            </SelectItem>
-          )
-        })}
-      </SelectContent>
-    </Select>
-  )
-}
+import { ForeignKeySheet } from './foreign-key-sheet'
 
 interface TableFormSheetProps {
   schema: string
@@ -146,8 +53,11 @@ type FormValues = {
 
 export function TableFormSheet({ schema, children }: TableFormSheetProps) {
   const [open, setOpen] = useState(false)
+  const [foreignKeySheetOpen, setForeignKeySheetOpen] = useState(false)
+  const [editingForeignKey, setEditingForeignKey] = useState<
+    ForeignKeyDefinition | undefined
+  >()
   const { mutate: createTable, isPending: isSubmitting } = useCreateTable()
-  const { data: tables = [] } = useTables(schema)
   const { data: enums = [] } = useDatabaseEnums(schema)
 
   const getDefaultColumns = () => [
@@ -184,11 +94,6 @@ export function TableFormSheet({ schema, children }: TableFormSheetProps) {
     columns: getDefaultColumns(),
     foreignKeys: [],
   })
-
-  // Filter out tables that are being created in the current form to avoid self-reference
-  const availableTables = tables.filter(
-    (table: Table) => table.name !== formValues.name && table.kind === 'TABLE',
-  )
 
   // Combine built-in data types with custom enum types
   // Group enums by name to avoid duplicates
@@ -305,6 +210,42 @@ export function TableFormSheet({ schema, children }: TableFormSheetProps) {
     }
 
     return true
+  }
+
+  const handleForeignKeySave = (foreignKey: ForeignKeyDefinition) => {
+    if (editingForeignKey) {
+      // Update existing foreign key
+      setFormValues((prev) => ({
+        ...prev,
+        foreignKeys: prev.foreignKeys.map((fk) =>
+          fk === editingForeignKey ? foreignKey : fk,
+        ),
+      }))
+    } else {
+      // Add new foreign key
+      setFormValues((prev) => ({
+        ...prev,
+        foreignKeys: [...prev.foreignKeys, foreignKey],
+      }))
+    }
+    setEditingForeignKey(undefined)
+  }
+
+  const handleEditForeignKey = (foreignKey: ForeignKeyDefinition) => {
+    setEditingForeignKey(foreignKey)
+    setForeignKeySheetOpen(true)
+  }
+
+  const handleAddForeignKey = () => {
+    setEditingForeignKey(undefined)
+    setForeignKeySheetOpen(true)
+  }
+
+  const handleRemoveForeignKey = (foreignKey: ForeignKeyDefinition) => {
+    setFormValues((prev) => ({
+      ...prev,
+      foreignKeys: prev.foreignKeys.filter((fk) => fk !== foreignKey),
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -665,197 +606,66 @@ export function TableFormSheet({ schema, children }: TableFormSheetProps) {
                 </p>
               </div>
 
-              <div className="space-y-4">
-                {/* Foreign Key Rows */}
-                {formValues.foreignKeys.map((fk, fkIndex) => (
+              {/* Foreign Key Cards */}
+              <div className="space-y-3">
+                {formValues.foreignKeys.map((fk, index) => (
                   <div
-                    key={fkIndex}
-                    className="space-y-4 border p-4 rounded-md"
+                    key={index}
+                    className="border rounded-lg p-4 bg-card space-y-3"
                   >
-                    {/* First Row: Column | Ref Table | Ref Column */}
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="flex items-center justify-between">
                       <div className="space-y-1">
-                        <Label className="text-sm font-medium">
-                          {TABLE_FORM_MESSAGES.COLUMN_NAME}
-                        </Label>
-                        <Select
-                          value={fk.column}
-                          onValueChange={(value: string | null) => {
-                            if (value === null) return
-                            setFormValues((prev) => ({
-                              ...prev,
-                              foreignKeys: prev.foreignKeys.map((fk, i) =>
-                                i === fkIndex ? { ...fk, column: value } : fk,
-                              ),
-                            }))
-                          }}
+                        <p className="text-sm font-medium">
+                          ADD Foreign key relation to: {schema}.
+                          {fk.referencedTable}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {fk.column} → {schema}.{fk.referencedTable}.
+                          {fk.referencedColumn}
+                        </p>
+                        {(fk.onDelete !== 'NO ACTION' ||
+                          fk.onUpdate !== 'NO ACTION') && (
+                          <div className="flex gap-2 mt-2">
+                            {fk.onDelete !== 'NO ACTION' && (
+                              <Badge variant="secondary" className="text-xs">
+                                ON DELETE: {fk.onDelete}
+                              </Badge>
+                            )}
+                            {fk.onUpdate !== 'NO ACTION' && (
+                              <Badge variant="secondary" className="text-xs">
+                                ON UPDATE: {fk.onUpdate}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditForeignKey(fk)}
+                          disabled={isSubmitting}
                         >
-                          <SelectTrigger className="w-full">
-                            <SelectValue>
-                              {fk.column || TABLE_FORM_MESSAGES.SELECT_COLUMN}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent className="w-60">
-                            {formValues.columns.map((col) => (
-                              <SelectItem key={col.name} value={col.name}>
-                                {col.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-sm font-medium">
-                          {TABLE_FORM_MESSAGES.REFERENCED_TABLE}
-                        </Label>
-                        <Select
-                          value={fk.referencedTable}
-                          onValueChange={(value: string | null) => {
-                            if (value === null) return
-                            setFormValues((prev) => ({
-                              ...prev,
-                              foreignKeys: prev.foreignKeys.map((fk, i) =>
-                                i === fkIndex
-                                  ? {
-                                      ...fk,
-                                      referencedTable: value,
-                                      referencedColumn: '',
-                                    }
-                                  : fk,
-                              ),
-                            }))
-                          }}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue>
-                              {fk.referencedTable ||
-                                TABLE_FORM_MESSAGES.SELECT_REFERENCED_TABLE}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent className="w-60">
-                            {availableTables.map((table: Table) => (
-                              <SelectItem key={table.name} value={table.name}>
-                                {table.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-sm font-medium">
-                          {TABLE_FORM_MESSAGES.REFERENCED_COLUMN}
-                        </Label>
-                        <ReferencedColumnSelector
-                          value={fk.referencedColumn}
-                          onChange={(value: string | null) => {
-                            if (value === null) return
-                            setFormValues((prev) => ({
-                              ...prev,
-                              foreignKeys: prev.foreignKeys.map((fk, i) =>
-                                i === fkIndex
-                                  ? { ...fk, referencedColumn: value }
-                                  : fk,
-                              ),
-                            }))
-                          }}
-                          schema={schema}
-                          table={fk.referencedTable}
-                          disabled={isSubmitting || !fk.referencedTable}
-                          localColumn={formValues.columns.find(
-                            (col) => col.name === fk.column,
-                          )}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Second Row: On Delete | On Update | Remove Button */}
-                    <div className="grid grid-cols-3 gap-4 items-end">
-                      <div className="space-y-1">
-                        <Label className="text-sm font-medium">
-                          {TABLE_FORM_MESSAGES.ON_DELETE}
-                        </Label>
-                        <Select
-                          value={fk.onDelete}
-                          onValueChange={(value: ForeignKeyAction | null) => {
-                            if (!value) return
-                            setFormValues((prev) => ({
-                              ...prev,
-                              foreignKeys: prev.foreignKeys.map((fk, i) =>
-                                i === fkIndex ? { ...fk, onDelete: value } : fk,
-                              ),
-                            }))
-                          }}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue>{fk.onDelete}</SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {FOREIGN_KEY_ACTIONS.map((action) => (
-                              <SelectItem
-                                key={action.value}
-                                value={action.value}
-                              >
-                                {action.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-sm font-medium">
-                          {TABLE_FORM_MESSAGES.ON_UPDATE}
-                        </Label>
-                        <Select
-                          value={fk.onUpdate}
-                          onValueChange={(value: ForeignKeyAction | null) => {
-                            if (!value) return
-                            setFormValues((prev) => ({
-                              ...prev,
-                              foreignKeys: prev.foreignKeys.map((fk, i) =>
-                                i === fkIndex ? { ...fk, onUpdate: value } : fk,
-                              ),
-                            }))
-                          }}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue>{fk.onUpdate}</SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {FOREIGN_KEY_ACTIONS.map((action) => (
-                              <SelectItem
-                                key={action.value}
-                                value={action.value}
-                              >
-                                {action.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="flex justify-end">
+                          <HugeiconsIcon icon={Edit} className="h-4 w-4" />
+                          Edit
+                        </Button>
                         <Button
                           type="button"
                           variant="destructive"
-                          onClick={() =>
-                            setFormValues((prev) => ({
-                              ...prev,
-                              foreignKeys: prev.foreignKeys.filter(
-                                (_, i) => i !== fkIndex,
-                              ),
-                            }))
-                          }
-                          className="w-full"
+                          size="sm"
+                          onClick={() => handleRemoveForeignKey(fk)}
+                          disabled={isSubmitting}
                         >
-                          <HugeiconsIcon
-                            icon={Trash2}
-                            className="h-4 w-4 mr-2"
-                          />
-                          {TABLE_FORM_MESSAGES.REMOVE}
+                          <HugeiconsIcon icon={Trash2} className="h-4 w-4" />
+                          Remove
                         </Button>
                       </div>
                     </div>
                   </div>
                 ))}
+
+                {/* Add Foreign Key Button */}
                 <Button
                   type="button"
                   variant="outline"
@@ -865,15 +675,7 @@ export function TableFormSheet({ schema, children }: TableFormSheetProps) {
                     formValues.columns.length === 0 ||
                     formValues.columns.every((col) => !col.name)
                   }
-                  onClick={() =>
-                    setFormValues((prev) => ({
-                      ...prev,
-                      foreignKeys: [
-                        ...prev.foreignKeys,
-                        { ...DEFAULT_FOREIGN_KEY },
-                      ],
-                    }))
-                  }
+                  onClick={handleAddForeignKey}
                 >
                   <HugeiconsIcon icon={Plus} className="h-4 w-4 mr-2" />
                   {TABLE_FORM_MESSAGES.ADD_FOREIGN_KEY}
@@ -897,6 +699,17 @@ export function TableFormSheet({ schema, children }: TableFormSheetProps) {
             </Button>
           </SheetFooter>
         </form>
+
+        {/* Foreign Key Sheet */}
+        <ForeignKeySheet
+          open={foreignKeySheetOpen}
+          onOpenChange={setForeignKeySheetOpen}
+          schema={schema}
+          tableName={formValues.name}
+          columns={formValues.columns}
+          existingForeignKey={editingForeignKey}
+          onSave={handleForeignKeySave}
+        />
       </SheetContent>
     </Sheet>
   )

@@ -15,12 +15,7 @@ export interface Table {
   columns?: ColumnDefinition[]
 }
 
-export type ForeignKeyAction =
-  | 'NO ACTION'
-  | 'RESTRICT'
-  | 'CASCADE'
-  | 'SET NULL'
-  | 'SET DEFAULT'
+export type ForeignKeyAction = 'NO ACTION' | 'RESTRICT' | 'CASCADE'
 
 export interface ForeignKeyDefinition {
   column: string
@@ -28,6 +23,7 @@ export interface ForeignKeyDefinition {
   referencedColumn: string
   onDelete: ForeignKeyAction
   onUpdate: ForeignKeyAction
+  schema?: string
 }
 
 export interface CreateTableParams {

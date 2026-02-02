@@ -32,6 +32,8 @@ export const FilterOperators = {
   IS_NOT_NULL: 'IS NOT NULL',
 } as const
 
+import type { ForeignKeyAction } from '@/types/database'
+
 export type FilterOperator =
   (typeof FilterOperators)[keyof typeof FilterOperators]
 
@@ -129,15 +131,14 @@ export const DEFAULT_FOREIGN_KEY = {
   referencedColumn: '',
   onDelete: 'NO ACTION' as const,
   onUpdate: 'NO ACTION' as const,
+  schema: 'public' as const,
 } as const
 
-export const FOREIGN_KEY_ACTIONS = [
-  { value: 'NO ACTION' as const, label: 'No Action' },
-  { value: 'RESTRICT' as const, label: 'Restrict' },
-  { value: 'CASCADE' as const, label: 'Cascade' },
-  { value: 'SET NULL' as const, label: 'Set Null' },
-  { value: 'SET DEFAULT' as const, label: 'Set Default' },
-] as const
+export const FOREIGN_KEY_ACTIONS: ForeignKeyAction[] = [
+  'NO ACTION',
+  'RESTRICT',
+  'CASCADE',
+]
 
 export const EXPORT_FORMATS = {
   JSON: 'json',
