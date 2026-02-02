@@ -11,6 +11,7 @@ export const QUERY_OPERATION_KEYS = {
   CREATE_TABLE: 'create-table',
   DELETE_TABLE: 'delete-table',
   UPDATE_TABLE: 'update-table',
+  ADD_COLUMN: 'add-column',
 
   // Database structure operations
   GET_DATABASE_TABLES: 'database-tables',

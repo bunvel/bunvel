@@ -411,3 +411,63 @@ export const updateRow = createServerFn({ method: 'POST' })
       handleApiError(error)
     }
   })
+
+export const addColumn = createServerFn({ method: 'POST' })
+  .inputValidator(
+    (data: {
+      schema: string
+      table: string
+      column: string
+      dataType: string
+      foreignKeys?: Array<{
+        column: string
+        referencedTable: string
+        referencedColumn: string
+        onDelete?: string
+      }>
+    }) => {
+      if (!data?.schema || !data?.table || !data?.column || !data?.dataType) {
+        throw new Error(
+          'Schema, table, column name, and data type are required',
+        )
+      }
+      return data
+    },
+  )
+  .handler(async ({ data }) => {
+    try {
+      const { schema, table, column, dataType, foreignKeys = [] } = data
+
+      // Build the ALTER TABLE query to add the column
+      let query = SQL_QUERIES.ADD_COLUMN.replace('$1', schema)
+        .replace('$2', table)
+        .replace('$3', column)
+        .replace('$4', dataType)
+
+      // Add foreign key constraints if provided
+      foreignKeys.forEach((fk, index) => {
+        if (fk.column && fk.referencedTable && fk.referencedColumn) {
+          const constraintName = `fk_${table}_${column}_${fk.referencedTable}_${fk.referencedColumn}_${index}`
+          query += SQL_QUERIES.ADD_FOREIGN_KEY.replaceAll('$1', schema)
+            .replace('$2', table)
+            .replace('$3', constraintName)
+            .replace('$4', fk.column)
+            .replace('$5', fk.referencedTable)
+            .replace('$6', fk.referencedColumn)
+        }
+      })
+
+      const result = await apiClient.post(
+        '/meta/query?key=' + QUERY_OPERATION_KEYS.ADD_COLUMN,
+        { query, params: [] },
+      )
+
+      return {
+        success: true,
+        data: result.data,
+      }
+    } catch (error) {
+      console.error('Error in addColumn:', error)
+      handleApiError(error)
+    }
+  })

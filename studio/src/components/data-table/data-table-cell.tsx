@@ -72,21 +72,21 @@ export const DataTableCell = function DataTableCell({
       rawValue !== '' ? (
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger
-            render={<Button variant="secondary" size="icon-xs" />}
-          >
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Button variant="secondary" size="icon-xs">
-                    <HugeiconsIcon icon={ArrowRight} />
-                  </Button>
-                }
-              />
-              <TooltipContent>
-                <p>View related data</p>
-              </TooltipContent>
-            </Tooltip>
-          </PopoverTrigger>
+            render={
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button variant="secondary" size="icon-xs">
+                      <HugeiconsIcon icon={ArrowRight} />
+                    </Button>
+                  }
+                />
+                <TooltipContent>
+                  <p>View related data</p>
+                </TooltipContent>
+              </Tooltip>
+            }
+          ></PopoverTrigger>
           <PopoverContent
             align="center"
             className="p-0"

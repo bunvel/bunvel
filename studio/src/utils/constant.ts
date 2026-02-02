@@ -195,6 +195,7 @@ export const PLACEHOLDERS = {
   SELECT_OPERATOR: 'Operator',
   TABLE_NAME_FK: 'Table name',
   COLUMN_NAME_FK: 'Column name',
+  CHECK_CONSTRAINT: 'length("column_name") < 500',
 } as const
 
 // Common title texts

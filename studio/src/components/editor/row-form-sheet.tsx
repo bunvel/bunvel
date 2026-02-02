@@ -216,13 +216,14 @@ export function RowFormSheet({
     for (const column of metadata.columns) {
       const value = formValues[column.column_name]
 
-      if (column.is_identity === 'YES') continue
-
-      // For edit mode, include primary keys in the result for WHERE clause
+      // For edit mode, include primary keys in the result for WHERE clause (even if identity)
       if (mode === 'edit' && column.is_primary_key) {
         result[column.column_name] = value
         continue
       }
+
+      // Skip identity columns for insert mode and non-primary key identity columns for edit mode
+      if (column.is_identity === 'YES') continue
 
       // For edit mode, include all values including NULL to allow clearing fields
       if (mode === 'edit') {
@@ -279,7 +280,13 @@ export function RowFormSheet({
         },
       )
     } else {
-      const primaryKeys = metadata?.primary_keys || []
+      // Extract primary keys from metadata if not available
+      const primaryKeys = metadata?.primary_keys?.length
+        ? metadata.primary_keys
+        : metadata?.columns
+            ?.filter((col) => col.is_primary_key)
+            .map((col) => col.column_name) || []
+
       updateRow(
         { schema, table, row: validation.values, primaryKeys },
         {

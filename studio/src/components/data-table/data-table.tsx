@@ -225,6 +225,8 @@ export function DataTable<TData, TValue = unknown>({
                               className="h-4 w-4 shrink-0"
                               onClick={(e) => e.stopPropagation()}
                             />
+                          ) : cell.column.id === 'empty-column' ? (
+                            <div className="p-2"></div>
                           ) : (
                             <DataTableCell
                               value={formatCellValue(cell.getValue())}

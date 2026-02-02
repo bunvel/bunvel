@@ -298,4 +298,14 @@ export const SQL_QUERIES = {
       c.conname, 
       array_position(c.conkey, a.attnum);
   `,
+
+  // Add column to table
+  ADD_COLUMN: `
+    ALTER TABLE $1.$2 ADD COLUMN $3 $4;
+  `,
+
+  // Add foreign key constraint
+  ADD_FOREIGN_KEY: `
+    ALTER TABLE $1.$2 ADD CONSTRAINT "$3" FOREIGN KEY ("$4") REFERENCES $1.$5 ("$6") ON DELETE NO ACTION;
+  `,
 } as const
