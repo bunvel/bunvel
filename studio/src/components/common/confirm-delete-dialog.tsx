@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
@@ -10,7 +11,6 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { useState } from 'react'
-import { Card } from '@/components/ui/card'
 
 export function ConfirmDeleteDialog({
   open,
