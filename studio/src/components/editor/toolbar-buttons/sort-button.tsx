@@ -1,11 +1,9 @@
 import { Button } from '@/components/ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -158,8 +156,8 @@ export function SortButton({
   const hasChanges = JSON.stringify(localSorts) !== JSON.stringify(pendingSorts)
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
         render={
           <Button
             variant="outline"
@@ -176,153 +174,144 @@ export function SortButton({
             )}
           </Button>
         }
-      ></DropdownMenuTrigger>
+      ></PopoverTrigger>
 
-      <DropdownMenuContent
-        className="w-[400px]"
-        align="start"
-        autoFocus={false}
-      >
-        <DropdownMenuGroup>
-          <div className="flex items-center justify-between px-2 py-1.5">
-            <DropdownMenuLabel className="p-0">Sort Columns</DropdownMenuLabel>
-            {pendingSorts.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearAll}
-                className="h-auto px-2 py-1 text-xs"
-              >
-                Clear all
-              </Button>
-            )}
-          </div>
-
-          {/* Existing Sorts */}
-          <div className="max-h-[300px] space-y-2 overflow-y-auto px-2 py-2">
-            {pendingSorts.length === 0 ? (
-              <div className="py-6 text-center text-sm text-muted-foreground">
-                No sorts applied
-              </div>
-            ) : (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={pendingSorts.map(
-                    (sort) => `${sort.column}-${sort.direction}`,
-                  )}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {pendingSorts.map((sort, index) => {
-                    const availableColumns = columns.filter(
-                      (col) =>
-                        !pendingSorts.some(
-                          (s) => s.column === col.column_name,
-                        ) || sort.column === col.column_name,
-                    )
-
-                    return (
-                      <SortableItem
-                        key={`${sort.column}-${sort.direction}`}
-                        id={`${sort.column}-${sort.direction}`}
-                      >
-                        <div className="flex items-center gap-2 w-full">
-                          <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-background text-xs font-medium">
-                            {index + 1}
-                          </span>
-
-                          <Select
-                            value={sort.column}
-                            onValueChange={(value) =>
-                              handleColumnChange(sort.column, value)
-                            }
-                          >
-                            <SelectTrigger className="h-8 w-[180px]">
-                              <SelectValue title="Select column"></SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                              {availableColumns.map((col) => (
-                                <SelectItem
-                                  key={col.column_name}
-                                  value={col.column_name}
-                                >
-                                  {col.column_name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 px-2 gap-1"
-                            onClick={() =>
-                              handleToggleSortDirection(sort.column)
-                            }
-                          >
-                            {sort.direction === 'asc' ? 'A → Z' : 'Z → A'}
-                          </Button>
-
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 hover:bg-transparent hover:text-destructive ml-auto"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handleRemoveSort(sort.column)
-                            }}
-                          >
-                            <HugeiconsIcon icon={X} className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </SortableItem>
-                    )
-                  })}
-                </SortableContext>
-              </DndContext>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-between border-t px-2 py-2">
+      <PopoverContent className="w-[400px]" align="start" autoFocus={false}>
+        <div className="flex items-center justify-between px-2 py-1.5">
+          <h4 className="leading-none font-medium">Sort Columns</h4>
+          {pendingSorts.length > 0 && (
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => {
-                if (availableColumns.length > 0) {
-                  setPendingSorts((prev) => [
-                    ...prev,
-                    {
-                      column: availableColumns[0].column_name,
-                      direction: 'asc',
-                    },
-                  ])
-                }
-              }}
-              disabled={availableColumns.length === 0}
+              onClick={handleClearAll}
+              className="h-auto px-2 py-1 text-xs"
             >
-              <HugeiconsIcon icon={Plus} size={16} />
-              Add Sort
+              Clear all
             </Button>
-            <div className="flex items-center justify-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleApplySorting}
-                disabled={!hasChanges}
-                size="sm"
-              >
-                Apply Sorting
-              </Button>
+          )}
+        </div>
+
+        {/* Existing Sorts */}
+        <div className="max-h-[300px] space-y-2 overflow-y-auto px-2 py-2">
+          {pendingSorts.length === 0 ? (
+            <div className="py-6 text-center text-sm text-muted-foreground">
+              No sorts applied
             </div>
+          ) : (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={pendingSorts.map(
+                  (sort) => `${sort.column}-${sort.direction}`,
+                )}
+                strategy={verticalListSortingStrategy}
+              >
+                {pendingSorts.map((sort, index) => {
+                  const availableColumns = columns.filter(
+                    (col) =>
+                      !pendingSorts.some((s) => s.column === col.column_name) ||
+                      sort.column === col.column_name,
+                  )
+
+                  return (
+                    <SortableItem
+                      key={`${sort.column}-${sort.direction}`}
+                      id={`${sort.column}-${sort.direction}`}
+                    >
+                      <div className="flex items-center gap-2 w-full">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-sm bg-background text-xs font-medium">
+                          {index + 1}
+                        </span>
+
+                        <Select
+                          value={sort.column}
+                          onValueChange={(value) =>
+                            handleColumnChange(sort.column, value)
+                          }
+                        >
+                          <SelectTrigger className="h-8 w-[180px]">
+                            <SelectValue title="Select column"></SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableColumns.map((col) => (
+                              <SelectItem
+                                key={col.column_name}
+                                value={col.column_name}
+                              >
+                                {col.column_name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-2 gap-1"
+                          onClick={() => handleToggleSortDirection(sort.column)}
+                        >
+                          {sort.direction === 'asc' ? 'A → Z' : 'Z → A'}
+                        </Button>
+
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 hover:bg-transparent hover:text-destructive ml-auto"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRemoveSort(sort.column)
+                          }}
+                        >
+                          <HugeiconsIcon icon={X} className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </SortableItem>
+                  )
+                })}
+              </SortableContext>
+            </DndContext>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between border-t px-2 py-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (availableColumns.length > 0) {
+                setPendingSorts((prev) => [
+                  ...prev,
+                  {
+                    column: availableColumns[0].column_name,
+                    direction: 'asc',
+                  },
+                ])
+              }
+            }}
+            disabled={availableColumns.length === 0}
+          >
+            <HugeiconsIcon icon={Plus} size={16} />
+            Add Sort
+          </Button>
+          <div className="flex items-center justify-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleApplySorting}
+              disabled={!hasChanges}
+              size="sm"
+            >
+              Apply Sorting
+            </Button>
           </div>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }

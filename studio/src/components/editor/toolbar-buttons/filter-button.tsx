@@ -1,12 +1,10 @@
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -183,8 +181,8 @@ export function FilterButton({
   )
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
         render={
           <Button
             variant="outline"
@@ -201,181 +199,173 @@ export function FilterButton({
             )}
           </Button>
         }
-      ></DropdownMenuTrigger>
+      ></PopoverTrigger>
 
-      <DropdownMenuContent
-        className="w-[500px]"
-        align="start"
-        autoFocus={false}
-      >
-        <DropdownMenuGroup>
-          <div className="flex items-center justify-between px-2 py-1.5">
-            <DropdownMenuLabel className="p-0 text-base">
-              Filter Columns
-            </DropdownMenuLabel>
-            {pendingFilters.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearAll}
-                className="h-auto px-2 py-1 text-xs"
+      <PopoverContent className="w-[500px]" align="start" autoFocus={false}>
+        <div className="flex items-center justify-between px-2 py-1.5">
+          <h4 className="leading-none font-medium">Filter Columns</h4>
+          {pendingFilters.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearAll}
+              className="h-auto px-2 py-1 text-xs"
+            >
+              Clear all
+            </Button>
+          )}
+        </div>
+
+        {/* Existing Filters */}
+        <div className="max-h-[300px] space-y-2 overflow-y-auto mb-4">
+          {pendingFilters.length === 0 ? (
+            <div className="py-4 text-center text-sm text-muted-foreground">
+              No filters applied
+            </div>
+          ) : (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={pendingFilters.map((filter) => filter.id)}
+                strategy={verticalListSortingStrategy}
               >
-                Clear all
-              </Button>
-            )}
-          </div>
-
-          {/* Existing Filters */}
-          <div className="max-h-[300px] space-y-2 overflow-y-auto mb-4">
-            {pendingFilters.length === 0 ? (
-              <div className="py-4 text-center text-sm text-muted-foreground">
-                No filters applied
-              </div>
-            ) : (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={pendingFilters.map((filter) => filter.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {pendingFilters.map((filter) => (
-                    <SortableItem
-                      key={filter.id}
-                      id={filter.id}
-                      onRemove={() => handleRemoveFilter(filter.id)}
-                    >
-                      <div className="flex items-center gap-2 w-full">
-                        <div className="flex-1 grid grid-cols-3 gap-2">
-                          <Select
-                            value={filter.column}
-                            onValueChange={(value: string | null) => {
-                              if (value !== null) {
-                                handleUpdateFilter(filter.id, { column: value })
-                              }
-                            }}
-                          >
-                            <SelectTrigger className="h-8 w-full">
-                              <SelectValue title="Column" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {availableColumns.map((col) => (
-                                <SelectItem
-                                  key={col.column_name}
-                                  value={col.column_name}
-                                >
-                                  {col.column_name}
-                                </SelectItem>
-                              ))}
-                              {availableColumns.length === 0 && (
-                                <div className="text-sm text-muted-foreground px-2 py-1.5">
-                                  No columns available
-                                </div>
-                              )}
-                            </SelectContent>
-                          </Select>
-
-                          <Select
-                            value={filter.operator}
-                            onValueChange={(value: FilterOperator | null) => {
-                              if (value !== null) {
-                                handleUpdateFilter(filter.id, {
-                                  operator: value,
-                                })
-                              } else {
-                                handleUpdateFilter(filter.id, {
-                                  operator: '=',
-                                })
-                              }
-                            }}
-                          >
-                            <SelectTrigger className="h-8 w-full">
-                              <SelectValue title="Operator" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.entries(FilterOperatorLabels).map(
-                                ([operator, label]) => (
-                                  <SelectItem key={operator} value={operator}>
-                                    {String(label)}
-                                  </SelectItem>
-                                ),
-                              )}
-                            </SelectContent>
-                          </Select>
-
-                          {filter.operator !== 'IS NULL' &&
-                            filter.operator !== 'IS NOT NULL' && (
-                              <Input
-                                type="text"
-                                value={filter.value?.toString() ?? ''}
-                                onChange={(e) => {
-                                  const value = e.target.value
-                                  setPendingFilters((prev) =>
-                                    prev.map((f) =>
-                                      f.id === filter.id ? { ...f, value } : f,
-                                    ),
-                                  )
-                                }}
-                                onKeyDown={(e) => e.stopPropagation()}
-                                placeholder="Value"
-                              />
+                {pendingFilters.map((filter) => (
+                  <SortableItem
+                    key={filter.id}
+                    id={filter.id}
+                    onRemove={() => handleRemoveFilter(filter.id)}
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <div className="flex-1 grid grid-cols-3 gap-2">
+                        <Select
+                          value={filter.column}
+                          onValueChange={(value: string | null) => {
+                            if (value !== null) {
+                              handleUpdateFilter(filter.id, { column: value })
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="h-8 w-full">
+                            <SelectValue title="Column" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableColumns.map((col) => (
+                              <SelectItem
+                                key={col.column_name}
+                                value={col.column_name}
+                              >
+                                {col.column_name}
+                              </SelectItem>
+                            ))}
+                            {availableColumns.length === 0 && (
+                              <div className="text-sm text-muted-foreground px-2 py-1.5">
+                                No columns available
+                              </div>
                             )}
-                        </div>
-                      </div>
-                    </SortableItem>
-                  ))}
-                </SortableContext>
-              </DndContext>
-            )}
-          </div>
+                          </SelectContent>
+                        </Select>
 
-          {/* Add New Filter Button */}
-          <div className="flex items-center justify-between border-t px-2 py-2">
+                        <Select
+                          value={filter.operator}
+                          onValueChange={(value: FilterOperator | null) => {
+                            if (value !== null) {
+                              handleUpdateFilter(filter.id, {
+                                operator: value,
+                              })
+                            } else {
+                              handleUpdateFilter(filter.id, {
+                                operator: '=',
+                              })
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="h-8 w-full">
+                            <SelectValue title="Operator" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.entries(FilterOperatorLabels).map(
+                              ([operator, label]) => (
+                                <SelectItem key={operator} value={operator}>
+                                  {String(label)}
+                                </SelectItem>
+                              ),
+                            )}
+                          </SelectContent>
+                        </Select>
+
+                        {filter.operator !== 'IS NULL' &&
+                          filter.operator !== 'IS NOT NULL' && (
+                            <Input
+                              type="text"
+                              value={filter.value?.toString() ?? ''}
+                              onChange={(e) => {
+                                const value = e.target.value
+                                setPendingFilters((prev) =>
+                                  prev.map((f) =>
+                                    f.id === filter.id ? { ...f, value } : f,
+                                  ),
+                                )
+                              }}
+                              onKeyDown={(e) => e.stopPropagation()}
+                              placeholder="Value"
+                            />
+                          )}
+                      </div>
+                    </div>
+                  </SortableItem>
+                ))}
+              </SortableContext>
+            </DndContext>
+          )}
+        </div>
+
+        {/* Add New Filter Button */}
+        <div className="flex items-center justify-between border-t px-2 py-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (availableColumns.length > 0) {
+                const newFilter: FilterConfig = {
+                  id: `new-${Date.now()}`,
+                  column: availableColumns[0].column_name,
+                  operator: '=',
+                  value: null, // Use null instead of empty string
+                }
+                setPendingFilters((prev) => [...prev, newFilter])
+              }
+            }}
+            disabled={availableColumns.length === 0}
+          >
+            <HugeiconsIcon icon={Plus} className="mr-2 h-4 w-4" />
+            Add Filter
+          </Button>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2">
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => {
-                if (availableColumns.length > 0) {
-                  const newFilter: FilterConfig = {
-                    id: `new-${Date.now()}`,
-                    column: availableColumns[0].column_name,
-                    operator: '=',
-                    value: null, // Use null instead of empty string
-                  }
-                  setPendingFilters((prev) => [...prev, newFilter])
-                }
-              }}
-              disabled={availableColumns.length === 0}
+              onClick={handleCancel}
             >
-              <HugeiconsIcon icon={Plus} className="mr-2 h-4 w-4" />
-              Add Filter
+              Cancel
             </Button>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleCancel}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleApplyFilters}
-                disabled={!hasChanges || hasInvalidFilters}
-              >
-                Apply
-              </Button>
-            </div>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleApplyFilters}
+              disabled={!hasChanges || hasInvalidFilters}
+            >
+              Apply
+            </Button>
           </div>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }
