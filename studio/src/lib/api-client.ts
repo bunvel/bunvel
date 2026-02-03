@@ -76,7 +76,7 @@ export const apiClient = new ApiClient()
 export function handleApiError(error: unknown): never {
   if (error instanceof Error) {
     const apiError = error as ApiError
-    logger.error('API Error', 'api-client', {
+    logger.service('api-client').error('API Error', {
       message: apiError.message,
       status: apiError.status,
       code: apiError.code,

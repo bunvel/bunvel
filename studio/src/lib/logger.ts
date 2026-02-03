@@ -24,17 +24,19 @@ const baseLogger = pino({
         },
       }
     : undefined,
-  // In production, use JSON format for better log aggregation
-  serializers: !import.meta.env.DEV
-    ? {
-        // Add any serializers here if needed in production
-      }
-    : undefined,
+  // Note: Add custom serializers here if needed for production log aggregation
 })
 
 class Logger {
+  private childLoggerCache = new Map<string, PinoLogger>()
+
   private createChildLogger(context: string): PinoLogger {
-    return baseLogger.child({ context })
+    let cached = this.childLoggerCache.get(context)
+    if (!cached) {
+      cached = baseLogger.child({ context })
+      this.childLoggerCache.set(context, cached)
+    }
+    return cached
   }
 
   debug(message: string, context?: string, data?: any): void {

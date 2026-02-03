@@ -79,7 +79,7 @@ export const getDatabaseTableColumns = createServerFn({ method: 'POST' })
       )
       return response.data as DatabaseTableColumns[]
     } catch (error) {
-      logger.service('table.service').error('Error fetching tables', error)
+      logger.service('table.service').error('Error fetching columns', error)
       handleApiError(error)
     }
   })
