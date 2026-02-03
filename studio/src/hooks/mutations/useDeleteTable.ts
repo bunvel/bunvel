@@ -1,7 +1,7 @@
 import { deleteTable } from '@/services/table.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { reactQueryKeys } from '../queries/react-query-keys'
+import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
 
 interface UseDeleteTableOptions {
   onTableDeleted?: (schema: string, table: string) => void

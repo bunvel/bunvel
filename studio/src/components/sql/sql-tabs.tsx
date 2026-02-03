@@ -3,7 +3,7 @@ import { Tabs, TabsList } from '@/components/ui/tabs'
 import { useSqlManager } from '@/hooks/use-sql-manager'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 
 export function SqlTabs() {
   const { tabs, activeTabId, setActiveTab, removeTab, createNewQueryTab } =

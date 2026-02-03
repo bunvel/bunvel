@@ -4,7 +4,7 @@ import { ColumnMetadata } from '@/types/table'
 import { ArrowRight } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import * as React from 'react'
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { RelatedDataTable } from './related-data-table'
 
 import { Button } from '@/components/ui/button'

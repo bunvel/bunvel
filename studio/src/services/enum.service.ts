@@ -1,9 +1,10 @@
+import { apiClient, handleApiError } from '@/lib/api-client'
+import { logger } from '@/lib/logger'
+import { SQL_QUERIES } from '@/lib/sql-queries'
 import type { CreateEnumParams, DatabaseEnum } from '@/types'
 import { escapeIdentifier } from '@/utils/func'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
-import { apiClient, handleApiError } from '../lib/api-client'
-import { SQL_QUERIES } from '../lib/sql-queries'
 
 export const getDatabaseEnums = createServerFn({ method: 'POST' })
   .inputValidator((data: { schema: string }) => {
@@ -23,7 +24,7 @@ export const getDatabaseEnums = createServerFn({ method: 'POST' })
       )
       return response.data as DatabaseEnum[]
     } catch (error) {
-      console.error('Error fetching enums:', error)
+      logger.service('enum.service').error('Error fetching enums', error)
       handleApiError(error)
     }
   })
@@ -57,7 +58,7 @@ export const createEnum = createServerFn({ method: 'POST' })
       await apiClient.post('/meta/query', { query })
       return { success: true }
     } catch (error) {
-      console.error('Error creating enum:', error)
+      logger.service('enum.service').error('Error creating enum', error)
       throw error
     }
   })
@@ -83,7 +84,7 @@ export const deleteEnum = createServerFn({ method: 'POST' })
       await apiClient.post('/meta/query', { query })
       return { success: true }
     } catch (error) {
-      console.error('Error deleting enum:', error)
+      logger.service('enum.service').error('Error deleting enum', error)
       throw error
     }
   })

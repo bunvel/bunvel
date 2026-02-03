@@ -20,7 +20,7 @@ import { formatCellValue } from '@/utils/format'
 import { ArrowLeft, ArrowRight } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
-import { DataTableHeaderCell } from '../data-table/data-table-header-cell'
+import { DataTableHeaderCell } from '@/components/data-table/data-table-header-cell'
 import { FilterButton } from './toolbar-buttons/filter-button'
 import { SortButton } from './toolbar-buttons/sort-button'
 

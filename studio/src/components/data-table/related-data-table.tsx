@@ -1,6 +1,6 @@
 import { TableDataResult, TableMetadata } from '@/types/table'
 import { formatCellValue } from '@/utils/format'
-import { Spinner } from '../ui/spinner'
+import { Spinner } from '@/components/ui/spinner'
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../ui/table'
+} from '@/components/ui/table'
 import { DataTableHeaderCell } from './data-table-header-cell'
 
 interface RelatedDataTableProps {

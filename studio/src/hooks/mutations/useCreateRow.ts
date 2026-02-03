@@ -2,7 +2,7 @@ import { insertRow } from '@/services/editor.service'
 import type { CreateRowParams } from '@/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { reactQueryKeys } from '../queries/react-query-keys'
+import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
 
 export function useCreateRow() {
   const queryClient = useQueryClient()

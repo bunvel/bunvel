@@ -1,5 +1,6 @@
 import type { ApiError, ApiResponse } from '@/types'
 import { API_URL } from '@/utils/constant'
+import { logger } from './logger'
 
 class ApiClient {
   constructor(private baseUrl: string = API_URL || '') {}
@@ -75,7 +76,11 @@ export const apiClient = new ApiClient()
 export function handleApiError(error: unknown): never {
   if (error instanceof Error) {
     const apiError = error as ApiError
-    console.error('API Error:', apiError.message, apiError)
+    logger.service('api-client').error('API Error', {
+      message: apiError.message,
+      status: apiError.status,
+      code: apiError.code,
+    })
     throw apiError
   }
   const unknownError = new Error('An unknown error occurred') as ApiError

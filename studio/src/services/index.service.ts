@@ -1,9 +1,10 @@
+import { apiClient, handleApiError } from '@/lib/api-client'
+import { logger } from '@/lib/logger'
+import { SQL_QUERIES } from '@/lib/sql-queries'
 import type { CreateIndexParams, DatabaseTableIndexes } from '@/types'
 import { escapeIdentifier } from '@/utils/func'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
-import { apiClient, handleApiError } from '../lib/api-client'
-import { SQL_QUERIES } from '../lib/sql-queries'
 
 export const getDatabaseTableIndexes = createServerFn({ method: 'POST' })
   .inputValidator((data: { schema: string }) => {
@@ -23,7 +24,9 @@ export const getDatabaseTableIndexes = createServerFn({ method: 'POST' })
       )
       return response.data as DatabaseTableIndexes[]
     } catch (error) {
-      console.error('Error fetching table indexes:', error)
+      logger
+        .service('index.service')
+        .error('Error fetching table indexes', error)
       handleApiError(error)
     }
   })
@@ -74,7 +77,7 @@ export const createIndex = createServerFn({ method: 'POST' })
       )
       return { success: true }
     } catch (error) {
-      console.error('Error creating index:', error)
+      logger.service('index.service').error('Error creating index', error)
       handleApiError(error)
     }
   })

@@ -1,9 +1,9 @@
 import { useExecuteSqlQuery } from '@/hooks/mutations/useExecuteSqlQuery'
 import { useSqlManager } from '@/hooks/use-sql-manager'
+import { SQL_COMPLETIONS } from '@/utils/sql/sql-completions'
 import { Editor } from '@monaco-editor/react'
 import { useTheme } from 'next-themes'
 import { useEffect, useRef } from 'react'
-import { SQL_COMPLETIONS } from '../../utils/sql/sql-completions'
 
 export function MonacoSqlEditor() {
   const editorRef = useRef<any>(null)

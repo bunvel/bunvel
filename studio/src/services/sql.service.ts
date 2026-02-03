@@ -1,5 +1,6 @@
+import { apiClient, handleApiError } from '@/lib/api-client'
+import { logger } from '@/lib/logger'
 import { createServerFn } from '@tanstack/react-start'
-import { apiClient, handleApiError } from '../lib/api-client'
 
 export const executeQuery = createServerFn({ method: 'POST' })
   .inputValidator((d: string) => d)
@@ -30,7 +31,7 @@ export const executeQuery = createServerFn({ method: 'POST' })
         executionTime: endTime - startTime,
       }
     } catch (error) {
-      console.error('Query execution error:', error)
+      logger.service('sql.service').error('Query execution error', error)
       handleApiError(error)
     }
   })

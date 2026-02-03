@@ -1,9 +1,10 @@
+import { apiClient, handleApiError } from '@/lib/api-client'
+import { logger } from '@/lib/logger'
+import { SQL_QUERIES } from '@/lib/sql-queries'
 import type { Schema } from '@/types'
 import { escapeIdentifier } from '@/utils/func'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
-import { apiClient, handleApiError } from '../lib/api-client'
-import { SQL_QUERIES } from '../lib/sql-queries'
 
 export const getSchemas = createServerFn({ method: 'POST' }).handler(
   async () => {
@@ -23,7 +24,7 @@ export const getSchemas = createServerFn({ method: 'POST' }).handler(
         data: response.data,
       }
     } catch (error) {
-      console.error('Failed to fetch schemas:', error)
+      logger.service('schema.service').error('Failed to fetch schemas', error)
       handleApiError(error)
     }
   },
@@ -54,7 +55,7 @@ export const createSchema = createServerFn({ method: 'POST' })
         data: response.data,
       }
     } catch (error) {
-      console.error('Failed to create schema:', error)
+      logger.service('schema.service').error('Failed to create schema', error)
       handleApiError(error)
     }
   })

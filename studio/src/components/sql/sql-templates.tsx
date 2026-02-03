@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 import type { SqlTemplate } from '@/types'
+import { SQL_TEMPLATE_QUERIES } from '@/utils/sql/sql-template-queries'
 import {
   FileText,
   Home01Icon,
@@ -16,7 +17,6 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useMemo, useState } from 'react'
-import { SQL_TEMPLATE_QUERIES } from '../../utils/sql/sql-template-queries'
 
 const sqlTemplates: SqlTemplate[] = [
   {

@@ -12,9 +12,9 @@ import type { TableColumn, TableData } from '@/types'
 import { Back, Loading03Icon, Search } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import * as React from 'react'
-import { Button } from '../ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { InputGroup, InputGroupAddon, InputGroupInput } from '../ui/input-group'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 interface DatabaseTableProps<T = TableData> {
   columns: TableColumn[]
   data: T[]

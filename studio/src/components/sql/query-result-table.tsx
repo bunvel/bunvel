@@ -4,8 +4,8 @@ import { Alert, Check, Info } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ColumnDef, Row } from '@tanstack/react-table'
 import { useCallback, useMemo, useState } from 'react'
-import { DataTable } from '../data-table/data-table'
-import { Spinner } from '../ui/spinner'
+import { DataTable } from '@/components/data-table/data-table'
+import { Spinner } from '@/components/ui/spinner'
 
 export function QueryResultTable() {
   const { activeTab } = useSqlManager()

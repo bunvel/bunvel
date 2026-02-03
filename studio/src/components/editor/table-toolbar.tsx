@@ -1,7 +1,7 @@
 import { useTableManager } from '@/hooks/use-table-manager'
 import { X } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 import {
   CopyButton,
   DeleteButton,

@@ -1,6 +1,8 @@
+import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
+import { logger } from '@/lib/logger'
 import { createSchema } from '@/services/schema.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { reactQueryKeys } from '../queries/react-query-keys'
+import { toast } from 'sonner'
 
 interface CreateSchemaVariables {
   name: string
@@ -22,7 +24,8 @@ export function useCreateSchema() {
       })
     },
     onError: (error: Error) => {
-      console.error('Schema creation failed:', error)
+      logger.hook('use-create-schema').error('Schema creation failed', error)
+      toast.error('Failed to create schema')
     },
   })
 }

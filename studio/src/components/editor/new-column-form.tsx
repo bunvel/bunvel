@@ -25,9 +25,9 @@ import { Edit, Plus, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Field, FieldContent, FieldDescription, FieldLabel } from '../ui/field'
-import { Separator } from '../ui/separator'
-import { Switch } from '../ui/switch'
+import { Field, FieldContent, FieldDescription, FieldLabel } from '@/components/ui/field'
+import { Separator } from '@/components/ui/separator'
+import { Switch } from '@/components/ui/switch'
 import { ForeignKeySheet } from './foreign-key-sheet'
 
 interface NewColumnFormProps {

@@ -1,6 +1,6 @@
 import { useSqlManager } from '@/hooks/use-sql-manager'
 import { cn } from '@/lib/utils'
-import { ToggleSidebar } from '../common/toggle-sidebar'
+import { ToggleSidebar } from '@/components/common/toggle-sidebar'
 import { MonacoSqlEditor } from './monaco-sql-editor'
 import { QueryResultActions } from './query-result-actions'
 import { QueryResultTable } from './query-result-table'
