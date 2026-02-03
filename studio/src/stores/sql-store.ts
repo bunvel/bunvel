@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger'
 import type { QueryHistoryItem, SqlTab } from '@/types'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
@@ -13,7 +14,11 @@ const loadQueryHistory = (): QueryHistoryItem[] => {
     const stored = window.localStorage.getItem(QUERY_HISTORY_KEY)
     return stored ? JSON.parse(stored) : []
   } catch (error) {
-    console.error('Failed to load query history from localStorage:', error)
+    logger.error(
+      'Failed to load query history from localStorage',
+      'sql-store',
+      error,
+    )
     return []
   }
 }
@@ -25,7 +30,11 @@ const saveQueryHistory = (history: QueryHistoryItem[]) => {
   try {
     window.localStorage.setItem(QUERY_HISTORY_KEY, JSON.stringify(history))
   } catch (error) {
-    console.error('Failed to save query history to localStorage:', error)
+    logger.error(
+      'Failed to save query history to localStorage',
+      'sql-store',
+      error,
+    )
   }
 }
 

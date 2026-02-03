@@ -1,4 +1,5 @@
 import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
+import { logger } from '@/lib/logger'
 import { addColumn } from '@/services/editor.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -56,7 +57,7 @@ export function useAddColumn() {
       }
     },
     onError: (error) => {
-      console.error('Error adding column:', error)
+      logger.hook('use-add-column').error('Error adding column', error)
       toast.error('Failed to add column')
     },
   })

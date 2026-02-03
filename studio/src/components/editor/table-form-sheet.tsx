@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/sheet'
 import { useCreateTable } from '@/hooks/mutations/useTableMutations'
 import { useDatabaseEnums } from '@/hooks/queries/useEnums'
+import { logger } from '@/lib/logger'
 import type { ColumnDefinition, ForeignKeyDefinition } from '@/types'
 import {
   DATA_TYPES,
@@ -205,7 +206,9 @@ export function TableFormSheet({ schema, children }: TableFormSheetProps) {
         }
       } catch (error) {
         // If we can't validate types, let the backend handle it
-        console.warn('Could not validate foreign key types:', error)
+        logger
+          .component('table-form-sheet')
+          .warn('Could not validate foreign key types', error)
       }
     }
 
@@ -293,7 +296,9 @@ export function TableFormSheet({ schema, children }: TableFormSheetProps) {
           resetForm()
         },
         onError: (error) => {
-          console.error('Error creating table:', error)
+          logger
+            .component('table-form-sheet')
+            .error('Error creating table', error)
 
           // Extract meaningful error message
           let errorMessage = 'Failed to create table'

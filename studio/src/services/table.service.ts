@@ -11,6 +11,7 @@ import { escapeIdentifier, formatDefaultValue } from '@/utils/func'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from '../lib/api-client'
+import { logger } from '../lib/logger'
 import { SQL_QUERIES } from '../lib/sql-queries'
 
 export const getTables = createServerFn({ method: 'POST' })
@@ -31,7 +32,7 @@ export const getTables = createServerFn({ method: 'POST' })
       )
       return response.data as Table[]
     } catch (error) {
-      console.error('Error fetching tables:', error)
+      logger.service('table.service').error('Error fetching tables', error)
       handleApiError(error)
     }
   })
@@ -55,7 +56,7 @@ export const getDatabaseTables = createServerFn({ method: 'POST' })
 
       return response.data as DatabaseTables[]
     } catch (error) {
-      console.error('Error fetching tables:', error)
+      logger.service('table.service').error('Error fetching tables', error)
       handleApiError(error)
     }
   })
@@ -78,7 +79,7 @@ export const getDatabaseTableColumns = createServerFn({ method: 'POST' })
       )
       return response.data as DatabaseTableColumns[]
     } catch (error) {
-      console.error('Error fetching tables:', error)
+      logger.service('table.service').error('Error fetching tables', error)
       handleApiError(error)
     }
   })
@@ -98,7 +99,7 @@ export const getDatabaseTriggers = createServerFn({ method: 'POST' })
       )
       return response.data as DatabaseTrigger[]
     } catch (error) {
-      console.error('Error fetching triggers:', error)
+      logger.service('table.service').error('Error fetching triggers', error)
       handleApiError(error)
     }
   })
@@ -118,7 +119,7 @@ export const getDatabaseFunctions = createServerFn({ method: 'POST' })
       )
       return response.data as DatabaseFunction[]
     } catch (error) {
-      console.error('Error fetching functions:', error)
+      logger.service('table.service').error('Error fetching functions', error)
       handleApiError(error)
     }
   })
@@ -142,7 +143,7 @@ export const deleteTable = createServerFn({ method: 'POST' })
       )
       return { success: true }
     } catch (error) {
-      console.error('Error deleting table:', error)
+      logger.service('table.service').error('Error deleting table', error)
       handleApiError(error)
     }
   })
@@ -165,7 +166,7 @@ export const truncateTable = createServerFn({ method: 'POST' })
       )
       return { success: true }
     } catch (error) {
-      console.error('Error truncating table:', error)
+      logger.service('table.service').error('Error truncating table', error)
       handleApiError(error)
     }
   })
@@ -229,11 +230,12 @@ export const createTable = createServerFn({ method: 'POST' })
           def += ` DEFAULT ${formattedDefault}`
         } catch (error) {
           // Skip default value if formatting fails
-          console.warn(
-            `Invalid default value for column ${col.name}:`,
-            col.defaultValue,
-            error,
-          )
+          logger
+            .service('table.service')
+            .warn(`Invalid default value for column ${col.name}`, {
+              defaultValue: col.defaultValue,
+              error,
+            })
         }
       }
 
@@ -279,7 +281,7 @@ export const createTable = createServerFn({ method: 'POST' })
       )
       return { success: true }
     } catch (error) {
-      console.error('Error creating table:', error)
+      logger.service('table.service').error('Error creating table', error)
       throw error
     }
   })

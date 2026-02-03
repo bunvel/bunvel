@@ -1,6 +1,7 @@
 import type { DatabaseTables, TableKind } from '@/types'
 import { createServerFn } from '@tanstack/react-start'
 import { apiClient, handleApiError } from '../lib/api-client'
+import { logger } from '../lib/logger'
 import { SQL_QUERIES } from '../lib/sql-queries'
 
 export interface TableNode {
@@ -132,7 +133,9 @@ export const getSchemaDiagram = createServerFn({ method: 'POST' })
         } as SchemaDiagram,
       }
     } catch (error) {
-      console.error('Failed to fetch schema diagram:', error)
+      logger
+        .service('schema-diagram.service')
+        .error('Failed to fetch schema diagram', error)
       handleApiError(error)
     }
   })
