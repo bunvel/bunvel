@@ -2,7 +2,7 @@ import { createEnum, deleteEnum } from '@/services/enum.service'
 import type { CreateEnumParams } from '@/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { reactQueryKeys } from '../queries/react-query-keys'
+import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
 
 export function useCreateEnum() {
   const queryClient = useQueryClient()

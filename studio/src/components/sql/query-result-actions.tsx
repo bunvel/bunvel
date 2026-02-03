@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { useExecuteSqlQuery } from '@/hooks/mutations/useExecuteSqlQuery'
 import { useSqlManager } from '@/hooks/use-sql-manager'
-import { Spinner } from '../ui/spinner'
+import { Spinner } from '@/components/ui/spinner'
 import { ExportButton } from './export-button'
 
 export function QueryResultActions() {

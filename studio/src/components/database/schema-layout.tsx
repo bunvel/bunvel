@@ -1,10 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSchemaDiagram } from '@/hooks/queries/useSchemaDiagram'
-import React from 'react'
-import { Spinner } from '../ui/spinner'
+import { Spinner } from '@/components/ui/spinner'
 import { SchemaDiagram } from './schema-diagram'
 
-export const SchemaLayout: React.FC = () => {
+export const SchemaLayout = () => {
   const {
     data: diagramData,
     isLoading: diagramLoading,

@@ -22,10 +22,10 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useTheme } from 'next-themes'
-import { default as React, useMemo } from 'react'
+import { useMemo } from 'react'
 
 // Custom node component for database tables
-const TableNodeComponent: React.FC<{ data: TableNode }> = ({ data }) => {
+const TableNodeComponent = ({ data }: { data: TableNode }) => {
   return (
     <Card className="min-w-[280px] max-w-[320px] p-0 gap-0">
       {/* Table Header */}
@@ -96,7 +96,7 @@ interface SchemaDiagramProps {
   }
 }
 
-export const SchemaDiagram: React.FC<SchemaDiagramProps> = ({ data }) => {
+export const SchemaDiagram = ({ data }: SchemaDiagramProps) => {
   const { theme, systemTheme } = useTheme()
 
   // Convert our data to ReactFlow format

@@ -32,12 +32,7 @@ interface JsonNodeProps {
   collapseAll?: boolean
 }
 
-const JsonNode: React.FC<JsonNodeProps> = ({
-  data,
-  isLast,
-  expandAll,
-  collapseAll,
-}) => {
+const JsonNode = ({ data, isLast, expandAll, collapseAll }: JsonNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(true)
 
   // React to expand/collapse all commands

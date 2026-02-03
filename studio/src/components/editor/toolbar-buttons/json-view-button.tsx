@@ -1,8 +1,8 @@
+import { JsonViewSheet } from '@/components/editor/json-view-sheet'
 import { Button } from '@/components/ui/button'
 import { useTableManager } from '@/hooks/use-table-manager'
 import { Code } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { JsonViewSheet } from '../json-view-sheet'
 
 export function JsonViewButton() {
   const { schema, table, selectedRows, tableData } = useTableManager()

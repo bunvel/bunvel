@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { useState } from 'react'
-import { Card } from '../ui/card'
+import { Card } from '@/components/ui/card'
 
 export function ConfirmDeleteDialog({
   open,

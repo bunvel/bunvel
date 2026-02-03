@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import {
   Sheet,
   SheetContent,
@@ -37,7 +38,6 @@ import { Edit, Plus, Settings, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Separator } from '../ui/separator'
 import { ForeignKeySheet } from './foreign-key-sheet'
 
 interface TableFormSheetProps {

@@ -1,7 +1,7 @@
+import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
 import { logger } from '@/lib/logger'
 import { createSchema } from '@/services/schema.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { reactQueryKeys } from '../queries/react-query-keys'
 
 interface CreateSchemaVariables {
   name: string

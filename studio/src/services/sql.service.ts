@@ -1,6 +1,6 @@
+import { apiClient, handleApiError } from '@/lib/api-client'
+import { logger } from '@/lib/logger'
 import { createServerFn } from '@tanstack/react-start'
-import { apiClient, handleApiError } from '../lib/api-client'
-import { logger } from '../lib/logger'
 
 export const executeQuery = createServerFn({ method: 'POST' })
   .inputValidator((d: string) => d)

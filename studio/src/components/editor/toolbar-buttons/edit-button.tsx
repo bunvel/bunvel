@@ -1,8 +1,8 @@
+import { RowFormSheet } from '@/components/editor/row-form-sheet'
 import { Button } from '@/components/ui/button'
 import { useTableManager } from '@/hooks/use-table-manager'
 import { BUTTON_LABELS } from '@/utils/constant'
 import { isReadonlySchema } from '@/utils/func'
-import { RowFormSheet } from '../row-form-sheet'
 
 export function EditButton() {
   const { selectedRows, schema, table } = useTableManager()

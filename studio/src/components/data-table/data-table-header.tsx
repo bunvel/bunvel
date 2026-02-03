@@ -1,5 +1,5 @@
 import { flexRender } from '@tanstack/react-table'
-import { TableHead, TableHeader, TableRow } from '../ui/table'
+import { TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export function DataTableHeader({ table }: { table: any }) {
   return (

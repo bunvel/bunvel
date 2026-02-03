@@ -3,7 +3,7 @@ import { useTableManager } from '@/hooks/use-table-manager'
 import { TableRow } from '@/types/table'
 import { formatCellValue } from '@/utils/format'
 import { ColumnDef } from '@tanstack/react-table'
-import { DataTableHeaderCell } from '../data-table/data-table-header-cell'
+import { DataTableHeaderCell } from '@/components/data-table/data-table-header-cell'
 import { NewColumnForm } from './new-column-form'
 import { TableToolbar } from './table-toolbar'
 

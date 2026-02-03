@@ -1,3 +1,6 @@
+import { apiClient, handleApiError } from '@/lib/api-client'
+import { logger } from '@/lib/logger'
+import { SQL_QUERIES } from '@/lib/sql-queries'
 import type {
   CreateTableParams,
   DatabaseFunction,
@@ -10,9 +13,6 @@ import type {
 import { escapeIdentifier, formatDefaultValue } from '@/utils/func'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
-import { apiClient, handleApiError } from '../lib/api-client'
-import { logger } from '../lib/logger'
-import { SQL_QUERIES } from '../lib/sql-queries'
 
 export const getTables = createServerFn({ method: 'POST' })
   .inputValidator((data: { schema: string }) => {

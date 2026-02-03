@@ -3,7 +3,7 @@ import { createTable } from '@/services/table.service'
 import type { CreateTableParams, DeleteRowsParams } from '@/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { reactQueryKeys } from '../queries/react-query-keys'
+import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
 
 export function useCreateTable() {
   const queryClient = useQueryClient()

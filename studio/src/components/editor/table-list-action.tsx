@@ -15,7 +15,7 @@ import { Copy01Icon, MoreVertical, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { SidebarMenuAction } from '../ui/sidebar'
+import { SidebarMenuAction } from '@/components/ui/sidebar'
 
 export function TableListAction({ schema, table }: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)

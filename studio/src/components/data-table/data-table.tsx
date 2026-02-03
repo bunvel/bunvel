@@ -15,7 +15,7 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table'
 import { useEffect, useEffectEvent, useMemo, useState } from 'react'
-import { Table, TableBody, TableCell, TableRow } from '../ui/table'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { DataTableCell } from './data-table-cell'
 import { DataTableHeader } from './data-table-header'
 import { DataTablePagination } from './data-table-pagination'

@@ -13,8 +13,8 @@ import {
   type NavigateOptions,
 } from '@tanstack/react-router'
 import { useEffect, useEffectEvent } from 'react'
-import { Button } from '../ui/button'
-import { Skeleton } from '../ui/skeleton'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { CreateSchemaSheet } from './create-schema-sheet'
 
 export function SchemaSelector({ hideCreate = true }: { hideCreate: boolean }) {
