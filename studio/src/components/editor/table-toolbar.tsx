@@ -1,17 +1,15 @@
+import { Button } from '@/components/ui/button'
 import { useTableManager } from '@/hooks/use-table-manager'
 import { X } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Button } from '@/components/ui/button'
-import {
-  CopyButton,
-  DeleteButton,
-  EditButton,
-  ExportButton,
-  FilterButton,
-  InsertButton,
-  JsonViewButton,
-  SortButton,
-} from './toolbar-buttons'
+import { CopyButton } from './toolbar-buttons/copy-button'
+import { DeleteButton } from './toolbar-buttons/delete-button'
+import { EditButton } from './toolbar-buttons/edit-button'
+import { ExportButton } from './toolbar-buttons/export-button'
+import { FilterButton } from './toolbar-buttons/filter-button'
+import { InsertButton } from './toolbar-buttons/insert-button'
+import { JsonViewButton } from './toolbar-buttons/json-view-button'
+import { SortButton } from './toolbar-buttons/sort-button'
 
 export function TableToolbar() {
   const { kind, selectedRows, handleSelectionClear } = useTableManager()

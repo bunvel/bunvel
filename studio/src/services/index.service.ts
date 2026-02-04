@@ -1,7 +1,7 @@
 import { apiClient, handleApiError } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
 import { SQL_QUERIES } from '@/lib/sql-queries'
-import type { CreateIndexParams, DatabaseTableIndexes } from '@/types'
+import type { CreateIndexParams, DatabaseTableIndexes } from '@/types/database'
 import { escapeIdentifier } from '@/utils/func'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'

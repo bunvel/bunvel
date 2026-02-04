@@ -14,12 +14,17 @@ import {
 } from '@/components/ui/select'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTableManager } from '@/hooks/use-table-manager'
-import { FilterConfig as BaseFilterConfig } from '@/types/table'
 import {
-  FilterOperator,
-  FilterOperatorLabels,
-  FilterSqlOperators,
-} from '@/utils/constant'
+  FilterConfig,
+  ColumnMetadata as TableColumnMetadata,
+} from '@/types/table'
+import { FilterOperator, FilterOperatorLabels } from '@/utils/constant'
+import {
+  areFiltersEqual,
+  createFilter,
+  isFilterValid,
+  processFiltersWithIds,
+} from '@/utils/filter-utils'
 import {
   DndContext,
   DragEndEvent,
@@ -38,30 +43,6 @@ import { Filter, Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
 import { SortableItem } from './sortable-item'
-
-// Utility function to validate filter configuration
-const isFilterValid = (filter: BaseFilterConfig): boolean => {
-  const operatorConfig = FilterSqlOperators[filter.operator]
-  if (!operatorConfig.requiresParameter) {
-    return true // IS NULL, IS NOT NULL don't need values
-  }
-  // Other operators must have non-empty values
-  return (
-    filter.value !== null && filter.value !== '' && filter.value !== undefined
-  )
-}
-
-// Utility function to generate unique filter ID
-const generateFilterId = (filter: BaseFilterConfig): string =>
-  `${filter.column}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-
-// Utility function to process filters with IDs
-const processFiltersWithIds = (filters: BaseFilterConfig[]): FilterConfig[] =>
-  filters.filter(isFilterValid).map((f) => ({ ...f, id: generateFilterId(f) }))
-
-interface FilterConfig extends BaseFilterConfig {
-  id: string
-}
 
 interface FilterButtonProps {
   schema?: string
@@ -104,7 +85,7 @@ export function FilterButton({
   const { data: tableMetadata } = useTableMetadata(schema, table)
   const columns = tableMetadata?.columns || []
   const availableColumns = columns.filter(
-    (col) =>
+    (col: TableColumnMetadata) =>
       !pendingFilters.some((filter) => filter.column === col.column_name),
   )
 
@@ -157,8 +138,8 @@ export function FilterButton({
     const validFilters = pendingFilters.filter(isFilterValid)
 
     setLocalFilters(validFilters)
-    // Strip the id before passing to parent
-    handleFilterChange(validFilters.map(({ id, ...rest }) => rest))
+    // Pass filters with IDs to parent (FilterConfig now includes id)
+    handleFilterChange(validFilters)
     setOpen(false)
   }
 
@@ -171,13 +152,11 @@ export function FilterButton({
     setPendingFilters([])
   }
 
-  const hasChanges =
-    JSON.stringify(localFilters.map(({ id, ...rest }) => rest)) !==
-    JSON.stringify(pendingFilters.map(({ id, ...rest }) => rest))
+  const hasChanges = !areFiltersEqual(localFilters, pendingFilters)
 
   // Check if there are invalid filters (empty values)
   const hasInvalidFilters = pendingFilters.some(
-    (filter: BaseFilterConfig) => !isFilterValid(filter),
+    (filter: FilterConfig) => !isFilterValid(filter),
   )
 
   return (
@@ -252,14 +231,16 @@ export function FilterButton({
                             <SelectValue title="Column" />
                           </SelectTrigger>
                           <SelectContent>
-                            {availableColumns.map((col) => (
-                              <SelectItem
-                                key={col.column_name}
-                                value={col.column_name}
-                              >
-                                {col.column_name}
-                              </SelectItem>
-                            ))}
+                            {availableColumns.map(
+                              (col: TableColumnMetadata) => (
+                                <SelectItem
+                                  key={col.column_name}
+                                  value={col.column_name}
+                                >
+                                  {col.column_name}
+                                </SelectItem>
+                              ),
+                            )}
                             {availableColumns.length === 0 && (
                               <div className="text-sm text-muted-foreground px-2 py-1.5">
                                 No columns available
@@ -330,12 +311,11 @@ export function FilterButton({
             size="sm"
             onClick={() => {
               if (availableColumns.length > 0) {
-                const newFilter: FilterConfig = {
-                  id: `new-${Date.now()}`,
-                  column: availableColumns[0].column_name,
-                  operator: '=',
-                  value: null, // Use null instead of empty string
-                }
+                const newFilter = createFilter(
+                  availableColumns[0].column_name,
+                  '=',
+                  null,
+                )
                 setPendingFilters((prev) => [...prev, newFilter])
               }
             }}

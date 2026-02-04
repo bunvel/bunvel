@@ -1,4 +1,4 @@
-import type { ApiError, ApiResponse } from '@/types'
+import type { ApiError, ApiResponse } from '@/types/api'
 import { API_URL } from '@/utils/constant'
 import { logger } from './logger'
 

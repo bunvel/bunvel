@@ -7,7 +7,7 @@ import { NotFound } from '@/components/error/NotFound'
 import { ThemeProvider } from '@/components/theme/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import '../styles.css'
+import appCss from '../styles.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -36,7 +36,12 @@ export const Route = createRootRoute({
         content: '/og-image.png',
       },
     ],
-    links: [],
+    links: [
+      {
+        rel: 'stylesheet',
+        href: appCss,
+      },
+    ],
   }),
   errorComponent: DefaultCatchBoundary,
   notFoundComponent: () => <NotFound />,

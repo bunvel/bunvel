@@ -1,14 +1,13 @@
 import { apiClient, handleApiError } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
 import { SQL_QUERIES } from '@/lib/sql-queries'
+import { CreateRowParams, UpdateRowParams } from '@/types/database'
+import { SchemaTable } from '@/types/schema'
 import {
   ColumnMetadata,
-  CreateRowParams,
   DeleteRowsParams,
-  SchemaTable,
   TableDataParams,
-} from '@/types'
-import { UpdateRowParams } from '@/types/database'
+} from '@/types/table'
 import { DEFAULT_PAGE_SIZE, FilterSqlOperators } from '@/utils/constant'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'

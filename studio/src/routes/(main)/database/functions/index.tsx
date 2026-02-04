@@ -1,8 +1,9 @@
 import { DatabaseTable } from '@/components/database/database-table'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseFunctions } from '@/hooks/queries/useTables'
-import type { TableColumn } from '@/types'
-import { DatabaseFunction, SchemaTable } from '@/types'
+import type { TableColumn } from '@/types/components'
+import { DatabaseFunction } from '@/types/database'
+import { SchemaTable } from '@/types/schema'
 import { PLACEHOLDERS } from '@/utils/constant'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 

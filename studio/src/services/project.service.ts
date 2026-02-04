@@ -1,6 +1,6 @@
 import { apiClient, handleApiError } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
-import type { Project } from '@/types'
+import type { Project } from '@/types/project'
 import { createServerFn } from '@tanstack/react-start'
 
 export const getProject = createServerFn({ method: 'GET' }).handler(

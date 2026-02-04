@@ -1,4 +1,11 @@
 import { SchemaSelector } from '@/components/editor/schema-selector'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '@/components/ui/input-group'
 import {
   Table,
   TableBody,
@@ -8,13 +15,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
-import type { TableColumn, TableData } from '@/types'
+import type { TableColumn, TableData } from '@/types/components'
 import { Back, Loading03Icon, Search } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import * as React from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 interface DatabaseTableProps<T = TableData> {
   columns: TableColumn[]
   data: T[]

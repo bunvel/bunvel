@@ -3,6 +3,7 @@ import type { FilterOperator } from '@/utils/constant'
 export type TableRow = Record<string, unknown>
 
 export interface FilterConfig {
+  id: string
   column: string
   operator: FilterOperator
   value: string | number | boolean | null

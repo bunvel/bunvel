@@ -1,10 +1,14 @@
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { useRelatedTableData } from '@/hooks/queries/useRelatedTableData'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
 import { ColumnMetadata } from '@/types/table'
 import { ArrowRight } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import * as React from 'react'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { RelatedDataTable } from './related-data-table'
 
 import { Button } from '@/components/ui/button'
@@ -65,7 +69,7 @@ export const DataTableCell = function DataTableCell({
       rawValue !== null &&
       rawValue !== undefined &&
       rawValue !== '' ? (
-        <Popover>
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
           <PopoverTrigger
             render={<Button variant="secondary" size="icon-xs" />}
           >
