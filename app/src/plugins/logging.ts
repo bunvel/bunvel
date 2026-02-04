@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import pino from "pino";
+import { env } from "../utils/config";
 import { LOGGING_CONFIG } from "../utils/constant";
 
 // Create base Pino logger with environment-specific configuration
@@ -19,7 +20,7 @@ export const logger = pino({
   },
   // In development, use pretty printing
   transport:
-    process.env.NODE_ENV === "development"
+    env.NODE_ENV === "development"
       ? {
           target: "pino-pretty",
           options: {
@@ -31,7 +32,7 @@ export const logger = pino({
       : undefined,
   // In production, use JSON format for better log aggregation
   serializers:
-    process.env.NODE_ENV !== "development"
+    env.NODE_ENV !== "development"
       ? {
           // Add any serializers here if needed in production
         }
