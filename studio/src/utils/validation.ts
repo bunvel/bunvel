@@ -37,17 +37,14 @@ export function checkColumnTypeCompatibility(
   localType: string,
   referencedType: string,
 ): { compatible: boolean; warning: string } {
-  const localTypeLower = localType.toLowerCase()
-  const refTypeLower = referencedType.toLowerCase()
-
   const isCompatible =
-    localTypeLower === refTypeLower ||
-    (localTypeLower.includes('int') && refTypeLower.includes('int')) ||
-    (localTypeLower.includes('varchar') && refTypeLower.includes('varchar')) ||
-    (localTypeLower.includes('text') && refTypeLower.includes('text')) ||
-    (localTypeLower.includes('char') && refTypeLower.includes('char')) ||
-    (localTypeLower === 'uuid' && refTypeLower === 'uuid') ||
-    (localTypeLower.includes('timestamp') && refTypeLower.includes('timestamp'))
+    localType === referencedType ||
+    (localType.includes('INT') && referencedType.includes('INT')) ||
+    (localType.includes('VARCHAR') && referencedType.includes('VARCHAR')) ||
+    (localType.includes('TEXT') && referencedType.includes('TEXT')) ||
+    (localType.includes('CHAR') && referencedType.includes('CHAR')) ||
+    (localType === 'UUID' && referencedType === 'UUID') ||
+    (localType.includes('TIMESTAMP') && referencedType.includes('TIMESTAMP'))
 
   return {
     compatible: isCompatible,

@@ -13,7 +13,7 @@ export function useDataTypes(schema: string) {
   }, [])
 
   const allDataTypes = [
-    ...DATA_TYPES,
+    ...DATA_TYPES.map((type) => ({ value: type, label: type })),
     ...uniqueEnums.map((enum_: any) => ({
       value: enum_.enum_name,
       label: `${enum_.enum_name} (Custom Enum)`,

@@ -59,61 +59,61 @@ export const FilterOperatorTypes = {
 
 export const DATA_TYPES = [
   // String Types
-  { value: 'varchar', label: 'VARCHAR' },
-  { value: 'char', label: 'CHAR' },
-  { value: 'text', label: 'TEXT' },
+  'VARCHAR',
+  'CHAR',
+  'TEXT',
 
   // Numeric Types
-  { value: 'smallint', label: 'SMALLINT' },
-  { value: 'integer', label: 'INTEGER' },
-  { value: 'bigint', label: 'BIGINT' },
-  { value: 'decimal', label: 'DECIMAL' },
-  { value: 'numeric', label: 'NUMERIC' },
-  { value: 'real', label: 'REAL' },
-  { value: 'double precision', label: 'DOUBLE PRECISION' },
-  { value: 'serial', label: 'SERIAL' },
-  { value: 'bigserial', label: 'BIGSERIAL' },
+  'SMALLINT',
+  'INTEGER',
+  'BIGINT',
+  'DECIMAL',
+  'NUMERIC',
+  'REAL',
+  'DOUBLE PRECISION',
+  'SERIAL',
+  'BIGSERIAL',
 
   // Boolean
-  { value: 'boolean', label: 'BOOLEAN' },
+  'BOOLEAN',
 
   // Date/Time Types
-  { value: 'date', label: 'DATE' },
-  { value: 'time', label: 'TIME' },
-  { value: 'timetz', label: 'TIME WITH TIME ZONE' },
-  { value: 'timestamp', label: 'TIMESTAMP' },
-  { value: 'timestamptz', label: 'TIMESTAMP WITH TIME ZONE' },
-  { value: 'interval', label: 'INTERVAL' },
+  'DATE',
+  'TIME',
+  'TIME WITH TIME ZONE',
+  'TIMESTAMP',
+  'TIMESTAMP WITH TIME ZONE',
+  'INTERVAL',
 
   // Network Address Types
-  { value: 'inet', label: 'INET' },
-  { value: 'cidr', label: 'CIDR' },
-  { value: 'macaddr', label: 'MACADDR' },
+  'INET',
+  'CIDR',
+  'MACADDR',
 
   // JSON Types
-  { value: 'json', label: 'JSON' },
-  { value: 'jsonb', label: 'JSONB' },
+  'JSON',
+  'JSONB',
 
   // Binary Data
-  { value: 'bytea', label: 'BYTEA' },
+  'BYTEA',
 
   // UUID
-  { value: 'uuid', label: 'UUID' },
+  'UUID',
 
   // Special Types
-  { value: 'money', label: 'MONEY' },
-  { value: 'tsvector', label: 'TSVECTOR' },
-  { value: 'tsquery', label: 'TSQUERY' },
-  { value: 'xml', label: 'XML' },
+  'MONEY',
+  'TSVECTOR',
+  'TSQUERY',
+  'XML',
 
   // Geometric Types
-  { value: 'point', label: 'POINT' },
-  { value: 'line', label: 'LINE' },
-  { value: 'lseg', label: 'LSEG' },
-  { value: 'box', label: 'BOX' },
-  { value: 'path', label: 'PATH' },
-  { value: 'polygon', label: 'POLYGON' },
-  { value: 'circle', label: 'CIRCLE' },
+  'POINT',
+  'LINE',
+  'LSEG',
+  'BOX',
+  'PATH',
+  'POLYGON',
+  'CIRCLE',
 ] as const
 
 export const DEFAULT_COLUMN = {

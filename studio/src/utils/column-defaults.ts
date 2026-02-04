@@ -4,7 +4,7 @@ export function getDefaultColumns(): ColumnDefinition[] {
   return [
     {
       name: 'id',
-      type: 'bigint',
+      type: 'BIGINT',
       nullable: false,
       isPrimaryKey: true,
       unique: false,
@@ -12,7 +12,7 @@ export function getDefaultColumns(): ColumnDefinition[] {
     },
     {
       name: 'created_at',
-      type: 'timestamptz',
+      type: 'TIMESTAMP WITH TIME ZONE',
       nullable: false,
       isPrimaryKey: false,
       unique: false,
@@ -24,7 +24,7 @@ export function getDefaultColumns(): ColumnDefinition[] {
 export function createEmptyColumn(): ColumnDefinition {
   return {
     name: '',
-    type: 'text',
+    type: 'TEXT',
     nullable: true,
     isPrimaryKey: false,
     unique: false,

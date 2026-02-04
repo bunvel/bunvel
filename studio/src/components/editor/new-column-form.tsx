@@ -64,7 +64,7 @@ export function NewColumnForm({ schema, table }: NewColumnFormProps) {
   const [formValues, setFormValues] = useState<FormValues>({
     name: '',
     description: '',
-    type: 'text',
+    type: 'TEXT',
     isPrimaryKey: false,
     nullable: true,
     unique: false,
