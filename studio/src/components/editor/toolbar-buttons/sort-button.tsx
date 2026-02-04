@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTableManager } from '@/hooks/use-table-manager'
-import type { SortConfig } from '@/types'
+import type { SortConfig } from '@/types/table'
 import {
   DndContext,
   KeyboardSensor,

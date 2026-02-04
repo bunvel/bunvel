@@ -9,7 +9,7 @@ import type {
   DatabaseTrigger,
   DeleteTableParams,
   Table,
-} from '@/types'
+} from '@/types/database'
 import { escapeIdentifier, formatDefaultValue } from '@/utils/func'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
@@ -190,10 +190,10 @@ export const createTable = createServerFn({ method: 'POST' })
     const fullTableName = `${escapedSchema}.${escapedTable}`
 
     // Build column definitions
-    const primaryKeyCols = columns.filter((col) => col.isPrimaryKey)
+    const primaryKeyCols = columns.filter((col: any) => col.isPrimaryKey)
     const hasSinglePK = primaryKeyCols.length === 1
 
-    const columnDefs = columns.map((col) => {
+    const columnDefs = columns.map((col: any) => {
       const escapedName = escapeIdentifier(col.name)
       const lowerType = col.type.toLowerCase()
       let def = `${escapedName} ${col.type.toUpperCase()}`
@@ -245,7 +245,7 @@ export const createTable = createServerFn({ method: 'POST' })
     // Add composite primary key if needed
     if (primaryKeyCols.length > 1) {
       const pkColumns = primaryKeyCols
-        .map((col) => escapeIdentifier(col.name))
+        .map((col: any) => escapeIdentifier(col.name))
         .join(', ')
       columnDefs.push(`PRIMARY KEY (${pkColumns})`)
     }
@@ -260,8 +260,10 @@ export const createTable = createServerFn({ method: 'POST' })
 
     // Add foreign key constraints
     foreignKeys
-      .filter((fk) => fk.column && fk.referencedTable && fk.referencedColumn)
-      .forEach((fk, index) => {
+      .filter(
+        (fk: any) => fk.column && fk.referencedTable && fk.referencedColumn,
+      )
+      .forEach((fk: any, index: number) => {
         const fkName = `fk_${table}_${fk.column}_${fk.referencedTable}_${index}`
         query +=
           `;\nALTER TABLE ${fullTableName} ` +

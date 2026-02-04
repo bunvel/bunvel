@@ -1,7 +1,7 @@
 import { DatabaseTable } from '@/components/database/database-table'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseTableColumns } from '@/hooks/queries/useTables'
-import type { TableColumn } from '@/types'
+import type { TableColumn } from '@/types/components'
 import { PLACEHOLDERS } from '@/utils/constant'
 import { Check, X } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'

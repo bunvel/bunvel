@@ -11,7 +11,7 @@ import type {
   DatabaseTableIndexes,
   DatabaseTables,
   Table,
-} from '@/types'
+} from '@/types/database'
 import { useQuery } from '@tanstack/react-query'
 import { reactQueryKeys } from './react-query-keys'
 

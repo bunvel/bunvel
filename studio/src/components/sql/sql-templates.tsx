@@ -6,7 +6,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
-import type { SqlTemplate } from '@/types'
+import type { SqlTemplate } from '@/types/components'
 import { SQL_TEMPLATE_QUERIES } from '@/utils/sql/sql-template-queries'
 import {
   FileText,

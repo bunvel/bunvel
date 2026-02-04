@@ -1,5 +1,6 @@
 import { Checkbox } from '@/components/ui/checkbox'
-import { TableMetadata } from '@/types'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import { TableMetadata } from '@/types/table'
 import { formatCellValue } from '@/utils/format'
 import {
   getCoreRowModel,
@@ -15,7 +16,6 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table'
 import { useEffect, useEffectEvent, useMemo, useState } from 'react'
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { DataTableCell } from './data-table-cell'
 import { DataTableHeader } from './data-table-header'
 import { DataTablePagination } from './data-table-pagination'
@@ -67,7 +67,7 @@ export function DataTable<TData, TValue = unknown>({
   // Memoize column lookup for performance
   const columnLookup = useMemo(() => {
     const lookup = new Map<string, (typeof metadata.columns)[0]>()
-    metadata.columns.forEach((col) => {
+    metadata.columns.forEach((col: any) => {
       lookup.set(col.column_name, col)
     })
     return lookup

@@ -32,6 +32,7 @@ export function useRelatedTableData({
   const filters: FilterConfig[] = shouldFetch
     ? [
         {
+          id: `${foreignKeyColumn.foreign_column_name!}-=${foreignKeyValue}`,
           column: foreignKeyColumn.foreign_column_name!,
           operator: '=',
           value: foreignKeyValue,

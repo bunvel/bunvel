@@ -1,9 +1,10 @@
+import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
 import { deleteRows } from '@/services/editor.service'
 import { createTable } from '@/services/table.service'
-import type { CreateTableParams, DeleteRowsParams } from '@/types'
+import type { CreateTableParams } from '@/types/database'
+import type { DeleteRowsParams } from '@/types/table'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
 
 export function useCreateTable() {
   const queryClient = useQueryClient()

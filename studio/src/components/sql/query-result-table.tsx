@@ -1,11 +1,11 @@
+import { DataTable } from '@/components/data-table/data-table'
+import { Spinner } from '@/components/ui/spinner'
 import { useSqlManager } from '@/hooks/use-sql-manager'
-import type { TableMetadata } from '@/types'
+import type { TableMetadata } from '@/types/table'
 import { Alert, Check, Info } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ColumnDef, Row } from '@tanstack/react-table'
 import { useCallback, useMemo, useState } from 'react'
-import { DataTable } from '@/components/data-table/data-table'
-import { Spinner } from '@/components/ui/spinner'
 
 export function QueryResultTable() {
   const { activeTab } = useSqlManager()

@@ -1,8 +1,8 @@
+import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
 import { createIndex } from '@/services/index.service'
-import type { CreateIndexParams } from '@/types'
+import type { CreateIndexParams } from '@/types/database'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
 
 export function useCreateIndex() {
   const queryClient = useQueryClient()

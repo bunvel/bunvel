@@ -6,16 +6,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { SidebarMenuAction } from '@/components/ui/sidebar'
 import { useDeleteTable } from '@/hooks/mutations/useDeleteTable'
 import { useTruncateTable } from '@/hooks/mutations/useTruncateTable'
 import { useCopyToClipboard } from '@/hooks/use-clipboard'
 import { useTableManager } from '@/hooks/use-table-manager'
-import type { TableListActionProps } from '@/types'
+import type { TableListActionProps } from '@/types/components'
 import { Copy01Icon, MoreVertical, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { SidebarMenuAction } from '@/components/ui/sidebar'
 
 export function TableListAction({ schema, table }: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)

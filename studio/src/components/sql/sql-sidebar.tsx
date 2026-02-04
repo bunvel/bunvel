@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import type { QueryHistoryItem, SqlTab } from '@/types'
+import type { QueryHistoryItem } from '@/types/history'
+import type { SqlTab } from '@/types/tabs'
 import { useState } from 'react'
 import { QueryHistory } from './query-history'
 import { SqlTemplates } from './sql-templates'

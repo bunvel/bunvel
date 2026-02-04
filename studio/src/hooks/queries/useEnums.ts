@@ -1,5 +1,5 @@
 import { getDatabaseEnums } from '@/services/enum.service'
-import type { DatabaseEnum } from '@/types'
+import type { DatabaseEnum } from '@/types/database'
 import { useQuery } from '@tanstack/react-query'
 import { reactQueryKeys } from './react-query-keys'
 

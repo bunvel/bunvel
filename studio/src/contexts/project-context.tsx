@@ -1,5 +1,5 @@
 import { useProject } from '@/hooks/queries/useProject'
-import type { Project } from '@/types'
+import type { Project } from '@/types/project'
 import { createContext, useContext } from 'react'
 
 interface ProjectContextType {

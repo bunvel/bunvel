@@ -21,13 +21,14 @@ import type {
   ColumnDefinition,
   ForeignKeyAction,
   ForeignKeyDefinition,
-  Schema,
-} from '@/types'
+} from '@/types/database'
+import { Schema } from '@/types/database'
 import {
   DEFAULT_FOREIGN_KEY,
   FOREIGN_KEY_ACTIONS,
   TABLE_FORM_MESSAGES,
 } from '@/utils/constant'
+import { checkColumnTypeCompatibility } from '@/utils/validation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -74,24 +75,7 @@ function ReferencedColumnSelector({
   const getColumnTypeCompatibility = (refColumnType: string) => {
     if (!localColumn) return { compatible: true, warning: '' }
 
-    const localType = localColumn.type.toLowerCase()
-    const refType = refColumnType.toLowerCase()
-
-    const isCompatible =
-      localType === refType ||
-      (localType.includes('int') && refType.includes('int')) ||
-      (localType.includes('varchar') && refType.includes('varchar')) ||
-      (localType.includes('text') && refType.includes('text')) ||
-      (localType.includes('char') && refType.includes('char')) ||
-      (localType === 'uuid' && refType === 'uuid') ||
-      (localType.includes('timestamp') && refType.includes('timestamp'))
-
-    return {
-      compatible: isCompatible,
-      warning: isCompatible
-        ? ''
-        : `⚠️ Type mismatch: ${localColumn.type} → ${refColumnType}`,
-    }
+    return checkColumnTypeCompatibility(localColumn.type, refColumnType)
   }
 
   return (

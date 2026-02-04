@@ -7,7 +7,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
-import type { QueryHistoryItem } from '@/types'
+import type { QueryHistoryItem } from '@/types/history'
 import { SqlIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 

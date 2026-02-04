@@ -1,7 +1,8 @@
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTables } from '@/hooks/queries/useTables'
 import { useTableStore } from '@/stores/table-store'
-import { SchemaTable, TableKind } from '@/types'
+import { TableKind } from '@/types/database'
+import { SchemaTable } from '@/types/schema'
 import {
   FilterConfig,
   PaginationConfig,
@@ -133,7 +134,9 @@ export function useTableManager(): UseTableManagerReturn {
 
     // If removing active table, navigate to next available table
     if (tabs.activeTableKey === tableKey && tabs.selectedTables.length > 1) {
-      const remainingTables = tabs.selectedTables.filter((t) => t !== tableKey)
+      const remainingTables = tabs.selectedTables.filter(
+        (t: string) => t !== tableKey,
+      )
       const [newSchema, newTable] = remainingTables[0]?.split('.') || []
       const newActiveTable = remainingTables[0] || null
       setActiveTable(newActiveTable)

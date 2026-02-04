@@ -1,11 +1,15 @@
-import { toast } from 'sonner'
 import type { ColumnDefinition, ForeignKeyDefinition } from '@/types/database'
 import { TABLE_FORM_MESSAGES } from '@/utils/constant'
+import { toast } from 'sonner'
 
 export function validateTableForm(
   columns: ColumnDefinition[],
-  foreignKeys: ForeignKeyDefinition[]
-): { isValid: boolean; validColumns: ColumnDefinition[]; validForeignKeys: ForeignKeyDefinition[] } {
+  foreignKeys: ForeignKeyDefinition[],
+): {
+  isValid: boolean
+  validColumns: ColumnDefinition[]
+  validForeignKeys: ForeignKeyDefinition[]
+} {
   // Filter out empty column names and validate
   const validColumns = columns.filter((col) => col.name.trim() !== '')
   if (validColumns.length === 0) {
@@ -28,10 +32,35 @@ export function validateTableForm(
   return { isValid: true, validColumns, validForeignKeys }
 }
 
+// Extracted type compatibility logic for reuse
+export function checkColumnTypeCompatibility(
+  localType: string,
+  referencedType: string,
+): { compatible: boolean; warning: string } {
+  const localTypeLower = localType.toLowerCase()
+  const refTypeLower = referencedType.toLowerCase()
+
+  const isCompatible =
+    localTypeLower === refTypeLower ||
+    (localTypeLower.includes('int') && refTypeLower.includes('int')) ||
+    (localTypeLower.includes('varchar') && refTypeLower.includes('varchar')) ||
+    (localTypeLower.includes('text') && refTypeLower.includes('text')) ||
+    (localTypeLower.includes('char') && refTypeLower.includes('char')) ||
+    (localTypeLower === 'uuid' && refTypeLower === 'uuid') ||
+    (localTypeLower.includes('timestamp') && refTypeLower.includes('timestamp'))
+
+  return {
+    compatible: isCompatible,
+    warning: isCompatible
+      ? ''
+      : `⚠️ Type mismatch: ${localType} → ${referencedType}`,
+  }
+}
+
 export async function validateForeignKeyTypes(
   foreignKeys: ForeignKeyDefinition[],
   columns: ColumnDefinition[],
-  schema: string
+  schema: string,
 ): Promise<boolean> {
   const validForeignKeys = foreignKeys.filter(
     (fk) => fk.column && fk.referencedTable && fk.referencedColumn,
@@ -58,21 +87,13 @@ export async function validateForeignKeyTypes(
         )
 
         if (referencedColumn) {
-          // Check if types are compatible
-          const localType = localColumn.type.toLowerCase()
-          const refType = referencedColumn.data_type.toLowerCase()
+          // Use the extracted compatibility function
+          const { compatible } = checkColumnTypeCompatibility(
+            localColumn.type,
+            referencedColumn.data_type,
+          )
 
-          // Basic type compatibility check
-          const isCompatible =
-            localType === refType ||
-            (localType.includes('int') && refType.includes('int')) ||
-            (localType.includes('varchar') && refType.includes('varchar')) ||
-            (localType.includes('text') && refType.includes('text')) ||
-            (localType.includes('char') && refType.includes('char')) ||
-            (localType === 'uuid' && refType === 'uuid') ||
-            (localType.includes('timestamp') && refType.includes('timestamp'))
-
-          if (!isCompatible) {
+          if (!compatible) {
             toast.error(TABLE_FORM_MESSAGES.FOREIGN_KEY_TYPE_MISMATCH, {
               description: TABLE_FORM_MESSAGES.TYPE_MISMATCH_TEMPLATE.replace(
                 '{column}',

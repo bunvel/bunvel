@@ -6,17 +6,18 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 
+import { TableKindIcon } from '@/components/common/table-kind-icon'
+import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTables } from '@/hooks/queries/useTables'
-import { SchemaTable, Table } from '@/types'
+import { Table } from '@/types/database'
+import { SchemaTable } from '@/types/schema'
 import { PLACEHOLDERS } from '@/utils/constant'
 import { TableIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
-import { TableKindIcon } from '@/components/common/table-kind-icon'
-import { Input } from '@/components/ui/input'
 import { TableFormSheet } from './table-form-sheet'
 import { TableListAction } from './table-list-action'
 

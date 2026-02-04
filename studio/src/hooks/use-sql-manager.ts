@@ -1,5 +1,6 @@
 import { useSqlStore } from '@/stores/sql-store'
-import type { QueryHistoryItem, SqlTab } from '@/types'
+import type { QueryHistoryItem } from '@/types/history'
+import type { SqlTab } from '@/types/tabs'
 import { useEffect } from 'react'
 
 export interface UseSqlManagerReturn {
