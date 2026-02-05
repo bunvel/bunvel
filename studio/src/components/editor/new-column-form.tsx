@@ -99,6 +99,16 @@ export function NewColumnForm({ schema, table }: NewColumnFormProps) {
     // Build the data type string with constraints
     let dataType = formValues.type
 
+    // Ensure dataType is a string (handle case where it might be an object)
+    if (typeof dataType !== 'string') {
+      if (dataType && typeof dataType === 'object' && 'value' in dataType) {
+        // If it's an object with a value property, use that
+        dataType = (dataType as any).value || JSON.stringify(dataType)
+      } else {
+        dataType = String(dataType || 'TEXT')
+      }
+    }
+
     // Add NOT NULL constraint if not nullable
     if (!formValues.nullable) {
       dataType += ' NOT NULL'

@@ -37,20 +37,54 @@ export function checkColumnTypeCompatibility(
   localType: string,
   referencedType: string,
 ): { compatible: boolean; warning: string } {
+  // Ensure both types are strings, handle objects properly
+  let localTypeStr = ''
+  let referencedTypeStr = ''
+
+  try {
+    if (localType !== null && localType !== undefined) {
+      if (typeof localType === 'object') {
+        // If it's an object, try to get a meaningful string representation
+        localTypeStr = JSON.stringify(localType)
+      } else {
+        localTypeStr = String(localType)
+      }
+    }
+
+    if (referencedType !== null && referencedType !== undefined) {
+      if (typeof referencedType === 'object') {
+        // If it's an object, try to get a meaningful string representation
+        referencedTypeStr = JSON.stringify(referencedType)
+      } else {
+        referencedTypeStr = String(referencedType)
+      }
+    }
+  } catch (error) {
+    // Fallback to empty string if conversion fails
+    localTypeStr = ''
+    referencedTypeStr = ''
+  }
+
+  // Convert both to uppercase for case-insensitive comparison
+  const localTypeUpper = localTypeStr.toUpperCase()
+  const referencedTypeUpper = referencedTypeStr.toUpperCase()
+
   const isCompatible =
-    localType === referencedType ||
-    (localType.includes('INT') && referencedType.includes('INT')) ||
-    (localType.includes('VARCHAR') && referencedType.includes('VARCHAR')) ||
-    (localType.includes('TEXT') && referencedType.includes('TEXT')) ||
-    (localType.includes('CHAR') && referencedType.includes('CHAR')) ||
-    (localType === 'UUID' && referencedType === 'UUID') ||
-    (localType.includes('TIMESTAMP') && referencedType.includes('TIMESTAMP'))
+    localTypeStr === referencedTypeStr ||
+    (localTypeUpper.includes('INT') && referencedTypeUpper.includes('INT')) ||
+    (localTypeUpper.includes('VARCHAR') &&
+      referencedTypeUpper.includes('VARCHAR')) ||
+    (localTypeUpper.includes('TEXT') && referencedTypeUpper.includes('TEXT')) ||
+    (localTypeUpper.includes('CHAR') && referencedTypeUpper.includes('CHAR')) ||
+    (localTypeUpper === 'UUID' && referencedTypeUpper === 'UUID') ||
+    (localTypeUpper.includes('TIMESTAMP') &&
+      referencedTypeUpper.includes('TIMESTAMP'))
 
   return {
     compatible: isCompatible,
     warning: isCompatible
       ? ''
-      : `⚠️ Type mismatch: ${localType} → ${referencedType}`,
+      : `⚠️ Type mismatch: ${localTypeStr} → ${referencedTypeStr}`,
   }
 }
 

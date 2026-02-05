@@ -64,7 +64,7 @@ export function DataTypeSelector({
           <ComboboxEmpty>No data types found.</ComboboxEmpty>
           <ComboboxList>
             {(item) => (
-              <ComboboxItem key={item.value} value={item}>
+              <ComboboxItem key={item.value} value={item.value}>
                 {item.label}
               </ComboboxItem>
             )}

@@ -16,7 +16,7 @@ export function getDefaultColumns(): ColumnDefinition[] {
       nullable: false,
       isPrimaryKey: false,
       unique: false,
-      defaultValue: 'now()',
+      defaultValue: undefined,
     },
   ]
 }

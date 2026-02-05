@@ -75,7 +75,19 @@ function ReferencedColumnSelector({
   const getColumnTypeCompatibility = (refColumnType: string) => {
     if (!localColumn) return { compatible: true, warning: '' }
 
-    return checkColumnTypeCompatibility(localColumn.type, refColumnType)
+    // Handle case where localColumn.type might be an object
+    let localType = ''
+    if (localColumn.type !== null && localColumn.type !== undefined) {
+      if (typeof localColumn.type === 'object') {
+        localType = JSON.stringify(localColumn.type)
+      } else {
+        localType = String(localColumn.type)
+      }
+    }
+
+    if (!localType) return { compatible: true, warning: '' }
+
+    return checkColumnTypeCompatibility(localType, refColumnType)
   }
 
   return (
