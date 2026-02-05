@@ -1,14 +1,8 @@
+import { DataTypeSelector } from '@/components/common/data-type-selector'
 import { Button } from '@/components/ui/button'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import {
   Sheet,
@@ -146,7 +140,7 @@ export function NewColumnForm({ schema, table }: NewColumnFormProps) {
           setFormValues({
             name: '',
             description: '',
-            type: 'text',
+            type: 'TEXT',
             isPrimaryKey: false,
             nullable: true,
             unique: false,
@@ -210,23 +204,14 @@ export function NewColumnForm({ schema, table }: NewColumnFormProps) {
               <div className="space-y-4 w-full">
                 <Field>
                   <FieldLabel htmlFor="type">Type</FieldLabel>
-                  <Select
+                  <DataTypeSelector
                     value={formValues.type}
-                    onValueChange={(value) =>
+                    onChange={(value) =>
                       value && handleInputChange('type', value)
                     }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Choose a column type..." />
-                    </SelectTrigger>
-                    <SelectContent className="w-60">
-                      {allDataTypes.map(({ value, label }) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    dataTypes={allDataTypes}
+                    disabled={addColumnMutation.isPending}
+                  />
                 </Field>
 
                 <Field>

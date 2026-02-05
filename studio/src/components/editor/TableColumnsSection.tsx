@@ -1,23 +1,21 @@
+import { DataTypeSelector } from '@/components/common/data-type-selector'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Plus } from '@hugeicons/core-free-icons'
-import { HugeiconsIcon } from '@hugeicons/react'
 import type { ColumnDefinition } from '@/types/database'
 import { PLACEHOLDERS, TABLE_FORM_MESSAGES } from '@/utils/constant'
+import { Plus } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { ColumnActions } from './ColumnActions'
 
 interface TableColumnsSectionProps {
   columns: ColumnDefinition[]
   allDataTypes: Array<{ value: string; label: string }>
-  onColumnChange: (index: number, field: keyof ColumnDefinition, value: any) => void
+  onColumnChange: (
+    index: number,
+    field: keyof ColumnDefinition,
+    value: any,
+  ) => void
   onAddColumn: () => void
   onDeleteColumn: (index: number) => void
   disabled?: boolean
@@ -69,15 +67,14 @@ export function TableColumnsSection({
         {/* Column Rows */}
         <div className="space-y-4">
           {columns.map((column, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-12 gap-2 items-center"
-            >
+            <div key={index} className="grid grid-cols-12 gap-2 items-center">
               {/* Column Name */}
               <div className="col-span-4">
                 <Input
                   value={column.name}
-                  onChange={(e) => onColumnChange(index, 'name', e.target.value)}
+                  onChange={(e) =>
+                    onColumnChange(index, 'name', e.target.value)
+                  }
                   placeholder={PLACEHOLDERS.COLUMN_NAME}
                   required
                   disabled={disabled}
@@ -86,29 +83,23 @@ export function TableColumnsSection({
 
               {/* Data Type */}
               <div className="col-span-3">
-                <Select
+                <DataTypeSelector
                   value={column.type}
-                  onValueChange={(value) => onColumnChange(index, 'type', value)}
+                  onChange={(value) =>
+                    value && onColumnChange(index, 'type', value)
+                  }
+                  dataTypes={allDataTypes}
                   disabled={disabled}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="w-60">
-                    {allDataTypes.map(({ value, label }) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                />
               </div>
 
               {/* Default Value */}
               <div className="col-span-3">
                 <Input
                   value={column.defaultValue || ''}
-                  onChange={(e) => onColumnChange(index, 'defaultValue', e.target.value)}
+                  onChange={(e) =>
+                    onColumnChange(index, 'defaultValue', e.target.value)
+                  }
                   placeholder={PLACEHOLDERS.OPTIONAL}
                   disabled={disabled}
                 />
