@@ -1,5 +1,5 @@
+import { READONLY_SCHEMAS } from '@/constants/app'
 import { createServerFn } from '@tanstack/react-start'
-import { READONLY_SCHEMAS } from './constant'
 
 export const isReadonlySchema = (schema?: string): boolean => {
   return schema ? READONLY_SCHEMAS.includes(schema) : false
