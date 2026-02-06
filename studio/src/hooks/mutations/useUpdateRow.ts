@@ -2,7 +2,7 @@ import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
 import { useTableManager } from '@/hooks/use-table-manager'
 import { updateRow } from '@/services/editor.service'
 import type { UpdateRowParams } from '@/types/database'
-import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
+import { DEFAULT_PAGE_SIZE } from '@/constants/app'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 

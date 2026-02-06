@@ -5,13 +5,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { EXPORT_FORMATS, ExportFormat } from '@/constants/app'
+import { BUTTON_LABELS, DROPDOWN_LABELS } from '@/constants/ui'
 import { useTableManager } from '@/hooks/use-table-manager'
-import {
-  BUTTON_LABELS,
-  DROPDOWN_LABELS,
-  EXPORT_FORMATS,
-  ExportFormat,
-} from '@/utils/constant'
 import {
   ArrowDown,
   Files as FileJson,

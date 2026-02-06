@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/sheet'
 import { useCreateEnum } from '@/hooks/mutations/useEnumMutations'
 import { logger } from '@/lib/logger'
-import { PLACEHOLDERS } from '@/utils/constant'
+import { PLACEHOLDERS } from '@/constants/ui'
 import { Plus, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'

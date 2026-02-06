@@ -13,7 +13,7 @@ import { useDataTypes } from '@/hooks/useDataTypes'
 import { useForeignKeyManagement } from '@/hooks/useForeignKeyManagement'
 import type { ColumnDefinition, ForeignKeyDefinition } from '@/types/database'
 import { createEmptyColumn, getDefaultColumns } from '@/utils/column-defaults'
-import { TABLE_FORM_MESSAGES } from '@/utils/constant'
+import { TABLE_FORM_MESSAGES } from '@/constants/ui'
 import {
   handleTableFormError,
   showTableFormError,

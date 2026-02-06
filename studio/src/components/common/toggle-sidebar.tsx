@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { SCREEN_READER_LABELS } from '@/utils/constant'
+import { SCREEN_READER_LABELS } from '@/constants/ui'
 import { PanelLeft, PanelLeftClose } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 

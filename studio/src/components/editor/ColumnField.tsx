@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { ColumnDefinition } from '@/types/database'
-import { PLACEHOLDERS } from '@/utils/constant'
+import { PLACEHOLDERS } from '@/constants/ui'
 
 interface ColumnFieldProps {
   column: ColumnDefinition

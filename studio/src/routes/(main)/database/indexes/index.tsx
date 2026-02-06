@@ -13,7 +13,7 @@ import { useDatabaseIndexes } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types/components'
 import type { DatabaseTableIndexes } from '@/types/database'
 import { SchemaTable } from '@/types/schema'
-import { PLACEHOLDERS } from '@/utils/constant'
+import { PLACEHOLDERS } from '@/constants/ui'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 

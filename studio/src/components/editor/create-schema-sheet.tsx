@@ -10,7 +10,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useCreateSchema } from '@/hooks/mutations/useCreateSchema'
-import { BUTTON_LABELS, DESCRIPTIONS, PLACEHOLDERS } from '@/utils/constant'
+import { BUTTON_LABELS, DESCRIPTIONS, PLACEHOLDERS } from '@/constants/ui'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useForm } from '@tanstack/react-form'

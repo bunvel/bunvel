@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { DESCRIPTIONS, TITLES } from '@/utils/constant'
+import { DESCRIPTIONS, TITLES } from '@/constants/ui'
 import { Link } from '@tanstack/react-router'
 import { ErrorLayout } from './error-layout'
 

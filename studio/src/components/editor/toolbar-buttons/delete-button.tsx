@@ -2,7 +2,7 @@ import { ConfirmRowDeleteDialog } from '@/components/common/confirm-row-delete-d
 import { Button } from '@/components/ui/button'
 import { useDeleteRows } from '@/hooks/mutations/useTableMutations'
 import { useTableManager } from '@/hooks/use-table-manager'
-import { BUTTON_LABELS } from '@/utils/constant'
+import { BUTTON_LABELS } from '@/constants/ui'
 import { isReadonlySchema } from '@/utils/func'
 import { Trash } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'

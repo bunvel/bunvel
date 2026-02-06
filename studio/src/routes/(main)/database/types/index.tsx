@@ -4,7 +4,7 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseEnums } from '@/hooks/queries/useEnums'
 import type { TableColumn } from '@/types/components'
 import { SchemaTable } from '@/types/schema'
-import { PLACEHOLDERS } from '@/utils/constant'
+import { PLACEHOLDERS } from '@/constants/ui'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(main)/database/types/')({

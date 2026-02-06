@@ -30,7 +30,7 @@ import {
 import { Plus, Sorting05Icon, X } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
-import { SortableItem } from './sortable-item'
+import { SortableItem } from '../../common/sortable-item'
 
 interface SortButtonProps {
   schema?: string

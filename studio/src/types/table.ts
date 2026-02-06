@@ -1,4 +1,4 @@
-import type { FilterOperator } from '@/utils/constant'
+import type { FilterOperator } from '@/constants/filter'
 
 export type TableRow = Record<string, unknown>
 

@@ -1,5 +1,5 @@
 import { useDatabaseEnums } from '@/hooks/queries/useEnums'
-import { DATA_TYPES } from '@/utils/constant'
+import { DATA_TYPES } from '@/constants/database'
 
 export function useDataTypes(schema: string) {
   const { data: enums = [] } = useDatabaseEnums(schema)

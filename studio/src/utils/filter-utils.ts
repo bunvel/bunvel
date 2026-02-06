@@ -1,5 +1,5 @@
 import { FilterConfig } from '@/types/table'
-import { FilterSqlOperators } from '@/utils/constant'
+import { FilterSqlOperators } from '@/constants/filter'
 
 /**
  * Validates a filter configuration based on operator requirements

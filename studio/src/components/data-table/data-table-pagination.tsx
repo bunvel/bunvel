@@ -1,4 +1,4 @@
-import { DEFAULT_PAGE_SIZE_OPTIONS } from '@/utils/constant'
+import { DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/app'
 import {
   ChevronLeft,
   ChevronRight,

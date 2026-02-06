@@ -8,7 +8,7 @@ import {
   DeleteRowsParams,
   TableDataParams,
 } from '@/types/table'
-import { DEFAULT_PAGE_SIZE, FilterSqlOperators } from '@/utils/constant'
+import { DEFAULT_PAGE_SIZE, FilterSqlOperators } from '@/constants/filter'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
 

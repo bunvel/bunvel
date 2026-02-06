@@ -1,4 +1,3 @@
-// sortable-item.tsx
 import { Button } from '@/components/ui/button'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -12,7 +11,12 @@ interface SortableItemProps {
   onToggleDirection?: () => void
 }
 
-export function SortableItem({ id, children, onRemove, onToggleDirection }: SortableItemProps) {
+export function SortableItem({
+  id,
+  children,
+  onRemove,
+  onToggleDirection,
+}: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -30,23 +34,20 @@ export function SortableItem({ id, children, onRemove, onToggleDirection }: Sort
   }
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="flex items-center gap-2"
-    >
+    <div ref={setNodeRef} style={style} className="flex items-center gap-2">
       <button
         type="button"
         {...attributes}
         {...listeners}
         className="cursor-grab active:cursor-grabbing"
       >
-        <HugeiconsIcon icon={UnfoldMoreIcon} className="h-4 w-4 text-muted-foreground" />
+        <HugeiconsIcon
+          icon={UnfoldMoreIcon}
+          className="h-4 w-4 text-muted-foreground"
+        />
       </button>
-      
-      <div className="flex-1">
-        {children}
-      </div>
+
+      <div className="flex-1">{children}</div>
 
       {onToggleDirection && (
         <Button

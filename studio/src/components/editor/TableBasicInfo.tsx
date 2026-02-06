@@ -1,6 +1,6 @@
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { PLACEHOLDERS, TABLE_FORM_MESSAGES } from '@/utils/constant'
+import { PLACEHOLDERS, TABLE_FORM_MESSAGES } from '@/constants/ui'
 
 interface TableBasicInfoProps {
   name: string

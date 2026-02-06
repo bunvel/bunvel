@@ -12,13 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { FilterOperator, FilterOperatorLabels } from '@/constants/filter'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTableManager } from '@/hooks/use-table-manager'
 import {
   FilterConfig,
   ColumnMetadata as TableColumnMetadata,
 } from '@/types/table'
-import { FilterOperator, FilterOperatorLabels } from '@/utils/constant'
 import {
   areFiltersEqual,
   createFilter,
@@ -42,7 +42,7 @@ import {
 import { Filter, Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
-import { SortableItem } from './sortable-item'
+import { SortableItem } from '../../common/sortable-item'
 
 interface FilterButtonProps {
   schema?: string

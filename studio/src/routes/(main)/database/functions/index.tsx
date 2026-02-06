@@ -4,7 +4,7 @@ import { useDatabaseFunctions } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types/components'
 import { DatabaseFunction } from '@/types/database'
 import { SchemaTable } from '@/types/schema'
-import { PLACEHOLDERS } from '@/utils/constant'
+import { PLACEHOLDERS } from '@/constants/ui'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(main)/database/functions/')({

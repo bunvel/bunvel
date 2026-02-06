@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table'
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import type { FilterConfig, SortConfig } from '@/types/table'
-import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
+import { DEFAULT_PAGE_SIZE } from '@/constants/app'
 import { formatCellValue } from '@/utils/format'
 import { ArrowLeft, ArrowRight } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'

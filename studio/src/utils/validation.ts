@@ -1,5 +1,5 @@
 import type { ColumnDefinition, ForeignKeyDefinition } from '@/types/database'
-import { TABLE_FORM_MESSAGES } from '@/utils/constant'
+import { TABLE_FORM_MESSAGES } from '@/constants/ui'
 import { toast } from 'sonner'
 
 export function validateTableForm(

@@ -9,7 +9,7 @@ import {
   SortConfig,
   TableRow,
 } from '@/types/table'
-import { DEFAULT_PAGE_SIZE, MAX_TABLE_TABS } from '@/utils/constant'
+import { DEFAULT_PAGE_SIZE, MAX_TABLE_TABS } from '@/constants/app'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useEffect } from 'react'
 

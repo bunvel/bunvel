@@ -1,7 +1,7 @@
 import { BaseExportButton } from '@/components/common/base-export-button'
 import { useCopy } from '@/hooks/use-copy'
 import { useExport } from '@/hooks/use-export'
-import { BUTTON_LABELS, ExportFormat } from '@/utils/constant'
+import { BUTTON_LABELS, ExportFormat } from '@/constants/app'
 
 export function ExportButton({ selectedRows }: { selectedRows: any[] }) {
   const { exportData } = useExport()

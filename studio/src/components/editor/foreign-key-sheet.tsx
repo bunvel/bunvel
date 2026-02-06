@@ -14,6 +14,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { DEFAULT_FOREIGN_KEY, FOREIGN_KEY_ACTIONS } from '@/constants/database'
+import { TABLE_FORM_MESSAGES } from '@/constants/ui'
 import { useSchemas } from '@/hooks/queries/useSchemas'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTables } from '@/hooks/queries/useTables'
@@ -23,11 +25,6 @@ import type {
   ForeignKeyDefinition,
 } from '@/types/database'
 import { Schema } from '@/types/database'
-import {
-  DEFAULT_FOREIGN_KEY,
-  FOREIGN_KEY_ACTIONS,
-  TABLE_FORM_MESSAGES,
-} from '@/utils/constant'
 import { checkColumnTypeCompatibility } from '@/utils/validation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -341,7 +338,7 @@ export function ForeignKeySheet({
                     <SelectValue placeholder="Select action" />
                   </SelectTrigger>
                   <SelectContent>
-                    {FOREIGN_KEY_ACTIONS.map((action) => (
+                    {FOREIGN_KEY_ACTIONS.map((action: ForeignKeyAction) => (
                       <SelectItem key={action} value={action}>
                         {action}
                       </SelectItem>
@@ -365,7 +362,7 @@ export function ForeignKeySheet({
                     <SelectValue placeholder="Select action" />
                   </SelectTrigger>
                   <SelectContent>
-                    {FOREIGN_KEY_ACTIONS.map((action) => (
+                    {FOREIGN_KEY_ACTIONS.map((action: ForeignKeyAction) => (
                       <SelectItem key={action} value={action}>
                         {action}
                       </SelectItem>

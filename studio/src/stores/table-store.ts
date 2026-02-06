@@ -6,7 +6,7 @@ import type {
   TableState,
   TableTabsState,
 } from '@/types/table'
-import { DEFAULT_PAGE_SIZE } from '@/utils/constant'
+import { DEFAULT_PAGE_SIZE } from '@/constants/app'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 

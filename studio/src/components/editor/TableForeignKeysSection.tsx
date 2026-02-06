@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { ForeignKeyDefinition } from '@/types/database'
-import { TABLE_FORM_MESSAGES } from '@/utils/constant'
+import { TABLE_FORM_MESSAGES } from '@/constants/ui'
 import { ForeignKeyCard } from './ForeignKeyCard'
 
 interface TableForeignKeysSectionProps {

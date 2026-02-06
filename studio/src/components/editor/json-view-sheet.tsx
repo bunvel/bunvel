@@ -13,7 +13,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useCopy } from '@/hooks/use-copy'
-import { BUTTON_LABELS } from '@/utils/constant'
+import { BUTTON_LABELS } from '@/constants/ui'
 import { ArrowDown, ArrowRight, Code, Copy } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import React, { useState } from 'react'

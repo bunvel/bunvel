@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { ColumnDefinition } from '@/types/database'
-import { TABLE_FORM_MESSAGES } from '@/utils/constant'
+import { TABLE_FORM_MESSAGES } from '@/constants/ui'
 import { Settings, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
