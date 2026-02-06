@@ -6,18 +6,18 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseTables } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types/components'
 import type { DatabaseTables } from '@/types/database'
-import { SchemaTable } from '@/types/schema'
+import type { SchemaTable } from '@/types/schema'
 import { PLACEHOLDERS } from '@/constants/ui'
 import { LayoutTwoColumnIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
+import { Link, createFileRoute, useSearch } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(main)/database/tables/')({
   component: RouteComponent,
 })
 
 // Define the table columns
-const columns: TableColumn[] = [
+const columns: Array<TableColumn> = [
   { key: 'name', header: 'Name' },
   { key: 'description', header: 'Description' },
   { key: 'row_count', header: 'Rows (ESTIMATED)' },

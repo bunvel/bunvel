@@ -1,4 +1,4 @@
-import { TableDataResult, TableMetadata } from '@/types/table'
+import type { TableDataResult, TableMetadata } from '@/types/table'
 import { formatCellValue } from '@/utils/format'
 import { Spinner } from '@/components/ui/spinner'
 import {

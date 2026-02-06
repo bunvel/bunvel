@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { reactQueryKeys } from './react-query-keys'
 
 export function useDatabaseEnums(schema: string) {
-  return useQuery<DatabaseEnum[]>({
+  return useQuery<Array<DatabaseEnum>>({
     queryKey: reactQueryKeys.enums.list(schema),
     queryFn: () => getDatabaseEnums({ data: { schema } }),
     enabled: !!schema,

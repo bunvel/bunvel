@@ -15,14 +15,14 @@ export const getDatabaseEnums = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<DatabaseEnum[]>(
+      const response = await apiClient.post<Array<DatabaseEnum>>(
         '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_ENUMS,
         {
           query: SQL_QUERIES.GET_ENUMS,
           params: [data.schema],
         },
       )
-      return response.data as DatabaseEnum[]
+      return response.data as Array<DatabaseEnum>
     } catch (error) {
       logger.service('enum.service').error('Error fetching enums', error)
       handleApiError(error)

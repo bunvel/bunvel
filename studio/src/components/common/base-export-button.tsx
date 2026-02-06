@@ -5,7 +5,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { EXPORT_FORMATS, ExportFormat } from '@/constants/app'
+import type { ExportFormat } from '@/constants/app';
+import { EXPORT_FORMATS } from '@/constants/app'
 import { BUTTON_LABELS, DROPDOWN_LABELS } from '@/constants/ui'
 import { useTableManager } from '@/hooks/use-table-manager'
 import {

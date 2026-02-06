@@ -1,4 +1,4 @@
-import { IconSvgElement } from '@hugeicons/react'
+import type { IconSvgElement } from '@hugeicons/react'
 
 export interface TableColumn {
   key: string

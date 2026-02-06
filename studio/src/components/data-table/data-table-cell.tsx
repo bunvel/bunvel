@@ -5,7 +5,7 @@ import {
 } from '@/components/ui/popover'
 import { useRelatedTableData } from '@/hooks/queries/useRelatedTableData'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
-import { ColumnMetadata } from '@/types/table'
+import type { ColumnMetadata } from '@/types/table'
 import { ArrowRight } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import * as React from 'react'
@@ -85,8 +85,8 @@ export const DataTableCell = function DataTableCell({
               metadata={relatedMetadata}
               isLoading={isLoading}
               error={error}
-              tableName={columnMetadata?.foreign_table_name!}
-              schemaName={columnMetadata?.foreign_table_schema!}
+              tableName={columnMetadata?.foreign_table_name || ''}
+              schemaName={columnMetadata?.foreign_table_schema || ''}
             />
           </PopoverContent>
         </Popover>

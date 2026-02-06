@@ -38,15 +38,15 @@ export function ReferenceSelectorSheet({
   onRecordSelect,
 }: ReferenceSelectorSheetProps) {
   const [currentPage, setCurrentPage] = useState(1)
-  const [filters, setFilters] = useState<FilterConfig[]>([])
-  const [sorts, setSorts] = useState<SortConfig[]>([])
+  const [filters, setFilters] = useState<Array<FilterConfig>>([])
+  const [sorts, setSorts] = useState<Array<SortConfig>>([])
 
-  const handleFilterChange = (newFilters: FilterConfig[]) => {
+  const handleFilterChange = (newFilters: Array<FilterConfig>) => {
     setFilters(newFilters)
     setCurrentPage(1) // Reset to first page when filters change
   }
 
-  const handleSortChange = (newSorts: SortConfig[]) => {
+  const handleSortChange = (newSorts: Array<SortConfig>) => {
     setSorts(newSorts)
     setCurrentPage(1) // Reset to first page when sort changes
   }

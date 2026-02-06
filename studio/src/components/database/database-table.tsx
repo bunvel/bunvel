@@ -19,9 +19,10 @@ import type { TableColumn, TableData } from '@/types/components'
 import { Back, Loading03Icon, Search } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import * as React from 'react'
+
 interface DatabaseTableProps<T = TableData> {
-  columns: TableColumn[]
-  data: T[]
+  columns: Array<TableColumn>
+  data: Array<T>
   leftActions?: React.ReactNode
   /**
    * Placeholder text for the search input
@@ -36,8 +37,8 @@ interface DatabaseTableProps<T = TableData> {
   /**
    * Array of field names to include in search. If not provided, all string fields will be searchable
    */
-  searchFields?: string[]
-  headerRow?: (columns: TableColumn[]) => React.ReactNode
+  searchFields?: Array<string>
+  headerRow?: (columns: Array<TableColumn>) => React.ReactNode
   bodyRow?: (item: T, index: number) => React.ReactNode
   isLoading?: boolean
   error?: Error | null
@@ -84,7 +85,7 @@ export function DatabaseTable<T = TableData>({
   }
 
   // Default implementations
-  const defaultHeaderRow = (cols: TableColumn[]) => (
+  const defaultHeaderRow = (cols: Array<TableColumn>) => (
     <TableRow>
       {cols.map((column) => (
         <TableHead

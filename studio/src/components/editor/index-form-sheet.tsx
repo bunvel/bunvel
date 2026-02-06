@@ -23,7 +23,7 @@ import {
   useDatabaseTableColumns,
   useDatabaseTables,
 } from '@/hooks/queries/useTables'
-import { DatabaseTableColumns, Schema } from '@/types/database'
+import type { DatabaseTableColumns, Schema } from '@/types/database'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
@@ -42,7 +42,7 @@ interface IndexFormSheetProps {
 type FormValues = {
   schema: string
   table: string
-  columns: string[]
+  columns: Array<string>
   unique: boolean
   indexType: 'btree' | 'hash' | 'gist' | 'spgist' | 'gin' | 'brin'
 }

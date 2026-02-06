@@ -11,7 +11,7 @@ export const executeQuery = createServerFn({ method: 'POST' })
 
     try {
       const startTime = performance.now()
-      const response = await apiClient.post<Record<string, any>[]>(
+      const response = await apiClient.post<Array<Record<string, any>>>(
         '/meta/query',
         { query: data },
       )

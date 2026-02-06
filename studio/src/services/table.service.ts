@@ -23,14 +23,14 @@ export const getTables = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<Table[]>(
+      const response = await apiClient.post<Array<Table>>(
         '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_TABLES,
         {
           query: SQL_QUERIES.GET_ALL_TABLES,
           params: [data.schema],
         },
       )
-      return response.data as Table[]
+      return response.data as Array<Table>
     } catch (error) {
       logger.service('table.service').error('Error fetching tables', error)
       handleApiError(error)
@@ -46,7 +46,7 @@ export const getDatabaseTables = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<DatabaseTables[]>(
+      const response = await apiClient.post<Array<DatabaseTables>>(
         '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_TABLES,
         {
           query: SQL_QUERIES.GET_DATABASE_TABLES,
@@ -54,7 +54,7 @@ export const getDatabaseTables = createServerFn({ method: 'POST' })
         },
       )
 
-      return response.data as DatabaseTables[]
+      return response.data as Array<DatabaseTables>
     } catch (error) {
       logger.service('table.service').error('Error fetching tables', error)
       handleApiError(error)
@@ -70,14 +70,14 @@ export const getDatabaseTableColumns = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<DatabaseTableColumns[]>(
+      const response = await apiClient.post<Array<DatabaseTableColumns>>(
         '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_TABLE_COLUMNS,
         {
           query: SQL_QUERIES.GET_TABLE_COLUMNS,
           params: [data.oid],
         },
       )
-      return response.data as DatabaseTableColumns[]
+      return response.data as Array<DatabaseTableColumns>
     } catch (error) {
       logger.service('table.service').error('Error fetching columns', error)
       handleApiError(error)
@@ -90,14 +90,14 @@ export const getDatabaseTriggers = createServerFn({ method: 'POST' })
   }))
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<DatabaseTrigger[]>(
+      const response = await apiClient.post<Array<DatabaseTrigger>>(
         '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_TRIGGERS,
         {
           query: SQL_QUERIES.GET_TRIGGERS,
           params: [data.schema],
         },
       )
-      return response.data as DatabaseTrigger[]
+      return response.data as Array<DatabaseTrigger>
     } catch (error) {
       logger.service('table.service').error('Error fetching triggers', error)
       handleApiError(error)
@@ -110,14 +110,14 @@ export const getDatabaseFunctions = createServerFn({ method: 'POST' })
   }))
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<DatabaseFunction[]>(
+      const response = await apiClient.post<Array<DatabaseFunction>>(
         '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_FUNCTIONS,
         {
           query: SQL_QUERIES.GET_FUNCTIONS,
           params: [data.schema],
         },
       )
-      return response.data as DatabaseFunction[]
+      return response.data as Array<DatabaseFunction>
     } catch (error) {
       logger.service('table.service').error('Error fetching functions', error)
       handleApiError(error)

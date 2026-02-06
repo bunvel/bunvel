@@ -4,7 +4,7 @@ import { useSqlManager } from '@/hooks/use-sql-manager'
 import type { TableMetadata } from '@/types/table'
 import { Alert, Check, Info } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ColumnDef, Row } from '@tanstack/react-table'
+import type { ColumnDef, Row } from '@tanstack/react-table'
 import { useCallback, useMemo, useState } from 'react'
 
 export function QueryResultTable() {
@@ -15,7 +15,7 @@ export function QueryResultTable() {
   const isExecuting = activeTab?.isExecuting || false
 
   // Generate columns dynamically from the query result
-  const columns = useMemo<ColumnDef<Record<string, any>>[]>(() => {
+  const columns = useMemo<Array<ColumnDef<Record<string, any>>>>(() => {
     if (!queryResult?.columns) return []
 
     return queryResult.columns.map((column: string) => ({

@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger'
-import { EXPORT_FORMATS, ExportFormat } from '@/constants/app'
+import type { ExportFormat } from '@/constants/app';
+import { EXPORT_FORMATS } from '@/constants/app'
 import { useCallback } from 'react'
 
 interface ExportOptions {
@@ -17,7 +18,7 @@ interface FormatHandlerResult {
 }
 
 interface FormatHandler<T extends Record<string, unknown>> {
-  handle: (data: T[], options: ExportOptions) => FormatHandlerResult
+  handle: (data: Array<T>, options: ExportOptions) => FormatHandlerResult
 }
 
 export function useExport() {
@@ -40,7 +41,7 @@ export function useExport() {
   }
 
   const generateTableStructure = (
-    columns: string[],
+    columns: Array<string>,
     tableName: string,
   ): string => {
     // This is a simplified version - in a real app, you'd want to include column types
@@ -136,7 +137,7 @@ export function useExport() {
 
   const exportData = useCallback(
     async <T extends Record<string, unknown>>(
-      data: T[],
+      data: Array<T>,
       options: ExportOptions = {},
     ): Promise<boolean> => {
       try {

@@ -6,7 +6,7 @@ import { TABLE_FORM_MESSAGES } from '@/constants/ui'
 import { ForeignKeyCard } from './ForeignKeyCard'
 
 interface TableForeignKeysSectionProps {
-  foreignKeys: ForeignKeyDefinition[]
+  foreignKeys: Array<ForeignKeyDefinition>
   schema: string
   tableName: string
   onAddForeignKey: () => void

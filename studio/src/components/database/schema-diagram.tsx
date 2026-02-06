@@ -5,16 +5,17 @@ import type {
   RelationshipEdge,
   TableNode,
 } from '@/services/schema-diagram.service'
+import type {
+  Edge,
+  Node} from '@xyflow/react';
 import {
   Background,
   BackgroundVariant,
   ConnectionMode,
   Controls,
-  Edge,
   Handle,
   MarkerType,
   MiniMap,
-  Node,
   Position,
   ReactFlow,
   useEdgesState,
@@ -91,8 +92,8 @@ const nodeTypes = {
 
 interface SchemaDiagramProps {
   data: {
-    nodes: TableNode[]
-    edges: RelationshipEdge[]
+    nodes: Array<TableNode>
+    edges: Array<RelationshipEdge>
   }
 }
 
@@ -100,7 +101,7 @@ export const SchemaDiagram = ({ data }: SchemaDiagramProps) => {
   const { theme, systemTheme } = useTheme()
 
   // Convert our data to ReactFlow format
-  const initialNodes = useMemo<Node[]>(
+  const initialNodes = useMemo<Array<Node>>(
     () =>
       data.nodes.map((node) => ({
         id: node.id,
@@ -111,7 +112,7 @@ export const SchemaDiagram = ({ data }: SchemaDiagramProps) => {
     [data.nodes],
   )
 
-  const initialEdges = useMemo<Edge[]>(
+  const initialEdges = useMemo<Array<Edge>>(
     () =>
       data.edges.map((edge) => ({
         id: edge.id,

@@ -1,9 +1,9 @@
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTables } from '@/hooks/queries/useTables'
 import { useTableStore } from '@/stores/table-store'
-import { TableKind } from '@/types/database'
-import { SchemaTable } from '@/types/schema'
-import {
+import type { TableKind } from '@/types/database'
+import type { SchemaTable } from '@/types/schema'
+import type {
   FilterConfig,
   PaginationConfig,
   SortConfig,
@@ -30,7 +30,7 @@ export interface UseTableManagerReturn {
   tableState: any
 
   // Tab management
-  selectedTables: string[]
+  selectedTables: Array<string>
   activeTable: string | undefined
   handleTabChange: (value: string) => void
   handleTabClose: (e: React.MouseEvent, tableKey: string) => void
@@ -39,9 +39,9 @@ export interface UseTableManagerReturn {
   addTable: (schema: string, table: string) => void
 
   // Selection management
-  selectedRows: TableRow[]
+  selectedRows: Array<TableRow>
   rowSelection: Record<string, boolean>
-  handleRowSelectionChange: (newSelectedRows: TableRow[]) => void
+  handleRowSelectionChange: (newSelectedRows: Array<TableRow>) => void
   handleRowSelectionStateChange: (
     updaterOrValue:
       | Record<string, boolean>
@@ -54,12 +54,12 @@ export interface UseTableManagerReturn {
   handlePaginationChange: (newPagination: PaginationConfig) => void
 
   // Sorting management
-  sorts: SortConfig[]
-  handleSortChange: (newSorts: SortConfig[]) => void
+  sorts: Array<SortConfig>
+  handleSortChange: (newSorts: Array<SortConfig>) => void
 
   // Filtering management
-  filters: FilterConfig[]
-  handleFilterChange: (newFilters: FilterConfig[]) => void
+  filters: Array<FilterConfig>
+  handleFilterChange: (newFilters: Array<FilterConfig>) => void
 }
 
 export function useTableManager(): UseTableManagerReturn {
@@ -153,7 +153,7 @@ export function useTableManager(): UseTableManagerReturn {
   }
 
   // Selection management
-  const handleRowSelectionChange = (newSelectedRows: TableRow[]) => {
+  const handleRowSelectionChange = (newSelectedRows: Array<TableRow>) => {
     if (currentTableKey) {
       setSelectedRows(currentTableKey, newSelectedRows)
     }
@@ -182,7 +182,7 @@ export function useTableManager(): UseTableManagerReturn {
   }
 
   // Sorting management
-  const handleSortChange = (newSorts: SortConfig[]) => {
+  const handleSortChange = (newSorts: Array<SortConfig>) => {
     if (currentTableKey) {
       setSorts(currentTableKey, newSorts)
       // Reset to first page when sort changes
@@ -198,7 +198,7 @@ export function useTableManager(): UseTableManagerReturn {
   }
 
   // Filtering management
-  const handleFilterChange = (newFilters: FilterConfig[]) => {
+  const handleFilterChange = (newFilters: Array<FilterConfig>) => {
     if (currentTableKey) {
       setFilters(currentTableKey, newFilters)
       // Reset to first page when filters change

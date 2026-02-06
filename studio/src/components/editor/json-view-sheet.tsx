@@ -21,7 +21,7 @@ import React, { useState } from 'react'
 interface JsonViewSheetProps {
   schema: string
   table: string
-  data: any[]
+  data: Array<any>
   disabled?: boolean
 }
 

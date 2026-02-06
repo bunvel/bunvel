@@ -1,4 +1,4 @@
-import { FilterConfig } from '@/types/table'
+import type { FilterConfig } from '@/types/table'
 
 export const reactQueryKeys = {
   schemas: {
@@ -17,7 +17,7 @@ export const reactQueryKeys = {
       page: number
       pageSize: number
       sorts?: Array<{ column: string; direction: 'asc' | 'desc' }>
-      filters?: FilterConfig[]
+      filters?: Array<FilterConfig>
     }) => ['tables', 'data', params] as const,
     detail: (schema: string, table: string) =>
       ['tables', 'detail', schema, table] as const,

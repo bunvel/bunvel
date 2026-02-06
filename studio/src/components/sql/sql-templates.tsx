@@ -18,7 +18,7 @@ import {
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useMemo, useState } from 'react'
 
-const sqlTemplates: SqlTemplate[] = [
+const sqlTemplates: Array<SqlTemplate> = [
   {
     id: 'todo-complete',
     name: 'Todo',

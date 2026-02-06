@@ -1,5 +1,5 @@
 import { getTableData, getTableMetadata } from '@/services/editor.service'
-import { FilterConfig } from '@/types/table'
+import type { FilterConfig } from '@/types/table'
 import { useQuery } from '@tanstack/react-query'
 import { reactQueryKeys } from './react-query-keys'
 
@@ -28,8 +28,8 @@ export function useTableData(
     page: number
     pageSize: number
     sorts?: Array<{ column: string; direction: 'asc' | 'desc' }>
-    filters?: FilterConfig[]
-    primaryKeys?: string[]
+    filters?: Array<FilterConfig>
+    primaryKeys?: Array<string>
   } = {
     page: 1,
     pageSize: 50,

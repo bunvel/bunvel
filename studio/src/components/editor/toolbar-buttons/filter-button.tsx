@@ -12,10 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { FilterOperator, FilterOperatorLabels } from '@/constants/filter'
+import type { FilterOperator} from '@/constants/filter';
+import { FilterOperatorLabels } from '@/constants/filter'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTableManager } from '@/hooks/use-table-manager'
-import {
+import type {
   FilterConfig,
   ColumnMetadata as TableColumnMetadata,
 } from '@/types/table'
@@ -25,9 +26,10 @@ import {
   isFilterValid,
   processFiltersWithIds,
 } from '@/utils/filter-utils'
+import type {
+  DragEndEvent} from '@dnd-kit/core';
 import {
   DndContext,
-  DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   closestCenter,
@@ -47,8 +49,8 @@ import { SortableItem } from '../../common/sortable-item'
 interface FilterButtonProps {
   schema?: string
   table?: string
-  filters?: any[]
-  onFilterChange?: (filters: any[]) => void
+  filters?: Array<any>
+  onFilterChange?: (filters: Array<any>) => void
   recordCount?: number
 }
 
@@ -74,10 +76,10 @@ export function FilterButton({
   const handleFilterChange = propOnFilterChange ?? hookHandleFilterChange
   const recordCount = propRecordCount ?? (hookTableData?.data?.length || 0)
   // Process initial filters with validation
-  const [localFilters, setLocalFilters] = useState<FilterConfig[]>(() =>
+  const [localFilters, setLocalFilters] = useState<Array<FilterConfig>>(() =>
     processFiltersWithIds(filters || []),
   )
-  const [pendingFilters, setPendingFilters] = useState<FilterConfig[]>(() =>
+  const [pendingFilters, setPendingFilters] = useState<Array<FilterConfig>>(() =>
     processFiltersWithIds(filters || []),
   )
   const [open, setOpen] = useState(false)

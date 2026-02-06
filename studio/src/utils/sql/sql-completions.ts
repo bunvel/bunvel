@@ -169,20 +169,20 @@ const SQL_FUNCTIONS = {
 
 // Generate completion items from arrays
 const generateCompletions = (
-  items: string[],
+  items: Array<string>,
   kind: languages.CompletionItemKind,
-): SqlCompletionItem[] => items.map((item) => createCompletion(item, kind))
+): Array<SqlCompletionItem> => items.map((item) => createCompletion(item, kind))
 
 // Generate function completions
 const generateFunctionCompletions = (
   functions: Array<{ name: string; signature: string }>,
-): SqlCompletionItem[] =>
+): Array<SqlCompletionItem> =>
   functions.map((func) =>
     createCompletion(func.name, KIND.FUNCTION, func.signature),
   )
 
 // Build the complete SQL completions array
-export const SQL_COMPLETIONS: SqlCompletionItem[] = [
+export const SQL_COMPLETIONS: Array<SqlCompletionItem> = [
   // Generate all keyword completions
   ...Object.values(SQL_KEYWORDS)
     .flat()

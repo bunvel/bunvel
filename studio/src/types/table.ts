@@ -20,15 +20,15 @@ export interface PaginationConfig {
 }
 
 export interface TableState {
-  selectedRows: TableRow[]
+  selectedRows: Array<TableRow>
   rowSelection: Record<string, boolean>
   pagination: PaginationConfig
-  sorts: SortConfig[]
-  filters: FilterConfig[]
+  sorts: Array<SortConfig>
+  filters: Array<FilterConfig>
 }
 
 export interface TableTabsState {
-  selectedTables: string[]
+  selectedTables: Array<string>
   maxTabs: number
   activeTableKey: string | null
 }
@@ -56,14 +56,14 @@ export interface ForeignKey {
 }
 
 export interface TableMetadata {
-  columns: ColumnMetadata[]
-  primary_keys: string[]
-  foreign_keys: ForeignKey[]
+  columns: Array<ColumnMetadata>
+  primary_keys: Array<string>
+  foreign_keys: Array<ForeignKey>
   table_type: 'r' | 'v' | 'm'
 }
 
 export interface TableDataResult {
-  data: Record<string, any>[]
+  data: Array<Record<string, any>>
   total: number
   page: number
   pageSize: number
@@ -75,9 +75,9 @@ export interface TableDataParams {
   table: string
   page: number
   pageSize: number
-  sorts?: SortConfig[]
-  filters?: FilterConfig[]
-  primaryKeys?: string[]
+  sorts?: Array<SortConfig>
+  filters?: Array<FilterConfig>
+  primaryKeys?: Array<string>
   firstColumnName?: string
 }
 
@@ -88,6 +88,6 @@ export interface TableMetadataResult {
 export interface DeleteRowsParams {
   schema: string
   table: string
-  primaryKeys: string[]
-  rows: Record<string, any>[]
+  primaryKeys: Array<string>
+  rows: Array<Record<string, any>>
 }

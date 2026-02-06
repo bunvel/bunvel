@@ -1,6 +1,6 @@
 export interface QueryResult {
-  data: Record<string, any>[]
-  columns: string[]
+  data: Array<Record<string, any>>
+  columns: Array<string>
   rowCount: number
   executionTime: number
 }

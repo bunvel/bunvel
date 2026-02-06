@@ -24,14 +24,14 @@ export interface TableStore {
   clearAllTableStates: () => void
 
   // Specific table state setters
-  setSelectedRows: (tableKey: string, selectedRows: TableRow[]) => void
+  setSelectedRows: (tableKey: string, selectedRows: Array<TableRow>) => void
   setRowSelection: (
     tableKey: string,
     rowSelection: Record<string, boolean>,
   ) => void
   setPagination: (tableKey: string, pagination: PaginationConfig) => void
-  setSorts: (tableKey: string, sorts: SortConfig[]) => void
-  setFilters: (tableKey: string, filters: FilterConfig[]) => void
+  setSorts: (tableKey: string, sorts: Array<SortConfig>) => void
+  setFilters: (tableKey: string, filters: Array<FilterConfig>) => void
 
   // Tab management actions
   addTable: (schema: string, table: string, maxTabs?: number) => void
@@ -101,7 +101,7 @@ export const useTableStore = create<TableStore>()(
     },
 
     // Specific table state setters
-    setSelectedRows: (tableKey: string, selectedRows: TableRow[]) => {
+    setSelectedRows: (tableKey: string, selectedRows: Array<TableRow>) => {
       get().setTableState(tableKey, { selectedRows })
     },
 
@@ -116,11 +116,11 @@ export const useTableStore = create<TableStore>()(
       get().setTableState(tableKey, { pagination })
     },
 
-    setSorts: (tableKey: string, sorts: SortConfig[]) => {
+    setSorts: (tableKey: string, sorts: Array<SortConfig>) => {
       get().setTableState(tableKey, { sorts })
     },
 
-    setFilters: (tableKey: string, filters: FilterConfig[]) => {
+    setFilters: (tableKey: string, filters: Array<FilterConfig>) => {
       get().setTableState(tableKey, { filters })
     },
 

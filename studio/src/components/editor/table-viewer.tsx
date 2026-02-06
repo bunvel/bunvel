@@ -1,8 +1,8 @@
 import { DataTable } from '@/components/data-table/data-table'
 import { useTableManager } from '@/hooks/use-table-manager'
-import { TableRow } from '@/types/table'
+import type { TableRow } from '@/types/table'
 import { formatCellValue } from '@/utils/format'
-import { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableHeaderCell } from '@/components/data-table/data-table-header-cell'
 import { NewColumnForm } from './new-column-form'
 import { TableToolbar } from './table-toolbar'
@@ -22,7 +22,7 @@ export function TableViewer() {
     handlePaginationChange,
   } = useTableManager()
 
-  const columns: ColumnDef<TableRow>[] = !metadata?.columns
+  const columns: Array<ColumnDef<TableRow>> = !metadata?.columns
     ? []
     : [
         ...metadata.columns.map((column: any) => ({

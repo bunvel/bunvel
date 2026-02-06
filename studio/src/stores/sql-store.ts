@@ -8,7 +8,7 @@ import { subscribeWithSelector } from 'zustand/middleware'
 const QUERY_HISTORY_KEY = 'bunvel-query-history'
 
 // Load query history from localStorage
-const loadQueryHistory = (): QueryHistoryItem[] => {
+const loadQueryHistory = (): Array<QueryHistoryItem> => {
   if (typeof window === 'undefined') return []
 
   try {
@@ -25,7 +25,7 @@ const loadQueryHistory = (): QueryHistoryItem[] => {
 }
 
 // Save query history to localStorage
-const saveQueryHistory = (history: QueryHistoryItem[]) => {
+const saveQueryHistory = (history: Array<QueryHistoryItem>) => {
   if (typeof window === 'undefined') return
 
   try {
@@ -41,18 +41,18 @@ const saveQueryHistory = (history: QueryHistoryItem[]) => {
 
 export interface SqlStore {
   // SQL tabs state
-  tabs: SqlTab[]
+  tabs: Array<SqlTab>
   activeTabId: string | null
 
   // Query history state
-  queryHistory: QueryHistoryItem[]
+  queryHistory: Array<QueryHistoryItem>
 
   // UI state
   showSidebar: boolean
   selectedQuery: string
 
   // Tab actions
-  setTabs: (tabs: SqlTab[]) => void
+  setTabs: (tabs: Array<SqlTab>) => void
   setActiveTabId: (tabId: string | null) => void
   addTab: (tab: SqlTab, maxTabs?: number) => void
   removeTab: (tabId: string) => void
@@ -67,7 +67,7 @@ export interface SqlStore {
   createNewQueryTab: () => void
 
   // Query history actions
-  setQueryHistory: (history: QueryHistoryItem[]) => void
+  setQueryHistory: (history: Array<QueryHistoryItem>) => void
   addToHistory: (query: string, success: boolean) => void
   clearHistory: () => void
   selectFromHistory: (query: string) => void
@@ -87,7 +87,7 @@ export const useSqlStore = create<SqlStore>()(
     selectedQuery: '',
 
     // Tab actions
-    setTabs: (tabs: SqlTab[]) => {
+    setTabs: (tabs: Array<SqlTab>) => {
       set({ tabs })
     },
 
@@ -171,7 +171,7 @@ export const useSqlStore = create<SqlStore>()(
     },
 
     // Query history actions
-    setQueryHistory: (history: QueryHistoryItem[]) => {
+    setQueryHistory: (history: Array<QueryHistoryItem>) => {
       set({ queryHistory: history })
       saveQueryHistory(history)
     },

@@ -54,7 +54,7 @@ export function DataTableSkeleton({
                       <Skeleton className="h-4 w-4 mx-auto" />
                     </TableCell>
                   )}
-                  {Array.from({ length: columnCount }).map((_, cellIndex) => (
+                  {Array.from({ length: columnCount }).map((__, cellIndex) => (
                     <TableCell key={cellIndex} className="border">
                       <div className="flex items-center">
                         <Skeleton className="h-4 w-full" />

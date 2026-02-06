@@ -12,7 +12,7 @@ export interface TableNode {
   rowCount: number
   size: string
   columnCount: number
-  columns: ColumnInfo[]
+  columns: Array<ColumnInfo>
   position: { x: number; y: number }
 }
 
@@ -36,8 +36,8 @@ export interface RelationshipEdge {
 }
 
 export interface SchemaDiagram {
-  nodes: TableNode[]
-  edges: RelationshipEdge[]
+  nodes: Array<TableNode>
+  edges: Array<RelationshipEdge>
 }
 
 export const getSchemaDiagram = createServerFn({ method: 'POST' })
@@ -45,7 +45,7 @@ export const getSchemaDiagram = createServerFn({ method: 'POST' })
   .handler(async ({ data: schema }) => {
     try {
       // Get all tables in the schema
-      const tablesResponse = await apiClient.post<DatabaseTables[]>(
+      const tablesResponse = await apiClient.post<Array<DatabaseTables>>(
         '/meta/query?key=GET_DATABASE_TABLES',
         {
           query: SQL_QUERIES.GET_DATABASE_TABLES,
@@ -58,8 +58,8 @@ export const getSchemaDiagram = createServerFn({ method: 'POST' })
       }
 
       const tables = tablesResponse.data
-      const nodes: TableNode[] = []
-      const edges: RelationshipEdge[] = []
+      const nodes: Array<TableNode> = []
+      const edges: Array<RelationshipEdge> = []
 
       // Process each table to get columns and relationships
       for (let i = 0; i < tables.length; i++) {
@@ -74,7 +74,7 @@ export const getSchemaDiagram = createServerFn({ method: 'POST' })
           },
         )
 
-        const columns: ColumnInfo[] = []
+        const columns: Array<ColumnInfo> = []
         if (Array.isArray(metadataResponse.data)) {
           for (const row of metadataResponse.data) {
             columns.push({

@@ -19,7 +19,7 @@ interface DataTypeOption {
 interface DataTypeSelectorProps {
   value: string
   onChange: (value: string | null) => void
-  dataTypes: DataTypeOption[]
+  dataTypes: Array<DataTypeOption>
   disabled?: boolean
   placeholder?: string
   label?: string

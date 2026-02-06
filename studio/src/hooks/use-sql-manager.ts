@@ -7,7 +7,7 @@ export interface UseSqlManagerReturn {
   // Current tab state
   activeTab: SqlTab | null
   activeTabId: string | null
-  tabs: SqlTab[]
+  tabs: Array<SqlTab>
 
   // Query state
   query: string
@@ -32,7 +32,7 @@ export interface UseSqlManagerReturn {
   createNewQueryTab: () => void
 
   // Query history management
-  queryHistory: QueryHistoryItem[]
+  queryHistory: Array<QueryHistoryItem>
   addToHistory: (query: string, success: boolean) => void
   clearHistory: () => void
   selectFromHistory: (query: string) => void
@@ -101,12 +101,12 @@ export function useSqlManager(): UseSqlManagerReturn {
   }
 
   // Query history functions
-  const handleAddToHistory = (query: string, success: boolean) => {
-    addToHistory(query, success)
+  const handleAddToHistory = (historyQuery: string, success: boolean) => {
+    addToHistory(historyQuery, success)
   }
 
-  const handleSelectFromHistory = (query: string) => {
-    selectFromHistory(query)
+  const handleSelectFromHistory = (historyQuery: string) => {
+    selectFromHistory(historyQuery)
   }
 
   // UI management functions
@@ -114,8 +114,8 @@ export function useSqlManager(): UseSqlManagerReturn {
     setShowSidebar(!showSidebar)
   }
 
-  const handleSetSelectedQuery = (query: string) => {
-    setSelectedQuery(query)
+  const handleSetSelectedQuery = (selectedQueryValue: string) => {
+    setSelectedQuery(selectedQueryValue)
   }
 
   // Query management

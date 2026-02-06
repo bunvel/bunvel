@@ -1,4 +1,4 @@
-import { FilterConfig } from '@/types/table'
+import type { FilterConfig } from '@/types/table'
 import { FilterSqlOperators } from '@/constants/filter'
 
 /**
@@ -31,8 +31,8 @@ export const generateFilterId = (filter: FilterConfig): string =>
  * @returns Array of validated filters with unique IDs
  */
 export const processFiltersWithIds = (
-  filters: FilterConfig[],
-): FilterConfig[] =>
+  filters: Array<FilterConfig>,
+): Array<FilterConfig> =>
   filters.filter(isFilterValid).map((f) => ({ ...f, id: generateFilterId(f) }))
 
 /**
@@ -42,8 +42,8 @@ export const processFiltersWithIds = (
  * @returns boolean indicating if filters are equal
  */
 export const areFiltersEqual = (
-  filters1: FilterConfig[],
-  filters2: FilterConfig[],
+  filters1: Array<FilterConfig>,
+  filters2: Array<FilterConfig>,
 ): boolean => {
   return JSON.stringify(filters1.sort()) === JSON.stringify(filters2.sort())
 }
@@ -78,9 +78,9 @@ export const createFilter = (
  * @returns Array of filters without the specified column
  */
 export const removeFiltersByColumn = (
-  filters: FilterConfig[],
+  filters: Array<FilterConfig>,
   column: string,
-): FilterConfig[] => filters.filter((filter) => filter.column !== column)
+): Array<FilterConfig> => filters.filter((filter) => filter.column !== column)
 
 /**
  * Gets available columns that don't have filters applied
@@ -90,8 +90,8 @@ export const removeFiltersByColumn = (
  */
 export const getAvailableColumns = (
   allColumns: Array<{ column_name: string }>,
-  appliedFilters: FilterConfig[],
-): string[] => {
+  appliedFilters: Array<FilterConfig>,
+): Array<string> => {
   const usedColumns = new Set(appliedFilters.map((filter) => filter.column))
   return allColumns
     .map((col) => col.column_name)

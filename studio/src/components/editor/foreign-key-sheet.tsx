@@ -22,9 +22,8 @@ import { useTables } from '@/hooks/queries/useTables'
 import type {
   ColumnDefinition,
   ForeignKeyAction,
-  ForeignKeyDefinition,
+  ForeignKeyDefinition, Schema 
 } from '@/types/database'
-import { Schema } from '@/types/database'
 import { checkColumnTypeCompatibility } from '@/utils/validation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -34,7 +33,7 @@ interface ForeignKeySheetProps {
   onOpenChange: (open: boolean) => void
   schema?: string
   tableName: string
-  columns: ColumnDefinition[]
+  columns: Array<ColumnDefinition>
   existingForeignKey?: ForeignKeyDefinition
   onSave: (foreignKey: ForeignKeyDefinition) => void
 }

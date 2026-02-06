@@ -35,8 +35,8 @@ interface TableFormSheetProps {
 type FormValues = {
   name: string
   description: string
-  columns: ColumnDefinition[]
-  foreignKeys: ForeignKeyDefinition[]
+  columns: Array<ColumnDefinition>
+  foreignKeys: Array<ForeignKeyDefinition>
 }
 
 export function TableFormSheet({ schema, children }: TableFormSheetProps) {

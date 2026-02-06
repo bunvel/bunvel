@@ -9,7 +9,7 @@ import { HugeiconsIcon } from '@hugeicons/react'
 import { ColumnActions } from './ColumnActions'
 
 interface TableColumnsSectionProps {
-  columns: ColumnDefinition[]
+  columns: Array<ColumnDefinition>
   allDataTypes: Array<{ value: string; label: string }>
   onColumnChange: (
     index: number,

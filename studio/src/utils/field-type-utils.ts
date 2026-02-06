@@ -28,7 +28,7 @@ export const isJsonType = (fieldType: string): boolean => {
 
 export const isCustomEnum = (
   dataType: string,
-  enumValuesMap: Record<string, string[]>
+  enumValuesMap: Record<string, Array<string>>
 ): boolean => {
   return Object.keys(enumValuesMap).includes(dataType)
 }
@@ -40,8 +40,8 @@ export const formatArrayValue = (value: any): string => {
   return value.toString()
 }
 
-export const parseArrayInput = (input: string, fieldType: string): any[] => {
-  let items: string[] = []
+export const parseArrayInput = (input: string, fieldType: string): Array<any> => {
+  let items: Array<string> = []
 
   // Check if value is in bracketed format [item1, item2, item3]
   if (input.trim().startsWith('[') && input.trim().endsWith(']')) {

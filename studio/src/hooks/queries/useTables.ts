@@ -16,7 +16,7 @@ import { useQuery } from '@tanstack/react-query'
 import { reactQueryKeys } from './react-query-keys'
 
 export function useTables(schema: string = 'public') {
-  return useQuery<Table[]>({
+  return useQuery<Array<Table>>({
     queryKey: reactQueryKeys.tables.list(schema),
     queryFn: async () => getTables({ data: { schema } }),
     enabled: !!schema,
@@ -26,7 +26,7 @@ export function useTables(schema: string = 'public') {
 }
 
 export function useDatabaseTables(schema: string) {
-  return useQuery<DatabaseTables[]>({
+  return useQuery<Array<DatabaseTables>>({
     queryKey: reactQueryKeys.databaseTables.list(schema),
     queryFn: async () => getDatabaseTables({ data: { schema } }),
     enabled: !!schema,
@@ -36,7 +36,7 @@ export function useDatabaseTables(schema: string) {
 }
 
 export function useDatabaseTableColumns(oid: string) {
-  return useQuery<DatabaseTableColumns[]>({
+  return useQuery<Array<DatabaseTableColumns>>({
     queryKey: reactQueryKeys.tables.columns(oid),
     queryFn: async () => getDatabaseTableColumns({ data: { oid } }),
     enabled: !!oid,
@@ -46,7 +46,7 @@ export function useDatabaseTableColumns(oid: string) {
 }
 
 export function useDatabaseIndexes(schema: string) {
-  return useQuery<DatabaseTableIndexes[]>({
+  return useQuery<Array<DatabaseTableIndexes>>({
     queryKey: reactQueryKeys.indexes.list(schema),
     queryFn: async () => getDatabaseTableIndexes({ data: { schema } }),
     enabled: !!schema,

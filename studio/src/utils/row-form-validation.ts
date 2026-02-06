@@ -1,7 +1,7 @@
 import type { TableMetadata } from '@/types/table'
 
 export interface FormValues {
-  [key: string]: string | number | boolean | null | any[]
+  [key: string]: string | number | boolean | null | Array<any>
 }
 
 export interface ValidationResult {

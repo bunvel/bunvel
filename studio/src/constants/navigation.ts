@@ -4,7 +4,7 @@ import {
   SqlIcon,
   TableIcon,
 } from '@hugeicons/core-free-icons'
-import { IconSvgElement } from '@hugeicons/react'
+import type { IconSvgElement } from '@hugeicons/react'
 
 export interface MenuItem {
   title: string
@@ -16,7 +16,7 @@ export interface MenuItemWithIcon extends MenuItem {
   icon: IconSvgElement
 }
 
-export const NAV_MAIN_ITEMS: MenuItemWithIcon[] = [
+export const NAV_MAIN_ITEMS: Array<MenuItemWithIcon> = [
   {
     title: 'Dashboard',
     to: '/',
@@ -39,7 +39,7 @@ export const NAV_MAIN_ITEMS: MenuItemWithIcon[] = [
   },
 ]
 
-export const DATABASE_MENU_ITEMS: MenuItem[] = [
+export const DATABASE_MENU_ITEMS: Array<MenuItem> = [
   {
     title: 'Schema Diagram',
     to: '/database/schemas',

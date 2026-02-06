@@ -1,4 +1,5 @@
-import pino, { Logger as PinoLogger } from 'pino'
+import type { Logger as PinoLogger } from 'pino';
+import pino from 'pino'
 
 // Create base Pino logger with environment-specific configuration
 const baseLogger = pino({

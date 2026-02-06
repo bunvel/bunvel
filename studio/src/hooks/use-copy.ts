@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger'
-import { EXPORT_FORMATS, ExportFormat } from '@/constants/app'
+import type { ExportFormat } from '@/constants/app';
+import { EXPORT_FORMATS } from '@/constants/app'
 import { escapeIdentifier } from '@/utils/func'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
@@ -31,7 +32,7 @@ export function useCopy() {
 
   const copyRows = useCallback(
     async <T extends Record<string, unknown>>(
-      rows: T[],
+      rows: Array<T>,
       options: CopyOptions = {},
     ): Promise<boolean> => {
       const {

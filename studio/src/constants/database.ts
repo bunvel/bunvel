@@ -77,7 +77,7 @@ export const DEFAULT_FOREIGN_KEY = {
   schema: 'public' as const,
 } as const
 
-export const FOREIGN_KEY_ACTIONS: ForeignKeyAction[] = [
+export const FOREIGN_KEY_ACTIONS: Array<ForeignKeyAction> = [
   'NO ACTION',
   'RESTRICT',
   'CASCADE',

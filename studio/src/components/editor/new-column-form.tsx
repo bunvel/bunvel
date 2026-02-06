@@ -38,7 +38,7 @@ type FormValues = {
   isPrimaryKey: boolean
   nullable: boolean
   unique: boolean
-  foreignKeys: ForeignKeyDefinition[]
+  foreignKeys: Array<ForeignKeyDefinition>
 }
 
 export function NewColumnForm({ schema, table }: NewColumnFormProps) {

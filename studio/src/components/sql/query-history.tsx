@@ -12,7 +12,7 @@ import { SqlIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 
 interface QueryHistoryProps {
-  history: QueryHistoryItem[]
+  history: Array<QueryHistoryItem>
   onSelect: (query: string) => void
   onClear: () => void
   className?: string

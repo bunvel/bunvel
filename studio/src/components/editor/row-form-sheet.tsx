@@ -103,7 +103,7 @@ export function RowFormSheet({
   }, [metadata])
 
   const enumValuesMap = useMemo(() => {
-    const grouped: Record<string, string[]> = {}
+    const grouped: Record<string, Array<string>> = {}
     enums.forEach((item: DatabaseEnum) => {
       if (!grouped[item.enum_name]) {
         grouped[item.enum_name] = []

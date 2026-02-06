@@ -12,7 +12,7 @@ export const Route = createFileRoute('/(main)/database/tables/$oid')({
 })
 
 // Define the table columns
-const columns: TableColumn[] = [
+const columns: Array<TableColumn> = [
   { key: 'name', header: 'NAME' },
   { key: 'description', header: 'DESCRIPTION' },
   { key: 'data_type', header: 'DATA TYPE' },

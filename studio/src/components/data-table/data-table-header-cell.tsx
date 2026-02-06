@@ -1,6 +1,6 @@
 import { ColumnKeyIndicator } from '@/components/common/column-key-indicator'
 import { cn } from '@/lib/utils'
-import { ColumnMetadata } from '@/types/table'
+import type { ColumnMetadata } from '@/types/table'
 import { formatDataType } from '@/utils/format'
 
 interface DataTableHeaderCellProps {

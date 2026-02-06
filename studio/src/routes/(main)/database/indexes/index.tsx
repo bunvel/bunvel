@@ -12,7 +12,7 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseIndexes } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types/components'
 import type { DatabaseTableIndexes } from '@/types/database'
-import { SchemaTable } from '@/types/schema'
+import type { SchemaTable } from '@/types/schema'
 import { PLACEHOLDERS } from '@/constants/ui'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/(main)/database/indexes/')({
 })
 
 // Define the table columns
-const columns: TableColumn[] = [
+const columns: Array<TableColumn> = [
   { key: 'table_name', header: 'Table' },
   { key: 'column_name', header: 'Column' },
   { key: 'index_name', header: 'Index' },

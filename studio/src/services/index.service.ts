@@ -15,14 +15,14 @@ export const getDatabaseTableIndexes = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data }) => {
     try {
-      const response = await apiClient.post<DatabaseTableIndexes[]>(
+      const response = await apiClient.post<Array<DatabaseTableIndexes>>(
         '/meta/query?key=' + QUERY_OPERATION_KEYS.GET_DATABASE_INDEXES,
         {
           query: SQL_QUERIES.GET_TABLE_INDEXES,
           params: [data.schema],
         },
       )
-      return response.data as DatabaseTableIndexes[]
+      return response.data as Array<DatabaseTableIndexes>
     } catch (error) {
       logger
         .service('index.service')

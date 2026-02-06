@@ -35,8 +35,8 @@ import { SortableItem } from '../../common/sortable-item'
 interface SortButtonProps {
   schema?: string
   table?: string
-  sorts?: any[]
-  onSortChange?: (sorts: any[]) => void
+  sorts?: Array<any>
+  onSortChange?: (sorts: Array<any>) => void
   recordCount?: number
 }
 
@@ -61,8 +61,8 @@ export function SortButton({
   const sorts = propSorts ?? hookSorts
   const handleSortChange = propOnSortChange ?? hookHandleSortChange
   const recordCount = propRecordCount ?? (hookTableData?.data?.length || 0)
-  const [localSorts, setLocalSorts] = useState<SortConfig[]>(sorts)
-  const [pendingSorts, setPendingSorts] = useState<SortConfig[]>(sorts)
+  const [localSorts, setLocalSorts] = useState<Array<SortConfig>>(sorts)
+  const [pendingSorts, setPendingSorts] = useState<Array<SortConfig>>(sorts)
   const [open, setOpen] = useState(false)
 
   const { data: tableMetadata } = useTableMetadata(schema, table)
@@ -210,7 +210,7 @@ export function SortButton({
                 strategy={verticalListSortingStrategy}
               >
                 {pendingSorts.map((sort, index) => {
-                  const availableColumns = columns.filter(
+                  const columnsForSort = columns.filter(
                     (col) =>
                       !pendingSorts.some((s) => s.column === col.column_name) ||
                       sort.column === col.column_name,
@@ -236,7 +236,7 @@ export function SortButton({
                             <SelectValue title="Select column"></SelectValue>
                           </SelectTrigger>
                           <SelectContent>
-                            {availableColumns.map((col) => (
+                            {columnsForSort.map((col) => (
                               <SelectItem
                                 key={col.column_name}
                                 value={col.column_name}

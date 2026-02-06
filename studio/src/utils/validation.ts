@@ -3,12 +3,12 @@ import { TABLE_FORM_MESSAGES } from '@/constants/ui'
 import { toast } from 'sonner'
 
 export function validateTableForm(
-  columns: ColumnDefinition[],
-  foreignKeys: ForeignKeyDefinition[],
+  columns: Array<ColumnDefinition>,
+  foreignKeys: Array<ForeignKeyDefinition>,
 ): {
   isValid: boolean
-  validColumns: ColumnDefinition[]
-  validForeignKeys: ForeignKeyDefinition[]
+  validColumns: Array<ColumnDefinition>
+  validForeignKeys: Array<ForeignKeyDefinition>
 } {
   // Filter out empty column names and validate
   const validColumns = columns.filter((col) => col.name.trim() !== '')
@@ -89,8 +89,8 @@ export function checkColumnTypeCompatibility(
 }
 
 export async function validateForeignKeyTypes(
-  foreignKeys: ForeignKeyDefinition[],
-  columns: ColumnDefinition[],
+  foreignKeys: Array<ForeignKeyDefinition>,
+  columns: Array<ColumnDefinition>,
   schema: string,
 ): Promise<boolean> {
   const validForeignKeys = foreignKeys.filter(

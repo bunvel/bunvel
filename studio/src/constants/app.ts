@@ -17,7 +17,7 @@ export const DEFAULT_PAGE_SIZE = 50
 
 export const DEFAULT_CURRENT_PAGE = 1
 
-export const READONLY_SCHEMAS: readonly string[] = ['auth']
+export const READONLY_SCHEMAS: ReadonlyArray<string> = ['auth']
 
 export const EXPORT_FORMATS = {
   JSON: 'json',

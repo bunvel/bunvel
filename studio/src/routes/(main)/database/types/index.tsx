@@ -3,7 +3,7 @@ import { EnumFormSheet } from '@/components/editor/enum-form-sheet'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseEnums } from '@/hooks/queries/useEnums'
 import type { TableColumn } from '@/types/components'
-import { SchemaTable } from '@/types/schema'
+import type { SchemaTable } from '@/types/schema'
 import { PLACEHOLDERS } from '@/constants/ui'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 
@@ -12,7 +12,7 @@ export const Route = createFileRoute('/(main)/database/types/')({
 })
 
 // Define the table columns
-const columns: TableColumn[] = [
+const columns: Array<TableColumn> = [
   { key: 'schema_name', header: 'Schema' },
   { key: 'enum_name', header: 'Name' },
   { key: 'enum_values', header: 'Values' },
@@ -26,7 +26,7 @@ function RouteComponent() {
 
   // Group enum values by enum name
   const groupedEnums = enums.reduce<
-    Record<string, { schema_name: string; values: string[] }>
+    Record<string, { schema_name: string; values: Array<string> }>
   >((acc, item) => {
     if (!acc[item.enum_name]) {
       acc[item.enum_name] = {

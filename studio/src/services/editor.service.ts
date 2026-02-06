@@ -3,9 +3,9 @@ import { FilterSqlOperators } from '@/constants/filter'
 import { apiClient, handleApiError } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
 import { SQL_QUERIES } from '@/lib/sql-queries'
-import { CreateRowParams, UpdateRowParams } from '@/types/database'
-import { SchemaTable } from '@/types/schema'
-import {
+import type { CreateRowParams, UpdateRowParams } from '@/types/database'
+import type { SchemaTable } from '@/types/schema'
+import type {
   ColumnMetadata,
   DeleteRowsParams,
   TableDataParams,
@@ -44,7 +44,7 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
         params: [data.schema, data.table],
       })
 
-      const columns: ColumnMetadata[] = []
+      const columns: Array<ColumnMetadata> = []
       const primaryKeys = new Set<string>()
       const foreignKeysMap = new Map<
         string,
@@ -141,8 +141,8 @@ export const getTableData = createServerFn({ method: 'POST' })
       const tableRef = `"${schema}"."${table}"`
 
       // Build WHERE clause for filtering
-      const whereClauses: string[] = []
-      const params: any[] = []
+      const whereClauses: Array<string> = []
+      const params: Array<any> = []
 
       if (data.filters?.length) {
         data.filters.forEach((filter) => {
@@ -241,11 +241,11 @@ export const deleteRows = createServerFn({ method: 'POST' })
       const tableRef = `"${schema}"."${table}"`
 
       // Build WHERE clause for each row based on primary keys
-      const whereClauses: string[] = []
-      const params: any[] = []
+      const whereClauses: Array<string> = []
+      const params: Array<any> = []
 
       rows.forEach((row) => {
-        const rowConditions: string[] = []
+        const rowConditions: Array<string> = []
 
         primaryKeys.forEach((pk) => {
           const paramIndex = params.length + 1

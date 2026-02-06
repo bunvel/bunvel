@@ -27,6 +27,8 @@ import {
 } from '@/components/ui/select'
 import type { ColumnMetadata } from '@/types/table'
 import {
+  TEXTAREA_ROWS_JSON,
+  TEXTAREA_ROWS_TEXT,
   formatArrayValue,
   isCustomEnum,
   isDateType,
@@ -34,8 +36,6 @@ import {
   isNumericType,
   isTextType,
   parseArrayInput,
-  TEXTAREA_ROWS_JSON,
-  TEXTAREA_ROWS_TEXT,
 } from '@/utils/field-type-utils'
 import { CalendarDays, Edit } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -47,7 +47,7 @@ interface FieldRendererProps {
   value: any
   isSubmitting: boolean
   mode: 'insert' | 'edit'
-  enumValuesMap: Record<string, string[]>
+  enumValuesMap: Record<string, Array<string>>
   onChange: (column: string, value: any) => void
   onReferenceSelectorOpen: (column: ColumnMetadata) => void
 }

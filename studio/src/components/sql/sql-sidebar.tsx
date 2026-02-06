@@ -8,7 +8,7 @@ import { SqlTemplates } from './sql-templates'
 
 interface SqlSidebarProps {
   isOpen: boolean
-  history: QueryHistoryItem[]
+  history: Array<QueryHistoryItem>
   onSelect: (query: string) => void
   onClear: () => void
   onOpenInTab?: (tab: SqlTab) => void

@@ -1,7 +1,13 @@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
-import { TableMetadata } from '@/types/table'
+import type { TableMetadata } from '@/types/table'
 import { formatCellValue } from '@/utils/format'
+import type {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+} from '@tanstack/react-table'
 import {
   getCoreRowModel,
   getFacetedRowModel,
@@ -10,10 +16,6 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  type ColumnDef,
-  type ColumnFiltersState,
-  type SortingState,
-  type VisibilityState,
 } from '@tanstack/react-table'
 import { useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { DataTableCell } from './data-table-cell'
@@ -22,14 +24,14 @@ import { DataTablePagination } from './data-table-pagination'
 import { DataTableSkeleton } from './data-table-skeleton'
 
 interface DataTableProps<TData, TValue = unknown> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  columns: Array<ColumnDef<TData, TValue>>
+  data: Array<TData>
   metadata: TableMetadata
   isLoading?: boolean
   error?: unknown
   enableRowSelection?: boolean
   onRowClick?: (row: TData) => void
-  onRowSelectionChange?: (selectedRows: TData[]) => void
+  onRowSelectionChange?: (selectedRows: Array<TData>) => void
   onRowSelectionStateChange?: (
     updaterOrValue:
       | Record<string, boolean>
@@ -94,7 +96,7 @@ export function DataTable<TData, TValue = unknown>({
           />
         )
       },
-      cell: ({}) => {
+      cell: () => {
         // This is a dummy cell - the actual checkbox is rendered in the main table body
         return null
       },
@@ -134,7 +136,7 @@ export function DataTable<TData, TValue = unknown>({
 
   // Handle row selection changes without re-running effect unnecessarily
   const onRowSelectionChangeHandler = useEffectEvent(
-    (selectedRows: TData[]) => {
+    (selectedRows: Array<TData>) => {
       if (onRowSelectionChange) {
         onRowSelectionChange(selectedRows)
       }

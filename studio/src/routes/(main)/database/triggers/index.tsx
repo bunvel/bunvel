@@ -3,7 +3,7 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseTriggers } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types/components'
 import type { DatabaseTrigger } from '@/types/database'
-import { SchemaTable } from '@/types/schema'
+import type { SchemaTable } from '@/types/schema'
 import { PLACEHOLDERS } from '@/constants/ui'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 
@@ -12,7 +12,7 @@ export const Route = createFileRoute('/(main)/database/triggers/')({
 })
 
 // Define the table columns
-const columns: TableColumn[] = [
+const columns: Array<TableColumn> = [
   { key: 'trigger_name', header: 'Name' },
   { key: 'table_name', header: 'Table' },
   { key: 'function_name', header: 'Function' },

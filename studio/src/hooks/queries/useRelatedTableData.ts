@@ -1,5 +1,5 @@
 import { getTableData } from '@/services/editor.service'
-import { ColumnMetadata, FilterConfig, TableDataResult } from '@/types/table'
+import type { ColumnMetadata, FilterConfig, TableDataResult } from '@/types/table'
 import { useQuery } from '@tanstack/react-query'
 import { reactQueryKeys } from './react-query-keys'
 
@@ -29,7 +29,7 @@ export function useRelatedTableData({
   )
 
   // Create filter to find the related record
-  const filters: FilterConfig[] = shouldFetch
+  const filters: Array<FilterConfig> = shouldFetch
     ? [
         {
           id: `${foreignKeyColumn.foreign_column_name!}-=${foreignKeyValue}`,

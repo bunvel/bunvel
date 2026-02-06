@@ -3,12 +3,12 @@ import { FieldRenderer } from './FieldRenderer'
 
 interface FieldSectionProps {
   title: string
-  columns: ColumnMetadata[]
+  columns: Array<ColumnMetadata>
   isOptional?: boolean
   formValues: Record<string, any>
   isSubmitting: boolean
   mode: 'insert' | 'edit'
-  enumValuesMap: Record<string, string[]>
+  enumValuesMap: Record<string, Array<string>>
   onChange: (column: string, value: any) => void
   onReferenceSelectorOpen: (column: ColumnMetadata) => void
   hasPrimaryKey?: boolean

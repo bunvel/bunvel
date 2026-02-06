@@ -1,6 +1,6 @@
 import type { ColumnDefinition } from '@/types/database'
 
-export function getDefaultColumns(): ColumnDefinition[] {
+export function getDefaultColumns(): Array<ColumnDefinition> {
   return [
     {
       name: 'id',

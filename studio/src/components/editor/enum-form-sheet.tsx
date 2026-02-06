@@ -24,7 +24,7 @@ interface EnumFormSheetProps {
 
 type FormValues = {
   enumName: string
-  values: string[]
+  values: Array<string>
 }
 
 export function EnumFormSheet({ schema, children }: EnumFormSheetProps) {

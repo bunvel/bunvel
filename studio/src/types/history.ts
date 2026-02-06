@@ -6,7 +6,7 @@ export interface QueryHistoryItem {
 }
 
 export interface UseQueryHistoryReturn {
-  history: QueryHistoryItem[]
+  history: Array<QueryHistoryItem>
   addToHistory: (query: string, success: boolean) => void
   clearHistory: () => void
   selectFromHistory: (query: string) => void

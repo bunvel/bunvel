@@ -2,8 +2,8 @@ import { DatabaseTable } from '@/components/database/database-table'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseFunctions } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types/components'
-import { DatabaseFunction } from '@/types/database'
-import { SchemaTable } from '@/types/schema'
+import type { DatabaseFunction } from '@/types/database'
+import type { SchemaTable } from '@/types/schema'
 import { PLACEHOLDERS } from '@/constants/ui'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 
@@ -12,7 +12,7 @@ export const Route = createFileRoute('/(main)/database/functions/')({
 })
 
 // Define the table columns
-const columns: TableColumn[] = [
+const columns: Array<TableColumn> = [
   { key: 'function_name', header: 'Name' },
   { key: 'arguments', header: 'Arguments' },
   { key: 'return_type', header: 'Return Type' },

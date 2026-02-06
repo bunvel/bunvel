@@ -1,4 +1,4 @@
-import { ExportFormat } from '@/constants/app'
+import type { ExportFormat } from '@/constants/app'
 import { BUTTON_LABELS } from '@/constants/ui'
 import { useCopy } from '@/hooks/use-copy'
 import { useTableManager } from '@/hooks/use-table-manager'

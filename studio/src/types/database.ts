@@ -12,7 +12,7 @@ export interface ColumnDefinition {
 export interface Table {
   name: string
   kind: TableKind
-  columns?: ColumnDefinition[]
+  columns?: Array<ColumnDefinition>
 }
 
 export type ForeignKeyAction = 'NO ACTION' | 'RESTRICT' | 'CASCADE'
@@ -30,8 +30,8 @@ export interface CreateTableParams {
   schema: string
   table: string
   description: string
-  columns: ColumnDefinition[]
-  foreignKeys?: ForeignKeyDefinition[]
+  columns: Array<ColumnDefinition>
+  foreignKeys?: Array<ForeignKeyDefinition>
 }
 
 export interface CreateRowParams {
@@ -44,7 +44,7 @@ export interface UpdateRowParams {
   schema: string
   table: string
   row: Record<string, any>
-  primaryKeys: string[]
+  primaryKeys: Array<string>
 }
 
 export interface DeleteTableParams {
@@ -56,7 +56,7 @@ export interface DeleteTableParams {
 export interface CreateIndexParams {
   schema: string
   table: string
-  columns: string[]
+  columns: Array<string>
   unique?: boolean
   indexType?: 'btree' | 'hash' | 'gist' | 'spgist' | 'gin' | 'brin'
 }
@@ -64,7 +64,7 @@ export interface CreateIndexParams {
 export interface CreateEnumParams {
   schema: string
   enumName: string
-  values: string[]
+  values: Array<string>
 }
 
 export interface DatabaseTables {

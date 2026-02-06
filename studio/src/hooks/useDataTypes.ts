@@ -5,7 +5,7 @@ export function useDataTypes(schema: string) {
   const { data: enums = [] } = useDatabaseEnums(schema)
 
   // Group enums by name to avoid duplicates
-  const uniqueEnums = enums.reduce((acc: any[], enum_: any) => {
+  const uniqueEnums = enums.reduce((acc: Array<any>, enum_: any) => {
     if (!acc.find((e: any) => e.enum_name === enum_.enum_name)) {
       acc.push(enum_)
     }
