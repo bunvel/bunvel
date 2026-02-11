@@ -1,5 +1,5 @@
 import { apiClient, handleApiError } from '@/lib/api-client'
-import { logger } from '@/lib/logger'
+import { logWideEvent } from '@/lib/logger'
 import { SQL_QUERIES } from '@/lib/sql-queries'
 import type { CreateEnumParams, DatabaseEnum } from '@/types/database'
 import { escapeIdentifier } from '@/utils/func'
@@ -24,7 +24,7 @@ export const getDatabaseEnums = createServerFn({ method: 'POST' })
       )
       return response.data as Array<DatabaseEnum>
     } catch (error) {
-      logger.service('enum.service').error('Error fetching enums', error)
+      logWideEvent('enum.fetch.error', { schema: data.schema, error })
       handleApiError(error)
     }
   })
@@ -58,7 +58,7 @@ export const createEnum = createServerFn({ method: 'POST' })
       await apiClient.post('/meta/query', { query })
       return { success: true }
     } catch (error) {
-      logger.service('enum.service').error('Error creating enum', error)
+      logWideEvent('enum.create.error', { enumName: data.enumName, error })
       throw error
     }
   })
@@ -84,7 +84,7 @@ export const deleteEnum = createServerFn({ method: 'POST' })
       await apiClient.post('/meta/query', { query })
       return { success: true }
     } catch (error) {
-      logger.service('enum.service').error('Error deleting enum', error)
+      logWideEvent('enum.delete.error', { enumName: data.enumName, error })
       throw error
     }
   })

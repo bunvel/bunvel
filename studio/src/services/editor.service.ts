@@ -1,7 +1,7 @@
 import { DEFAULT_PAGE_SIZE } from '@/constants/app'
 import { FilterSqlOperators } from '@/constants/filter'
 import { apiClient, handleApiError } from '@/lib/api-client'
-import { logger } from '@/lib/logger'
+import { logWideEvent } from '@/lib/logger'
 import { SQL_QUERIES } from '@/lib/sql-queries'
 import type { CreateRowParams, UpdateRowParams } from '@/types/database'
 import type { SchemaTable } from '@/types/schema'
@@ -101,11 +101,11 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
       })
 
       if (!metadataResponse.data[0]) {
-        logger
-          .service('editor.service')
-          .warn(
-            `No metadata found for ${data.schema}.${data.table}, defaulting to table type 'r'`,
-          )
+        logWideEvent('editor.metadata.warn', {
+          schema: data.schema,
+          table: data.table,
+          message: 'No metadata found, defaulting to table type r',
+        })
       }
       const tableType = metadataResponse.data[0]?.table_type || 'r'
 
@@ -118,9 +118,11 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
         },
       }
     } catch (error) {
-      logger
-        .service('editor.service')
-        .error('Error fetching table metadata', error)
+      logWideEvent('editor.metadata.fetch.error', {
+        schema: data.schema,
+        table: data.table,
+        error,
+      })
       handleApiError(error)
     }
   })
@@ -217,7 +219,11 @@ export const getTableData = createServerFn({ method: 'POST' })
         totalPages: Math.ceil(total / data.pageSize),
       }
     } catch (error) {
-      logger.service('editor.service').error('Error in getTableData', error)
+      logWideEvent('editor.tabledata.error', {
+        schema: data.schema,
+        table: data.table,
+        error,
+      })
       handleApiError(error)
     }
   })
@@ -275,7 +281,12 @@ export const deleteRows = createServerFn({ method: 'POST' })
         deletedCount: rows.length,
       }
     } catch (error) {
-      logger.service('editor.service').error('Error in deleteRows', error)
+      logWideEvent('editor.rows.delete.error', {
+        schema: data.schema,
+        table: data.table,
+        rowCount: data.rows.length,
+        error,
+      })
       handleApiError(error)
     }
   })
@@ -334,7 +345,11 @@ export const insertRow = createServerFn({ method: 'POST' })
         data: result.data?.[0] || null,
       }
     } catch (error) {
-      logger.service('editor.service').error('Error in insertRow', error)
+      logWideEvent('editor.row.insert.error', {
+        schema: data.schema,
+        table: data.table,
+        error,
+      })
       handleApiError(error)
     }
   })
@@ -412,7 +427,11 @@ export const updateRow = createServerFn({ method: 'POST' })
         data: result.data?.[0] || null,
       }
     } catch (error) {
-      logger.service('editor.service').error('Error in updateRow', error)
+      logWideEvent('editor.row.update.error', {
+        schema: data.schema,
+        table: data.table,
+        error,
+      })
       handleApiError(error)
     }
   })
@@ -472,7 +491,12 @@ export const addColumn = createServerFn({ method: 'POST' })
         data: result.data,
       }
     } catch (error) {
-      logger.service('editor.service').error('Error in addColumn', error)
+      logWideEvent('editor.column.add.error', {
+        schema: data.schema,
+        table: data.table,
+        column: data.column,
+        error,
+      })
       handleApiError(error)
     }
   })

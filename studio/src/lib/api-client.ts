@@ -1,6 +1,6 @@
 import { API_URL } from '@/constants/app'
 import type { ApiError, ApiResponse } from '@/types/api'
-import { logger } from './logger'
+import { logWideEvent } from './logger'
 
 class ApiClient {
   constructor(private baseUrl: string = API_URL || '') {}
@@ -76,10 +76,11 @@ export const apiClient = new ApiClient()
 export function handleApiError(error: unknown): never {
   if (error instanceof Error) {
     const apiError = error as ApiError
-    logger.service('api-client').error('API Error', {
+    logWideEvent('api.error', {
       message: apiError.message,
       status: apiError.status,
       code: apiError.code,
+      details: apiError.details,
     })
     throw apiError
   }

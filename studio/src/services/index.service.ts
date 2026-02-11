@@ -1,5 +1,5 @@
 import { apiClient, handleApiError } from '@/lib/api-client'
-import { logger } from '@/lib/logger'
+import { logWideEvent } from '@/lib/logger'
 import { SQL_QUERIES } from '@/lib/sql-queries'
 import type { CreateIndexParams, DatabaseTableIndexes } from '@/types/database'
 import { escapeIdentifier } from '@/utils/func'
@@ -24,9 +24,7 @@ export const getDatabaseTableIndexes = createServerFn({ method: 'POST' })
       )
       return response.data as Array<DatabaseTableIndexes>
     } catch (error) {
-      logger
-        .service('index.service')
-        .error('Error fetching table indexes', error)
+      logWideEvent('index.fetch.error', { schema: data.schema, error })
       handleApiError(error)
     }
   })
@@ -77,7 +75,12 @@ export const createIndex = createServerFn({ method: 'POST' })
       )
       return { success: true }
     } catch (error) {
-      logger.service('index.service').error('Error creating index', error)
+      logWideEvent('index.create.error', {
+        schema: data.schema,
+        table: data.table,
+        columns: data.columns,
+        error,
+      })
       handleApiError(error)
     }
   })

@@ -1,5 +1,5 @@
 import { apiClient, handleApiError } from '@/lib/api-client'
-import { logger } from '@/lib/logger'
+import { logWideEvent } from '@/lib/logger'
 import { SQL_QUERIES } from '@/lib/sql-queries'
 import type { Schema } from '@/types/database'
 import { escapeIdentifier } from '@/utils/func'
@@ -24,7 +24,7 @@ export const getSchemas = createServerFn({ method: 'POST' }).handler(
         data: response.data,
       }
     } catch (error) {
-      logger.service('schema.service').error('Failed to fetch schemas', error)
+      logWideEvent('schema.fetch.error', { error })
       handleApiError(error)
     }
   },
@@ -55,7 +55,7 @@ export const createSchema = createServerFn({ method: 'POST' })
         data: response.data,
       }
     } catch (error) {
-      logger.service('schema.service').error('Failed to create schema', error)
+      logWideEvent('schema.create.error', { schemaName: data, error })
       handleApiError(error)
     }
   })

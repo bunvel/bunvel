@@ -1,5 +1,5 @@
 import { apiClient, handleApiError } from '@/lib/api-client'
-import { logger } from '@/lib/logger'
+import { logWideEvent } from '@/lib/logger'
 import type { Project } from '@/types/project'
 import { createServerFn } from '@tanstack/react-start'
 
@@ -14,7 +14,7 @@ export const getProject = createServerFn({ method: 'GET' }).handler(
 
       return response.data
     } catch (error) {
-      logger.service('project.service').error('Failed to fetch project', error)
+      logWideEvent('project.fetch.error', { error })
       handleApiError(error)
     }
   },

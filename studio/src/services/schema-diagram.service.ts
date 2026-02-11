@@ -1,5 +1,5 @@
 import { apiClient, handleApiError } from '@/lib/api-client'
-import { logger } from '@/lib/logger'
+import { logWideEvent } from '@/lib/logger'
 import { SQL_QUERIES } from '@/lib/sql-queries'
 import type { DatabaseTables, TableKind } from '@/types/database'
 import { createServerFn } from '@tanstack/react-start'
@@ -133,9 +133,7 @@ export const getSchemaDiagram = createServerFn({ method: 'POST' })
         } as SchemaDiagram,
       }
     } catch (error) {
-      logger
-        .service('schema-diagram.service')
-        .error('Failed to fetch schema diagram', error)
+      logWideEvent('schema-diagram.fetch.error', { schema, error })
       handleApiError(error)
     }
   })

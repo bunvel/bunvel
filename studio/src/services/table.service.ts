@@ -1,5 +1,5 @@
 import { apiClient, handleApiError } from '@/lib/api-client'
-import { logger } from '@/lib/logger'
+import { logWideEvent } from '@/lib/logger'
 import { SQL_QUERIES } from '@/lib/sql-queries'
 import type {
   CreateTableParams,
@@ -32,7 +32,7 @@ export const getTables = createServerFn({ method: 'POST' })
       )
       return response.data as Array<Table>
     } catch (error) {
-      logger.service('table.service').error('Error fetching tables', error)
+      logWideEvent('tables.fetch.error', { schema: data.schema, error })
       handleApiError(error)
     }
   })
@@ -56,7 +56,7 @@ export const getDatabaseTables = createServerFn({ method: 'POST' })
 
       return response.data as Array<DatabaseTables>
     } catch (error) {
-      logger.service('table.service').error('Error fetching tables', error)
+      logWideEvent('tables.fetch.error', { schema: data.schema, error })
       handleApiError(error)
     }
   })
@@ -79,7 +79,7 @@ export const getDatabaseTableColumns = createServerFn({ method: 'POST' })
       )
       return response.data as Array<DatabaseTableColumns>
     } catch (error) {
-      logger.service('table.service').error('Error fetching columns', error)
+      logWideEvent('table.columns.fetch.error', { oid: data.oid, error })
       handleApiError(error)
     }
   })
@@ -99,7 +99,7 @@ export const getDatabaseTriggers = createServerFn({ method: 'POST' })
       )
       return response.data as Array<DatabaseTrigger>
     } catch (error) {
-      logger.service('table.service').error('Error fetching triggers', error)
+      logWideEvent('table.triggers.fetch.error', { schema: data.schema, error })
       handleApiError(error)
     }
   })
@@ -119,7 +119,10 @@ export const getDatabaseFunctions = createServerFn({ method: 'POST' })
       )
       return response.data as Array<DatabaseFunction>
     } catch (error) {
-      logger.service('table.service').error('Error fetching functions', error)
+      logWideEvent('table.functions.fetch.error', {
+        schema: data.schema,
+        error,
+      })
       handleApiError(error)
     }
   })
@@ -143,7 +146,11 @@ export const deleteTable = createServerFn({ method: 'POST' })
       )
       return { success: true }
     } catch (error) {
-      logger.service('table.service').error('Error deleting table', error)
+      logWideEvent('table.delete.error', {
+        schema: data.schema,
+        table: data.table,
+        error,
+      })
       handleApiError(error)
     }
   })
@@ -166,7 +173,11 @@ export const truncateTable = createServerFn({ method: 'POST' })
       )
       return { success: true }
     } catch (error) {
-      logger.service('table.service').error('Error truncating table', error)
+      logWideEvent('table.truncate.error', {
+        schema: data.schema,
+        table: data.table,
+        error,
+      })
       handleApiError(error)
     }
   })
@@ -230,12 +241,11 @@ export const createTable = createServerFn({ method: 'POST' })
           def += ` DEFAULT ${formattedDefault}`
         } catch (error) {
           // Skip default value if formatting fails
-          logger
-            .service('table.service')
-            .warn(`Invalid default value for column ${col.name}`, {
-              defaultValue: col.defaultValue,
-              error,
-            })
+          logWideEvent('table.column.default.warn', {
+            columnName: col.name,
+            defaultValue: col.defaultValue,
+            error,
+          })
         }
       }
 
@@ -283,7 +293,11 @@ export const createTable = createServerFn({ method: 'POST' })
       )
       return { success: true }
     } catch (error) {
-      logger.service('table.service').error('Error creating table', error)
+      logWideEvent('table.create.error', {
+        schema: data.schema,
+        table: data.table,
+        error,
+      })
       throw error
     }
   })

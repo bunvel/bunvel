@@ -75,18 +75,6 @@ export const loggingPlugin = new Elysia({ name: "logging" })
 
     set.headers["x-request-start"] = start.toString();
     set.headers["x-correlation-id"] = correlationId;
-
-    httpLogger.info({
-      event: "http.request.start",
-      correlationId,
-      method: request.method,
-      url: request.url,
-      userAgent: request.headers.get("user-agent"),
-      ip:
-        request.headers.get("x-forwarded-for") ||
-        request.headers.get("x-real-ip") ||
-        "unknown",
-    });
   })
 
   .onAfterHandle(({ request, set }) => {
@@ -94,14 +82,47 @@ export const loggingPlugin = new Elysia({ name: "logging" })
     const duration = Date.now() - start;
     const correlationId = set.headers["x-correlation-id"] as string;
 
-    httpLogger.info({
-      event: "http.request.end",
+    // Extract path without query params for cleaner logs
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const query = url.search;
+
+    // Sanitize user agent (remove potential sensitive info)
+    const userAgent =
+      request.headers.get("user-agent")?.slice(0, 200) || "unknown";
+
+    // Sanitize IP (show only first 2 octets in production)
+    const rawIp =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+    const ip =
+      env.NODE_ENV === "production"
+        ? rawIp.split(".").slice(0, 2).join(".") + ".x.x"
+        : rawIp;
+
+    // Single wide event per request (Laravel-style)
+    const statusCode = Number(set.status ?? 200);
+    const wideEvent = {
+      event: "http.request",
       correlationId,
       method: request.method,
-      url: request.url,
-      statusCode: set.status ?? 200,
+      path,
+      query: query || undefined,
+      statusCode,
       duration,
-    });
+      userAgent,
+      ip,
+      timestamp: new Date().toISOString(),
+      // Environment context
+      service: "bunvel-api",
+      version: process.env.npm_package_version || "0.0.0",
+      nodeEnv: env.NODE_ENV,
+    };
+
+    // Use info level for successful requests, error for failures
+    const logLevel = statusCode >= 400 ? "error" : "info";
+    httpLogger[logLevel](wideEvent);
   })
 
   .onError(({ error, request, set }) => {
@@ -109,35 +130,62 @@ export const loggingPlugin = new Elysia({ name: "logging" })
     const duration = Date.now() - start;
     const correlationId = set.headers["x-correlation-id"] as string;
 
-    let errorMessage: string | undefined;
-    let errorStack: string | undefined;
-    let errorName: string | undefined;
+    // Extract path without query params for cleaner logs
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const query = url.search;
 
-    if (error && typeof error === "object") {
-      if ("message" in error) {
-        errorMessage = String(error.message);
-      }
-      if ("stack" in error) {
-        errorStack = String(error.stack);
-      }
-      if ("name" in error) {
-        errorName = String(error.name);
-      }
-    } else {
-      errorMessage = String(error);
-    }
+    // Sanitize user agent
+    const userAgent =
+      request.headers.get("user-agent")?.slice(0, 200) || "unknown";
 
-    errorLogger.error({
-      event: "http.request.error",
+    // Sanitize IP
+    const rawIp =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+    const ip =
+      env.NODE_ENV === "production"
+        ? rawIp.split(".").slice(0, 2).join(".") + ".x.x"
+        : rawIp;
+
+    // Sanitize error details (no stack traces in production logs)
+    const errorMessage =
+      error && typeof error === "object" && "message" in error
+        ? String(error.message)
+        : String(error);
+
+    // Single wide event for errors (Laravel-style)
+    const wideEvent = {
+      event: "http.request",
       correlationId,
       method: request.method,
-      url: request.url,
-      statusCode: set.status ?? 500,
+      path,
+      query: query || undefined,
+      statusCode: Number(set.status ?? 500),
       duration,
+      userAgent,
+      ip,
       error: {
         message: errorMessage,
-        stack: errorStack,
-        name: errorName,
+        type:
+          error && typeof error === "object" && "name" in error
+            ? String(error.name)
+            : "Error",
+        // Include stack only in development
+        ...(env.NODE_ENV === "development" &&
+        error &&
+        typeof error === "object" &&
+        "stack" in error
+          ? { stack: String(error.stack) }
+          : {}),
       },
-    });
+      timestamp: new Date().toISOString(),
+      // Environment context
+      service: "bunvel-api",
+      version: process.env.npm_package_version || "0.0.0",
+      nodeEnv: env.NODE_ENV,
+    };
+
+    errorLogger.error(wideEvent);
   });

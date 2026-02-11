@@ -1,5 +1,5 @@
 import { apiClient, handleApiError } from '@/lib/api-client'
-import { logger } from '@/lib/logger'
+import { logWideEvent } from '@/lib/logger'
 import { createServerFn } from '@tanstack/react-start'
 
 export const executeQuery = createServerFn({ method: 'POST' })
@@ -31,7 +31,7 @@ export const executeQuery = createServerFn({ method: 'POST' })
         executionTime: endTime - startTime,
       }
     } catch (error) {
-      logger.service('sql.service').error('Query execution error', error)
+      logWideEvent('sql.execute.error', { query: data, error })
       handleApiError(error)
     }
   })

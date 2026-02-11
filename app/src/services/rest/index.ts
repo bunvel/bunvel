@@ -3,7 +3,6 @@ import {
   InternalServerErrorException,
   MethodNotAllowedException,
 } from "elysia-http-exception";
-import { logger } from "../../plugins/logging";
 import { env } from "../../utils/config";
 import { ALLOWED_METHODS, JSON_CONTENT_TYPE } from "../../utils/constant";
 
@@ -30,13 +29,6 @@ export const restService = new Elysia({
       ).toString();
       const targetWithQuery = url.search ? `${target}${url.search}` : target;
 
-      logger.info({
-        event: "rest.request.proxying",
-        method: request.method,
-        originalUrl: request.url,
-        targetUrl: targetWithQuery,
-      });
-
       const headers = new Headers(request.headers);
       headers.set("Content-Type", JSON_CONTENT_TYPE);
       headers.set("Accept", JSON_CONTENT_TYPE);
@@ -57,22 +49,8 @@ export const restService = new Elysia({
         ? await response.json()
         : await response.text();
 
-      logger.info({
-        event: "rest.request.completed",
-        method: request.method,
-        originalUrl: request.url,
-        targetUrl: targetWithQuery,
-        statusCode: response.status,
-      });
-
       return contentType.includes(JSON_CONTENT_TYPE) ? result : result;
     } catch (error) {
-      logger.error({
-        event: "rest.request.failed",
-        method: request.method,
-        url: request.url,
-      });
-
       throw new InternalServerErrorException({
         error: "Internal server error",
         details: error instanceof Error ? error.message : String(error),
