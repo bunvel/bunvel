@@ -15,12 +15,5 @@ export function useCreateIndex() {
       })
       toast.success('Index created successfully')
     },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to create index'
-      toast.error('Error creating index', {
-        description: errorMessage,
-      })
-    },
   })
 }

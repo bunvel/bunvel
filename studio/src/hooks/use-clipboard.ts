@@ -1,4 +1,3 @@
-import { logger } from '@/lib/logger'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -19,7 +18,6 @@ export function useCopyToClipboard(): [CopiedValue, CopyFn] {
       setCopiedText(text)
       return true
     } catch (error) {
-      logger.hook('use-clipboard').error('Failed to copy to clipboard', error)
       setCopiedText(null)
       toast.error(
         'Failed to copy to clipboard. Please check browser permissions.',

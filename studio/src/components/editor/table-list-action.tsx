@@ -10,7 +10,6 @@ import { SidebarMenuAction } from '@/components/ui/sidebar'
 import { useDeleteTable } from '@/hooks/mutations/useDeleteTable'
 import { useTruncateTable } from '@/hooks/mutations/useTruncateTable'
 import { useCopyToClipboard } from '@/hooks/use-clipboard'
-import { useTableManager } from '@/hooks/use-table-manager'
 import type { TableListActionProps } from '@/types/components'
 import { Copy01Icon, MoreVertical, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -20,12 +19,7 @@ import { toast } from 'sonner'
 export function TableListAction({ schema, table }: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isTruncateDialogOpen, setIsTruncateDialogOpen] = useState(false)
-  const { removeTableBySchema } = useTableManager()
-  const { mutate: deleteTable, isPending: isDeleting } = useDeleteTable({
-    onTableDeleted: (deletedSchema, deletedTable) => {
-      removeTableBySchema(deletedSchema, deletedTable)
-    },
-  })
+  const { mutate: deleteTable, isPending: isDeleting } = useDeleteTable()
   const { mutate: truncateTable, isPending: isTruncating } = useTruncateTable()
   const [, copyToClipboard] = useCopyToClipboard()
 

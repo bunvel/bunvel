@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger'
+import { logWideEvent } from '@/lib/logger'
 import { useState } from 'react'
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
@@ -9,9 +9,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       const item = window.localStorage.getItem(key)
       return item ? JSON.parse(item) : initialValue
     } catch (error) {
-      logger
-        .hook('use-local-storage')
-        .error('LocalStorage read error', { key, error })
+      logWideEvent('localStorage read error', { key, error })
       return initialValue
     }
   })
@@ -25,9 +23,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
         window.localStorage.setItem(key, JSON.stringify(valueToStore))
       }
     } catch (error) {
-      logger
-        .hook('use-local-storage')
-        .error('LocalStorage write error', { key, error })
+      logWideEvent('localStorage write error', { key, error })
     }
   }
 

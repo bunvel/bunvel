@@ -20,13 +20,6 @@ export function useCreateTable() {
       })
       toast.success('Table created successfully')
     },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to create table'
-      toast.error('Error creating table', {
-        description: errorMessage,
-      })
-    },
   })
 }
 
@@ -48,13 +41,6 @@ export function useDeleteRows() {
       toast.success(
         `Successfully deleted ${result?.deletedCount || 0} row${(result?.deletedCount || 0) === 1 ? '' : 's'}`,
       )
-    },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to delete rows'
-      toast.error('Error deleting rows', {
-        description: errorMessage,
-      })
     },
   })
 }

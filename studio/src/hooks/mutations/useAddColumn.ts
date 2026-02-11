@@ -1,5 +1,4 @@
 import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
-import { logger } from '@/lib/logger'
 import { addColumn } from '@/services/editor.service'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -15,10 +14,9 @@ interface AddColumnParams {
     referencedColumn: string
     onDelete?: string
   }>
-  onSuccess?: () => void
 }
 
-export function useAddColumn() {
+export function useAddColumn(options?: { onSuccess?: () => void }) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -52,13 +50,9 @@ export function useAddColumn() {
       toast.success('Column added successfully')
 
       // Call custom onSuccess callback if provided
-      if (variables.onSuccess) {
-        variables.onSuccess()
+      if (options?.onSuccess) {
+        options.onSuccess()
       }
-    },
-    onError: (error) => {
-      logger.hook('use-add-column').error('Error adding column', error)
-      toast.error('Failed to add column')
     },
   })
 }

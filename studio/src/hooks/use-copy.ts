@@ -1,5 +1,4 @@
-import { logger } from '@/lib/logger'
-import type { ExportFormat } from '@/constants/app';
+import type { ExportFormat } from '@/constants/app'
 import { EXPORT_FORMATS } from '@/constants/app'
 import { escapeIdentifier } from '@/utils/func'
 import { useCallback } from 'react'
@@ -99,7 +98,6 @@ export function useCopy() {
         }
         return false
       } catch (err) {
-        logger.hook('use-copy').error('Failed to copy rows', err)
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to process data'
         toast.error(errorMessage)

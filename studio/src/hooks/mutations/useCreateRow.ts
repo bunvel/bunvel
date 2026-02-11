@@ -21,12 +21,5 @@ export function useCreateRow() {
       })
       toast.success('Row created successfully')
     },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to create row'
-      toast.error('Error creating row', {
-        description: errorMessage,
-      })
-    },
   })
 }

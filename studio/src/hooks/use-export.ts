@@ -1,7 +1,7 @@
-import { logger } from '@/lib/logger'
-import type { ExportFormat } from '@/constants/app';
+import type { ExportFormat } from '@/constants/app'
 import { EXPORT_FORMATS } from '@/constants/app'
 import { useCallback } from 'react'
+import { toast } from 'sonner'
 
 interface ExportOptions {
   format?: ExportFormat
@@ -142,7 +142,7 @@ export function useExport() {
     ): Promise<boolean> => {
       try {
         if (!data || data.length === 0) {
-          logger.hook('use-export').error('No data provided for export')
+          toast.error('No data available to export')
           return false
         }
 
@@ -151,9 +151,7 @@ export function useExport() {
 
         const handler = formatHandlers[format]
         if (!handler) {
-          logger
-            .hook('use-export')
-            .error(`Unsupported export format: ${format}`)
+          toast.error(`Unsupported export format: ${format}`)
           return false
         }
 
@@ -183,7 +181,7 @@ export function useExport() {
           setTimeout(() => URL.revokeObjectURL(url), 100)
         }
       } catch (error) {
-        logger.hook('use-export').error('Export failed', error)
+        toast.error('Export failed. Please try again.')
         return false
       }
     },

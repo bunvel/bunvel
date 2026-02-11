@@ -15,13 +15,6 @@ export function useCreateEnum() {
       })
       toast.success('Enum created successfully')
     },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to create enum'
-      toast.error('Error creating enum', {
-        description: errorMessage,
-      })
-    },
   })
 }
 
@@ -36,13 +29,6 @@ export function useDeleteEnum() {
         queryKey: reactQueryKeys.enums.list(schema),
       })
       toast.success('Enum deleted successfully')
-    },
-    onError: (error: unknown) => {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to delete enum'
-      toast.error('Error deleting enum', {
-        description: errorMessage,
-      })
     },
   })
 }
