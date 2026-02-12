@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { FilterOperator} from '@/constants/filter';
+import type { FilterOperator } from '@/constants/filter'
 import { FilterOperatorLabels } from '@/constants/filter'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTableManager } from '@/hooks/use-table-manager'
@@ -26,8 +26,7 @@ import {
   isFilterValid,
   processFiltersWithIds,
 } from '@/utils/filter-utils'
-import type {
-  DragEndEvent} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core'
 import {
   DndContext,
   KeyboardSensor,
@@ -51,7 +50,6 @@ interface FilterButtonProps {
   table?: string
   filters?: Array<any>
   onFilterChange?: (filters: Array<any>) => void
-  recordCount?: number
 }
 
 export function FilterButton({
@@ -59,7 +57,6 @@ export function FilterButton({
   table: propTable,
   filters: propFilters,
   onFilterChange: propOnFilterChange,
-  recordCount: propRecordCount,
 }: FilterButtonProps = {}) {
   // Use props if provided, otherwise use useTableManager
   const {
@@ -67,20 +64,18 @@ export function FilterButton({
     table: hookTable,
     filters: hookFilters,
     handleFilterChange: hookHandleFilterChange,
-    tableData: hookTableData,
   } = useTableManager()
 
   const schema = propSchema ?? hookSchema
   const table = propTable ?? hookTable
   const filters = propFilters ?? hookFilters
   const handleFilterChange = propOnFilterChange ?? hookHandleFilterChange
-  const recordCount = propRecordCount ?? (hookTableData?.data?.length || 0)
   // Process initial filters with validation
   const [localFilters, setLocalFilters] = useState<Array<FilterConfig>>(() =>
     processFiltersWithIds(filters || []),
   )
-  const [pendingFilters, setPendingFilters] = useState<Array<FilterConfig>>(() =>
-    processFiltersWithIds(filters || []),
+  const [pendingFilters, setPendingFilters] = useState<Array<FilterConfig>>(
+    () => processFiltersWithIds(filters || []),
   )
   const [open, setOpen] = useState(false)
 
@@ -165,12 +160,7 @@ export function FilterButton({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            disabled={recordCount === 0}
-          >
+          <Button variant="outline" size="sm" className="gap-2">
             <HugeiconsIcon icon={Filter} size={16} />
             Filter
             {filters.length > 0 && (

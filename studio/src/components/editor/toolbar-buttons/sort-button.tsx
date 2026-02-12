@@ -37,7 +37,6 @@ interface SortButtonProps {
   table?: string
   sorts?: Array<any>
   onSortChange?: (sorts: Array<any>) => void
-  recordCount?: number
 }
 
 export function SortButton({
@@ -45,7 +44,6 @@ export function SortButton({
   table: propTable,
   sorts: propSorts,
   onSortChange: propOnSortChange,
-  recordCount: propRecordCount,
 }: SortButtonProps = {}) {
   // Use props if provided, otherwise use useTableManager
   const {
@@ -53,14 +51,12 @@ export function SortButton({
     table: hookTable,
     sorts: hookSorts,
     handleSortChange: hookHandleSortChange,
-    tableData: hookTableData,
   } = useTableManager()
 
   const schema = propSchema ?? hookSchema
   const table = propTable ?? hookTable
   const sorts = propSorts ?? hookSorts
   const handleSortChange = propOnSortChange ?? hookHandleSortChange
-  const recordCount = propRecordCount ?? (hookTableData?.data?.length || 0)
   const [localSorts, setLocalSorts] = useState<Array<SortConfig>>(sorts)
   const [pendingSorts, setPendingSorts] = useState<Array<SortConfig>>(sorts)
   const [open, setOpen] = useState(false)
@@ -159,12 +155,7 @@ export function SortButton({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            disabled={recordCount === 0}
-          >
+          <Button variant="outline" size="sm" className="gap-2">
             <HugeiconsIcon icon={Sorting05Icon} size={16} />
             Sort
             {sorts.length > 0 && (
