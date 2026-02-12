@@ -1,5 +1,5 @@
-import type { ColumnDefinition, ForeignKeyDefinition } from '@/types/database'
 import { TABLE_FORM_MESSAGES } from '@/constants/ui'
+import type { ColumnDefinition, ForeignKeyDefinition } from '@/types/database'
 import { toast } from 'sonner'
 
 export function validateTableForm(
@@ -140,10 +140,9 @@ export async function validateForeignKeyTypes(
       }
     } catch (error) {
       // If we can't validate types, let the backend handle it
-      const { logger } = await import('@/lib/logger')
-      logger
-        .component('table-form-validation')
-        .warn('Could not validate foreign key types', error)
+      const { createLogger } = await import('@/lib/logger')
+      const logger = createLogger('table-form-validation')
+      logger.warn({ msg: 'Could not validate foreign key types', error })
     }
   }
 

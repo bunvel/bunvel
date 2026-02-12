@@ -9,9 +9,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { useCreateEnum } from '@/hooks/mutations/useEnumMutations'
-import { logger } from '@/lib/logger'
 import { PLACEHOLDERS } from '@/constants/ui'
+import { useCreateEnum } from '@/hooks/mutations/useEnumMutations'
 import { Plus, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
@@ -118,11 +117,6 @@ export function EnumFormSheet({ schema, children }: EnumFormSheetProps) {
         onSuccess: () => {
           setOpen(false)
           resetForm()
-        },
-        onError: (error) => {
-          logger
-            .component('enum-form-sheet')
-            .error('Error creating enum', error)
         },
       },
     )

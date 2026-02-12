@@ -1,5 +1,7 @@
+import { createLogger } from '@/lib/logger'
 import { toast } from 'sonner'
-import { logger } from '@/lib/logger'
+
+const logger = createLogger('table-form-sheet')
 
 export interface TableFormError {
   message: string
@@ -25,15 +27,15 @@ export function handleTableFormError(error: unknown): TableFormError {
     }
   }
 
-  logger
-    .component('table-form-sheet')
-    .error('Error creating table', error)
+  logger.error({ msg: 'Error creating table', error })
 
   return { message: errorMessage, description: errorDescription }
 }
 
 export function showTableFormError(error: TableFormError) {
   toast.error(error.message, {
-    description: error.description || 'Please check your table configuration and try again.',
+    description:
+      error.description ||
+      'Please check your table configuration and try again.',
   })
 }

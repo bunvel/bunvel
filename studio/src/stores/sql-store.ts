@@ -15,11 +15,10 @@ const loadQueryHistory = (): Array<QueryHistoryItem> => {
     const stored = window.localStorage.getItem(QUERY_HISTORY_KEY)
     return stored ? JSON.parse(stored) : []
   } catch (error) {
-    logger.error(
-      'Failed to load query history from localStorage',
-      'sql-store',
+    logger.error({
+      msg: 'Failed to load query history from localStorage',
       error,
-    )
+    })
     return []
   }
 }
@@ -31,11 +30,10 @@ const saveQueryHistory = (history: Array<QueryHistoryItem>) => {
   try {
     window.localStorage.setItem(QUERY_HISTORY_KEY, JSON.stringify(history))
   } catch (error) {
-    logger.error(
-      'Failed to save query history to localStorage',
-      'sql-store',
+    logger.error({
+      msg: 'Failed to save query history to localStorage',
       error,
-    )
+    })
   }
 }
 
