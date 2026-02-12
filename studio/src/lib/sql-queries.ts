@@ -41,7 +41,7 @@ export const SQL_QUERIES = {
       pg_catalog.pg_get_function_result(p.oid) AS return_type,
       pg_catalog.pg_get_function_arguments(p.oid) AS arguments,
       CASE p.prosecdef
-        WHEN true THEN 'SECURITY DEFINER'
+        WHEN TRUE THEN 'SECURITY DEFINER'
         ELSE 'SECURITY INVOKER'
       END AS security_type,
       pg_catalog.obj_description(p.oid, 'pg_proc') AS description
@@ -252,7 +252,7 @@ export const SQL_QUERIES = {
       fk.foreign_column_name
     FROM 
       columns c
-      JOIN object o ON true
+      JOIN object o ON TRUE
       LEFT JOIN primary_keys pk USING (column_name)
       LEFT JOIN foreign_keys fk USING (column_name)
     ORDER BY 

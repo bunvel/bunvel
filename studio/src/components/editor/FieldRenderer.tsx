@@ -255,12 +255,16 @@ export function FieldRenderer({
         {renderFieldLabel()}
         {renderInputWithForeignKey(
           <Select
-            value={value === null ? '' : value?.toString() || ''}
+            items={[
+              { label: 'TRUE', value: 'TRUE' },
+              { label: 'FALSE', value: 'FALSE' },
+            ]}
+            value={value === null ? '' : value?.toString().toUpperCase() || ''}
             onValueChange={(val) => {
               if (val === '') {
                 onChange(column.column_name, null)
               } else {
-                onChange(column.column_name, val === 'true')
+                onChange(column.column_name, val === 'TRUE')
               }
             }}
             disabled={isSubmitting || isDisabled}
@@ -271,8 +275,8 @@ export function FieldRenderer({
               />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="true">True</SelectItem>
-              <SelectItem value="false">False</SelectItem>
+              <SelectItem value="TRUE">TRUE</SelectItem>
+              <SelectItem value="FALSE">FALSE</SelectItem>
               {column.is_nullable === 'YES' && (
                 <SelectItem value="">NULL</SelectItem>
               )}
@@ -355,6 +359,7 @@ export function FieldRenderer({
         {renderFieldLabel()}
         {renderInputWithForeignKey(
           <Select
+            items={enumValues.map((v) => ({ label: v, value: v }))}
             value={value === null ? '' : value?.toString() || ''}
             onValueChange={(val) => {
               if (val === '') {

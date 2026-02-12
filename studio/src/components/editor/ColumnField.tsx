@@ -6,8 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { ColumnDefinition } from '@/types/database'
 import { PLACEHOLDERS } from '@/constants/ui'
+import type { ColumnDefinition } from '@/types/database'
 
 interface ColumnFieldProps {
   column: ColumnDefinition
@@ -44,6 +44,7 @@ export function ColumnField({
       {/* Data Type */}
       <div className="col-span-3">
         <Select
+          items={allDataTypes}
           value={column.type}
           onValueChange={(value) => onColumnChange(index, 'type', value)}
           disabled={disabled}

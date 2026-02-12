@@ -1,3 +1,11 @@
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/app'
 import {
   ChevronLeft,
@@ -7,14 +15,6 @@ import {
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { Table } from '@tanstack/react-table'
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
@@ -41,6 +41,7 @@ export function DataTablePagination<TData>({
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
+            items={DEFAULT_PAGE_SIZE_OPTIONS}
             value={`${table.getState().pagination.pageSize == Number.MAX_SAFE_INTEGER ? 'No Limit' : table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
               table.setPageSize(Number(value))
