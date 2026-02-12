@@ -8,6 +8,7 @@ interface AddColumnParams {
   table: string
   column: string
   dataType: string
+  defaultValue?: string
   foreignKeys?: Array<{
     column: string
     referencedTable: string
@@ -25,9 +26,12 @@ export function useAddColumn(options?: { onSuccess?: () => void }) {
       table,
       column,
       dataType,
+      defaultValue,
       foreignKeys,
     }: AddColumnParams) =>
-      addColumn({ data: { schema, table, column, dataType, foreignKeys } }),
+      addColumn({
+        data: { schema, table, column, dataType, defaultValue, foreignKeys },
+      }),
     onSuccess: (_, variables) => {
       // Invalidate table metadata to refresh the column list
       queryClient.invalidateQueries({
@@ -37,13 +41,11 @@ export function useAddColumn(options?: { onSuccess?: () => void }) {
         ),
       })
 
-      // Invalidate table data to refresh the table view
+      // Invalidate table data to refresh the table view (all pages, sizes, filters, sorts)
       queryClient.invalidateQueries({
         queryKey: reactQueryKeys.tables.data({
           schema: variables.schema,
           table: variables.table,
-          page: 1,
-          pageSize: 10,
         }),
       })
 

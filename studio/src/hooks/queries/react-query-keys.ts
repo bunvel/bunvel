@@ -14,8 +14,8 @@ export const reactQueryKeys = {
     data: (params: {
       schema: string
       table: string
-      page: number
-      pageSize: number
+      page?: number
+      pageSize?: number
       sorts?: Array<{ column: string; direction: 'asc' | 'desc' }>
       filters?: Array<FilterConfig>
     }) => ['tables', 'data', params] as const,

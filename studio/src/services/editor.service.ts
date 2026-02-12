@@ -10,6 +10,7 @@ import type {
   DeleteRowsParams,
   TableDataParams,
 } from '@/types/table'
+import { formatDefaultValue } from '@/utils/func'
 import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
 
@@ -443,6 +444,7 @@ export const addColumn = createServerFn({ method: 'POST' })
       table: string
       column: string
       dataType: string
+      defaultValue?: string
       foreignKeys?: Array<{
         column: string
         referencedTable: string
@@ -460,13 +462,45 @@ export const addColumn = createServerFn({ method: 'POST' })
   )
   .handler(async ({ data }) => {
     try {
-      const { schema, table, column, dataType, foreignKeys = [] } = data
+      const {
+        schema,
+        table,
+        column,
+        dataType,
+        defaultValue,
+        foreignKeys = [],
+      } = data
+
+      // Build the complete column definition with default value
+      let columnDefinition = dataType
+
+      // Add DEFAULT clause if provided (before NOT NULL)
+      if (defaultValue) {
+        try {
+          // Extract the base data type from dataType (remove constraints like NOT NULL, UNIQUE, etc.)
+          const baseDataType = dataType.split(' ')[0]
+          const formattedDefault = formatDefaultValue(
+            defaultValue,
+            baseDataType,
+          )
+          columnDefinition += ` DEFAULT ${formattedDefault}`
+        } catch (error) {
+          logWideEvent('editor.column.default.warn', {
+            schema,
+            table,
+            column,
+            defaultValue,
+            error,
+          })
+          // Continue without default value if formatting fails
+        }
+      }
 
       // Build the ALTER TABLE query to add the column
       let query = SQL_QUERIES.ADD_COLUMN.replace('$1', schema)
         .replace('$2', table)
         .replace('$3', column)
-        .replace('$4', dataType)
+        .replace('$4', columnDefinition)
 
       // Add foreign key constraints if provided
       foreignKeys.forEach((fk, index) => {

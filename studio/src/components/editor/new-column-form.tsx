@@ -12,11 +12,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { PLACEHOLDERS } from '@/constants/ui'
 import { useAddColumn } from '@/hooks/mutations/useAddColumn'
 import { useDataTypes } from '@/hooks/useDataTypes'
 import { useForeignKeyManagement } from '@/hooks/useForeignKeyManagement'
 import type { ForeignKeyDefinition } from '@/types/database'
-import { PLACEHOLDERS } from '@/constants/ui'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
@@ -130,14 +130,19 @@ export function NewColumnForm({ schema, table }: NewColumnFormProps) {
     )
 
     // Call the addColumn mutation
-    addColumnMutation.mutate({
-      schema,
-      table,
-      column: formValues.name,
-      dataType,
-      foreignKeys: validForeignKeys,
-      onSuccess: () => setOpen(false),
-    })
+    addColumnMutation.mutate(
+      {
+        schema,
+        table,
+        column: formValues.name,
+        dataType,
+        defaultValue: formValues.defaultValue,
+        foreignKeys: validForeignKeys,
+      },
+      {
+        onSuccess: () => setOpen(false),
+      },
+    )
   }
 
   return (
