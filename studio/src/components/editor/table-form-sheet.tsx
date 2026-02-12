@@ -2,18 +2,19 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { TABLE_FORM_MESSAGES } from '@/constants/ui'
 import { useCreateTable } from '@/hooks/mutations/useTableMutations'
 import { useDataTypes } from '@/hooks/useDataTypes'
 import { useForeignKeyManagement } from '@/hooks/useForeignKeyManagement'
 import type { ColumnDefinition, ForeignKeyDefinition } from '@/types/database'
 import { createEmptyColumn, getDefaultColumns } from '@/utils/column-defaults'
-import { TABLE_FORM_MESSAGES } from '@/constants/ui'
 import {
   handleTableFormError,
   showTableFormError,
@@ -224,14 +225,10 @@ export function TableFormSheet({ schema, children }: TableFormSheetProps) {
             />
           </div>
           <SheetFooter className="p-4 border-t flex flex-row justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
+            <SheetClose
               disabled={isSubmitting}
-            >
-              {TABLE_FORM_MESSAGES.CANCEL}
-            </Button>
+              render={<Button variant="outline">Cancel</Button>}
+            />
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting
                 ? TABLE_FORM_MESSAGES.CREATING

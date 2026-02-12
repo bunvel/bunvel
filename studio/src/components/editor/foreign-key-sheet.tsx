@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
@@ -22,7 +23,8 @@ import { useTables } from '@/hooks/queries/useTables'
 import type {
   ColumnDefinition,
   ForeignKeyAction,
-  ForeignKeyDefinition, Schema 
+  ForeignKeyDefinition,
+  Schema,
 } from '@/types/database'
 import { checkColumnTypeCompatibility } from '@/utils/validation'
 import { useEffect, useState } from 'react'
@@ -372,13 +374,7 @@ export function ForeignKeySheet({
             </div>
           </div>
           <SheetFooter className="p-4 border-t flex flex-row justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              {TABLE_FORM_MESSAGES.CANCEL}
-            </Button>
+            <SheetClose render={<Button variant="outline">Cancel</Button>} />
             <Button type="button" onClick={handleSave}>
               {existingForeignKey ? 'Update' : 'Add'} Foreign Key
             </Button>

@@ -3,14 +3,15 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { useCreateSchema } from '@/hooks/mutations/useCreateSchema'
 import { BUTTON_LABELS, DESCRIPTIONS, PLACEHOLDERS } from '@/constants/ui'
+import { useCreateSchema } from '@/hooks/mutations/useCreateSchema'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useForm } from '@tanstack/react-form'
@@ -96,14 +97,10 @@ export function CreateSchemaSheet() {
             />
           </div>
           <SheetFooter className="p-4 border-t flex flex-row justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
+            <SheetClose
               disabled={isPending}
-            >
-              {BUTTON_LABELS.CANCEL}
-            </Button>
+              render={<Button variant="outline">Cancel</Button>}
+            />
             <Button type="submit" disabled={isPending}>
               {isPending ? 'Creating...' : BUTTON_LABELS.CREATE_SCHEMA}
             </Button>

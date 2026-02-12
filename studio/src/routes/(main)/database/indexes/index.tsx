@@ -3,17 +3,19 @@ import { IndexFormSheet } from '@/components/editor/index-form-sheet'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { PLACEHOLDERS } from '@/constants/ui'
 import { useDatabaseIndexes } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types/components'
 import type { DatabaseTableIndexes } from '@/types/database'
 import type { SchemaTable } from '@/types/schema'
-import { PLACEHOLDERS } from '@/constants/ui'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 
@@ -73,6 +75,9 @@ function RouteComponent() {
               <div className="flex-1 p-4 overflow-auto">
                 <p>{selectedIndex?.index_definition}</p>
               </div>
+              <SheetFooter className="border-t p-4 flex flex-row justify-end space-x-2">
+                <SheetClose render={<Button variant="outline">Close</Button>} />
+              </SheetFooter>
             </SheetContent>
           </Sheet>
         </TableCell>

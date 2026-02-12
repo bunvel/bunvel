@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
@@ -240,20 +241,14 @@ export function EnumFormSheet({ schema, children }: EnumFormSheetProps) {
             </div>
           </div>
 
-          <SheetFooter className="border-t p-4">
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Creating...' : 'Create Enum'}
-              </Button>
-            </div>
+          <SheetFooter className="p-4 border-t flex flex-row justify-end gap-2">
+            <SheetClose
+              disabled={isSubmitting}
+              render={<Button variant="outline">Cancel</Button>}
+            />
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Creating...' : 'Create Enum'}
+            </Button>
           </SheetFooter>
         </form>
       </SheetContent>

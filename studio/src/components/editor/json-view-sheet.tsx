@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/collapsible'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
@@ -13,7 +14,6 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { useCopy } from '@/hooks/use-copy'
-import { BUTTON_LABELS } from '@/constants/ui'
 import { ArrowDown, ArrowRight, Code, Copy } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import React, { useState } from 'react'
@@ -217,13 +217,7 @@ export function JsonViewSheet({
           </div>
         </div>
         <SheetFooter className="p-4 border-t flex flex-row justify-end gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setOpen(false)}
-          >
-            {BUTTON_LABELS.CANCEL}
-          </Button>
+          <SheetClose render={<Button variant="outline">Cancel</Button>} />
         </SheetFooter>
       </SheetContent>
     </Sheet>

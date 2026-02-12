@@ -1,17 +1,18 @@
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { BUTTON_LABELS } from '@/constants/ui'
 import { useDatabaseEnums } from '@/hooks/queries/useEnums'
 import { useRowForm } from '@/hooks/useRowForm'
 import type { DatabaseEnum } from '@/types/database'
 import type { ColumnMetadata } from '@/types/table'
-import { BUTTON_LABELS } from '@/constants/ui'
 import { Edit, Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import React, { useCallback, useMemo, useState } from 'react'
@@ -201,14 +202,10 @@ export function RowFormSheet({
             )}
           </div>
           <SheetFooter className="p-4 border-t flex flex-row justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
+            <SheetClose
               disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
+              render={<Button variant="outline">Cancel</Button>}
+            />
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting
                 ? mode === 'insert'

@@ -11,8 +11,17 @@ import {
   useComboboxAnchor,
 } from '@/components/ui/combobox'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Sheet,
+  SheetClose,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -27,13 +36,6 @@ import type { DatabaseTableColumns, Schema } from '@/types/database'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 interface IndexFormSheetProps {
   children?: React.ReactNode
@@ -286,15 +288,11 @@ export function IndexFormSheet({ children }: IndexFormSheetProps) {
               )}
             </div>
           </div>
-          <div className="border-t p-4 flex justify-end space-x-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
+          <SheetFooter className="border-t p-4 flex flex-row justify-end space-x-2">
+            <SheetClose
               disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
+              render={<Button variant="outline">Cancel</Button>}
+            />
             <Button
               type="submit"
               disabled={
@@ -306,7 +304,7 @@ export function IndexFormSheet({ children }: IndexFormSheetProps) {
             >
               {isSubmitting ? 'Creating...' : 'Create Index'}
             </Button>
-          </div>
+          </SheetFooter>
         </form>
       </SheetContent>
     </Sheet>

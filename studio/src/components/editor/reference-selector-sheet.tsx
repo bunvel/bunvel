@@ -1,6 +1,8 @@
+import { DataTableHeaderCell } from '@/components/data-table/data-table-header-cell'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
@@ -13,14 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { DEFAULT_PAGE_SIZE } from '@/constants/app'
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import type { FilterConfig, SortConfig } from '@/types/table'
-import { DEFAULT_PAGE_SIZE } from '@/constants/app'
 import { formatCellValue } from '@/utils/format'
 import { ArrowLeft, ArrowRight } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
-import { DataTableHeaderCell } from '@/components/data-table/data-table-header-cell'
 import { FilterButton } from './toolbar-buttons/filter-button'
 import { SortButton } from './toolbar-buttons/sort-button'
 
@@ -109,14 +110,12 @@ export function ReferenceSelectorSheet({
         table={table}
         filters={filters}
         onFilterChange={handleFilterChange}
-        recordCount={tableData?.data?.length || 0}
       />
       <SortButton
         schema={schema}
         table={table}
         sorts={sorts}
         onSortChange={handleSortChange}
-        recordCount={tableData?.data?.length || 0}
       />
     </div>
   )
@@ -231,9 +230,7 @@ export function ReferenceSelectorSheet({
 
           {/* Footer */}
           <SheetFooter className="p-4 border-t flex flex-row justify-end gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
+            <SheetClose render={<Button variant="outline">Cancel</Button>} />
           </SheetFooter>
         </div>
       </SheetContent>

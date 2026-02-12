@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
@@ -305,13 +306,10 @@ export function NewColumnForm({ schema, table }: NewColumnFormProps) {
             </div>
           </div>
           <SheetFooter className="p-4 border-t flex flex-row justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
+            <SheetClose
+              disabled={addColumnMutation.isPending}
+              render={<Button variant="outline">Cancel</Button>}
+            />
             <Button type="submit" disabled={addColumnMutation.isPending}>
               {addColumnMutation.isPending ? 'Adding...' : 'Add Column'}
             </Button>
