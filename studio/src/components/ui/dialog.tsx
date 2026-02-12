@@ -1,10 +1,12 @@
-import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
-import * as React from "react"
+"use client"
 
-import { Button } from "@/components/ui/button"
+import * as React from "react"
+import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
+
 import { cn } from "@/lib/utils"
-import { Cancel01Icon } from "@hugeicons/core-free-icons"
+import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from "@hugeicons/react"
+import { Cancel01Icon } from "@hugeicons/core-free-icons"
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
@@ -79,11 +81,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn(
-        "bg-muted/50 -mx-4 -mt-4 px-4 pt-4 pb-3 border-b border-muted rounded-t-xl",
-        "gap-2 flex flex-col",
-        className
-      )}
+      className={cn("gap-2 flex flex-col", className)}
       {...props}
     />
   )
@@ -120,7 +118,7 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn("text-sm leading-none font-medium", className)}
+      className={cn("text-base leading-none font-medium", className)}
       {...props}
     />
   )
@@ -149,6 +147,5 @@ export {
   DialogOverlay,
   DialogPortal,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 }
-

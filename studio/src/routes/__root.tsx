@@ -6,6 +6,7 @@ import { DefaultCatchBoundary } from '@/components/error/DefaultCatchBoundary'
 import { NotFound } from '@/components/error/NotFound'
 import { ThemeProvider } from '@/components/theme/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import appCss from '../styles.css?url'
 
@@ -74,9 +75,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           disableTransitionOnChange
         >
           <QueryClientProvider client={queryClient}>
-            {children}
+            <TooltipProvider>
+              {children}
+              <Toaster />
+            </TooltipProvider>
           </QueryClientProvider>
-          <Toaster />
         </ThemeProvider>
         <TanStackDevtools
           config={{
