@@ -157,7 +157,7 @@ export function ReferenceSelectorSheet({
                 </div>
               </div>
             ) : (
-              <Table>
+              <Table className="w-auto">
                 <TableHeader>
                   <TableRow>
                     <TableCell className="font-medium text-sm p-2 border">
@@ -167,6 +167,11 @@ export function ReferenceSelectorSheet({
                       <TableCell
                         key={column.column_name}
                         className="font-medium text-sm p-2 border"
+                        style={{
+                          width: 150,
+                          minWidth: 150,
+                          maxWidth: '350px',
+                        }}
                       >
                         <DataTableHeaderCell column={column} />
                       </TableCell>
@@ -187,6 +192,11 @@ export function ReferenceSelectorSheet({
                         <TableCell
                           key={column.column_name}
                           className="border p-2"
+                          style={{
+                            width: 150,
+                            minWidth: 150,
+                            maxWidth: '350px',
+                          }}
                         >
                           <div className="text-sm max-w-32 truncate">
                             {formatCellValue(row[column.column_name])}
