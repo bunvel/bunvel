@@ -17,7 +17,7 @@ interface AddColumnParams {
   }>
 }
 
-export function useAddColumn(options?: { onSuccess?: () => void }) {
+export function useAddColumn() {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -50,11 +50,6 @@ export function useAddColumn(options?: { onSuccess?: () => void }) {
       })
 
       toast.success('Column added successfully')
-
-      // Call custom onSuccess callback if provided
-      if (options?.onSuccess) {
-        options.onSuccess()
-      }
     },
   })
 }
