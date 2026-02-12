@@ -5,6 +5,7 @@ import {
   ComboboxChips,
   ComboboxChipsInput,
   ComboboxContent,
+  ComboboxEmpty,
   ComboboxItem,
   ComboboxList,
   ComboboxValue,
@@ -32,7 +33,7 @@ import {
   useDatabaseTableColumns,
   useDatabaseTables,
 } from '@/hooks/queries/useTables'
-import type { DatabaseTableColumns, Schema } from '@/types/database'
+import type { Schema } from '@/types/database'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
@@ -55,6 +56,15 @@ export function IndexFormSheet({ children }: IndexFormSheetProps) {
   const { data: schemasResult = { data: [] } } = useSchemas()
   const columnsAnchor = useComboboxAnchor()
 
+  const indexTypes = [
+    { label: 'B-tree', value: 'btree' },
+    { label: 'Hash', value: 'hash' },
+    { label: 'GiST', value: 'gist' },
+    { label: 'SP-GiST', value: 'spgist' },
+    { label: 'GIN', value: 'gin' },
+    { label: 'BRIN', value: 'brin' },
+  ]
+
   const [formData, setFormData] = useState<FormValues>({
     schema: 'public',
     table: '',
@@ -63,10 +73,16 @@ export function IndexFormSheet({ children }: IndexFormSheetProps) {
     indexType: 'btree',
   })
 
-  const { data: tables = [] } = useDatabaseTables(formData.schema)
+  const { data: tables = [], isLoading: isLoadingTables } = useDatabaseTables(
+    formData.schema,
+  )
   const selectedTableOid = tables.find((t) => t.name === formData.table)?.oid
-  const { data: tableColumns = [] } = useDatabaseTableColumns(
-    selectedTableOid || '',
+  const { data: tableColumns = [], isLoading: isLoadingColumns } =
+    useDatabaseTableColumns(selectedTableOid || '')
+
+  // Create a lookup map for efficient column type access
+  const columnTypeMap = new Map(
+    tableColumns.map((col) => [col.name, col.data_type]),
   )
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -85,13 +101,13 @@ export function IndexFormSheet({ children }: IndexFormSheetProps) {
     })
 
     setOpen(false)
-    setFormData({
-      schema: '',
+    setFormData((prev) => ({
+      ...prev,
       table: '',
       columns: [],
       unique: false,
       indexType: 'btree',
-    })
+    }))
   }
 
   const handleInputChange = (field: keyof FormValues, value: any) => {
@@ -157,7 +173,7 @@ export function IndexFormSheet({ children }: IndexFormSheetProps) {
                 <Select
                   value={formData.table}
                   onValueChange={(value) => handleInputChange('table', value)}
-                  disabled={!formData.schema}
+                  disabled={!formData.schema || isLoadingTables}
                 >
                   <SelectTrigger className="w-full h-9">
                     <SelectValue
@@ -169,11 +185,21 @@ export function IndexFormSheet({ children }: IndexFormSheetProps) {
                     />
                   </SelectTrigger>
                   <SelectContent>
-                    {tables.map((table) => (
-                      <SelectItem key={table.name} value={table.name}>
-                        {table.name}
-                      </SelectItem>
-                    ))}
+                    {isLoadingTables ? (
+                      <div className="p-2 text-sm text-muted-foreground">
+                        Loading tables...
+                      </div>
+                    ) : tables.length === 0 ? (
+                      <div className="p-2 text-sm text-muted-foreground">
+                        No tables found
+                      </div>
+                    ) : (
+                      tables.map((table) => (
+                        <SelectItem key={table.name} value={table.name}>
+                          {table.name}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -184,50 +210,63 @@ export function IndexFormSheet({ children }: IndexFormSheetProps) {
                   <label className="text-sm font-medium">
                     Columns (max 32)
                   </label>
-                  <Combobox
-                    multiple
-                    value={formData.columns}
-                    onValueChange={(value) =>
-                      handleInputChange('columns', value)
-                    }
-                  >
-                    <ComboboxChips ref={columnsAnchor} className="w-full">
-                      <ComboboxValue>
-                        {(values) => (
-                          <>
-                            {values.map((value: string) => (
-                              <ComboboxChip key={value}>{value}</ComboboxChip>
-                            ))}
-                            <ComboboxChipsInput
-                              placeholder="Select columns..."
-                              disabled={formData.columns.length >= 32}
-                            />
-                          </>
-                        )}
-                      </ComboboxValue>
-                    </ComboboxChips>
-                    <ComboboxContent anchor={columnsAnchor}>
-                      <ComboboxList>
-                        {tableColumns.map((column: DatabaseTableColumns) => (
-                          <ComboboxItem
-                            key={column.name}
-                            value={column.name}
-                            disabled={
-                              formData.columns.length >= 32 &&
-                              !formData.columns.includes(column.name)
-                            }
-                          >
-                            <div className="flex flex-col">
-                              <span>{column.name}</span>
-                              <span className="text-xs text-muted-foreground">
-                                {column.data_type}
-                              </span>
-                            </div>
-                          </ComboboxItem>
-                        ))}
-                      </ComboboxList>
-                    </ComboboxContent>
-                  </Combobox>
+                  {isLoadingColumns ? (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      Loading columns...
+                    </div>
+                  ) : tableColumns.length === 0 ? (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      No columns found
+                    </div>
+                  ) : (
+                    <Combobox
+                      multiple
+                      autoHighlight
+                      items={tableColumns.map((col) => col.name)}
+                      value={formData.columns}
+                      onValueChange={(value) =>
+                        handleInputChange('columns', value)
+                      }
+                    >
+                      <ComboboxChips ref={columnsAnchor} className="w-full">
+                        <ComboboxValue>
+                          {(values) => (
+                            <>
+                              {values.map((value: string) => (
+                                <ComboboxChip key={value}>{value}</ComboboxChip>
+                              ))}
+                              <ComboboxChipsInput
+                                placeholder="Select columns..."
+                                disabled={formData.columns.length >= 32}
+                              />
+                            </>
+                          )}
+                        </ComboboxValue>
+                      </ComboboxChips>
+                      <ComboboxContent anchor={columnsAnchor}>
+                        <ComboboxEmpty>No columns found.</ComboboxEmpty>
+                        <ComboboxList>
+                          {(item) => (
+                            <ComboboxItem
+                              key={item}
+                              value={item}
+                              disabled={
+                                formData.columns.length >= 32 &&
+                                !formData.columns.includes(item)
+                              }
+                            >
+                              <div className="flex flex-col">
+                                <span>{item}</span>
+                                <span className="text-xs text-muted-foreground">
+                                  {columnTypeMap.get(item)}
+                                </span>
+                              </div>
+                            </ComboboxItem>
+                          )}
+                        </ComboboxList>
+                      </ComboboxContent>
+                    </Combobox>
+                  )}
                   {formData.columns.length > 0 && (
                     <p className="text-xs text-muted-foreground">
                       {formData.columns.length} of 32 columns selected
@@ -256,6 +295,7 @@ export function IndexFormSheet({ children }: IndexFormSheetProps) {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Index Type</label>
                 <Select
+                  items={indexTypes}
                   value={formData.indexType}
                   onValueChange={(value: any) =>
                     handleInputChange('indexType', value)
@@ -265,12 +305,11 @@ export function IndexFormSheet({ children }: IndexFormSheetProps) {
                     <SelectValue placeholder="Select index type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="btree">B-tree</SelectItem>
-                    <SelectItem value="hash">Hash</SelectItem>
-                    <SelectItem value="gist">GiST</SelectItem>
-                    <SelectItem value="spgist">SP-GiST</SelectItem>
-                    <SelectItem value="gin">GIN</SelectItem>
-                    <SelectItem value="brin">BRIN</SelectItem>
+                    {indexTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

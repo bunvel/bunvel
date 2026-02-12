@@ -161,7 +161,7 @@ export const SQL_QUERIES = {
     SELECT
       t.relname AS table_name,
       i.relname AS index_name,
-      a.attname AS column_name,
+      STRING_AGG(a.attname, ', ' ORDER BY a.attnum) AS column_name,
       pg_get_indexdef(i.oid) AS index_definition
     FROM
       pg_class t
@@ -171,6 +171,10 @@ export const SQL_QUERIES = {
       JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = ANY(ix.indkey)
     WHERE
       n.nspname = $1
+    GROUP BY
+      t.relname,
+      i.relname,
+      i.oid
     ORDER BY
       t.relname,
       i.relname;
