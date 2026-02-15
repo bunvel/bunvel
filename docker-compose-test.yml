@@ -51,7 +51,7 @@ services:
 
   postgres:
     container_name: bunvel-postgres
-    image: postgres:18.1-bookworm
+    image: postgres:18.2-bookworm
     shm_size: 128mb
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -72,7 +72,7 @@ services:
 
   rest:
     container_name: bunvel-rest
-    image: postgrest/postgrest:v14.4
+    image: postgrest/postgrest:v14.5
     restart: always
     environment:
       PGRST_DB_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
