@@ -59,15 +59,6 @@ export const DATA_TYPES = [
   'CIRCLE',
 ] as const
 
-export const DEFAULT_COLUMN = {
-  name: '',
-  type: 'text',
-  nullable: true,
-  isPrimaryKey: false,
-  unique: false,
-  defaultValue: undefined,
-} as const
-
 export const DEFAULT_FOREIGN_KEY = {
   column: '',
   referencedTable: '',

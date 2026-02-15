@@ -53,12 +53,14 @@ export interface DeleteTableParams {
   cascade: boolean
 }
 
+export type IndexType = 'btree' | 'hash' | 'gist' | 'spgist' | 'gin' | 'brin'
+
 export interface CreateIndexParams {
   schema: string
   table: string
   columns: Array<string>
   unique?: boolean
-  indexType?: 'btree' | 'hash' | 'gist' | 'spgist' | 'gin' | 'brin'
+  indexType?: IndexType
 }
 
 export interface CreateEnumParams {

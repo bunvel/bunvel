@@ -17,7 +17,7 @@ export interface SqlTemplate {
   description: string
   query: string
   icon: IconSvgElement
-  category?: 'basic' | 'blog' | 'ecommerce' | 'analytics'
+  category?: any
   difficulty?: 'beginner' | 'intermediate' | 'advanced'
 }
 

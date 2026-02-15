@@ -33,7 +33,7 @@ import {
   useDatabaseTableColumns,
   useDatabaseTables,
 } from '@/hooks/queries/useTables'
-import type { Schema } from '@/types/database'
+import type { IndexType, Schema } from '@/types/database'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
@@ -47,7 +47,7 @@ type FormValues = {
   table: string
   columns: Array<string>
   unique: boolean
-  indexType: 'btree' | 'hash' | 'gist' | 'spgist' | 'gin' | 'brin'
+  indexType: IndexType
 }
 
 export function IndexFormSheet({ children }: IndexFormSheetProps) {
