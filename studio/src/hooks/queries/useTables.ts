@@ -13,7 +13,7 @@ import type {
   Table,
 } from '@/types/database'
 import { useQuery } from '@tanstack/react-query'
-import { reactQueryKeys } from './react-query-keys'
+import { reactQueryKeys } from '../../utils/react-query-keys'
 
 export function useTables(schema: string = 'public') {
   return useQuery<Array<Table>>({

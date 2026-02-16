@@ -1,14 +1,13 @@
-import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
+import { queryClient } from '@/lib/query-client'
 import { deleteRows } from '@/services/editor.service'
 import { createTable } from '@/services/table.service'
 import type { CreateTableParams } from '@/types/database'
 import type { DeleteRowsParams } from '@/types/table'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { reactQueryKeys } from '@/utils/react-query-keys'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 export function useCreateTable() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (params: CreateTableParams) => createTable({ data: params }),
     onSuccess: (_, { schema }) => {
@@ -24,8 +23,6 @@ export function useCreateTable() {
 }
 
 export function useDeleteRows() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (params: DeleteRowsParams) => deleteRows({ data: params }),
     onSuccess: (result, { schema, table }) => {

@@ -1,6 +1,6 @@
 import { getSchemas } from '@/services/schema.service'
 import { useQuery } from '@tanstack/react-query'
-import { reactQueryKeys } from './react-query-keys'
+import { reactQueryKeys } from '../../utils/react-query-keys'
 
 export function useSchemas() {
   return useQuery({

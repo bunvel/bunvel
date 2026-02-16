@@ -1,12 +1,11 @@
-import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
+import { queryClient } from '@/lib/query-client'
 import { createIndex } from '@/services/index.service'
 import type { CreateIndexParams } from '@/types/database'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { reactQueryKeys } from '@/utils/react-query-keys'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 export function useCreateIndex() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (params: CreateIndexParams) => createIndex({ data: params }),
     onSuccess: (_, { schema }) => {

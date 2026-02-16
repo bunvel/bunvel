@@ -1,11 +1,11 @@
-import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
+import { queryClient } from '@/lib/query-client'
 import { deleteTable } from '@/services/table.service'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { reactQueryKeys } from '@/utils/react-query-keys'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTableManager } from '../use-table-manager'
 
 export function useDeleteTable() {
-  const queryClient = useQueryClient()
   const { removeTableBySchema } = useTableManager()
 
   return useMutation({

@@ -1,14 +1,13 @@
-import { reactQueryKeys } from '@/hooks/queries/react-query-keys'
+import { queryClient } from '@/lib/query-client'
 import { createSchema } from '@/services/schema.service'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { reactQueryKeys } from '@/utils/react-query-keys'
+import { useMutation } from '@tanstack/react-query'
 
 interface CreateSchemaVariables {
   name: string
 }
 
 export function useCreateSchema() {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: async ({ name }: CreateSchemaVariables) => {
       const result = await createSchema({

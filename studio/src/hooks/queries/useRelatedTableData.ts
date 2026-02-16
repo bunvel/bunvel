@@ -1,7 +1,11 @@
 import { getTableData } from '@/services/editor.service'
-import type { ColumnMetadata, FilterConfig, TableDataResult } from '@/types/table'
+import type {
+  ColumnMetadata,
+  FilterConfig,
+  TableDataResult,
+} from '@/types/table'
 import { useQuery } from '@tanstack/react-query'
-import { reactQueryKeys } from './react-query-keys'
+import { reactQueryKeys } from '../../utils/react-query-keys'
 
 const MAX_ROWS = 10
 
