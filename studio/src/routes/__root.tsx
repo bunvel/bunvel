@@ -4,10 +4,10 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
 import { DefaultCatchBoundary } from '@/components/error/DefaultCatchBoundary'
 import { NotFound } from '@/components/error/NotFound'
-import { ThemeProvider } from '@/components/theme/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ThemeProvider } from 'better-themes'
 import appCss from '../styles.css?url'
 
 export const Route = createRootRoute({

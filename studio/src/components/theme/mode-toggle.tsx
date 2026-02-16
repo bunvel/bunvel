@@ -1,4 +1,4 @@
-import { useTheme } from 'next-themes'
+import { useTheme } from 'better-themes'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -29,7 +29,7 @@ export function ModeToggle() {
             <span className="sr-only">Toggle theme</span>
           </Button>
         }
-        title='Change Theme'
+        title="Change Theme"
       ></DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme('light')}>

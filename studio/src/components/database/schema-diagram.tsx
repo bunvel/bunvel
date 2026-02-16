@@ -5,9 +5,7 @@ import type {
   RelationshipEdge,
   TableNode,
 } from '@/services/schema-diagram.service'
-import type {
-  Edge,
-  Node} from '@xyflow/react';
+import type { Edge, Node } from '@xyflow/react'
 import {
   Background,
   BackgroundVariant,
@@ -22,7 +20,7 @@ import {
   useNodesState,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { useTheme } from 'next-themes'
+import { useTheme } from 'better-themes'
 import { useMemo } from 'react'
 
 // Custom node component for database tables
