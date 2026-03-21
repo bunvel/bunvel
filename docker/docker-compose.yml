@@ -1,18 +1,48 @@
 services:
+  traefik:
+    container_name: bunvel-traefik
+    image: traefik:v3.6.11
+    restart: unless-stopped
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true" # disable in production
+
+      # Docker provider
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+
+      # Entry points
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+
+      # Redirect HTTP -> HTTPS
+      # - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      # - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+
+      # Let's Encrypt
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # dashboard
+
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+
+    networks:
+      - bunvel-network
+
   app:
     container_name: bunvel-app
     image: bunvel/app:0.3.1
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
-        reservations:
-          cpus: "0.5"
-          memory: 256M
-    ports:
-      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       - PORT=8000
       - NODE_ENV=production
@@ -26,54 +56,59 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGREST_URL=http://rest:8001
-      - VITE_BUNVEL_STUDIO_URL=${VITE_BUNVEL_STUDIO_URL}
+      - VITE_BUNVEL_STUDIO_URL=https://studio.${DOMAIN}
       - DEFAULT_ORGANIZATION=${DEFAULT_ORGANIZATION}
       - DEFAULT_PROJECT=${DEFAULT_PROJECT}
       - LOG_LEVEL=${LOG_LEVEL}
+
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.app.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.app.entrypoints=web"
+
+      - "traefik.http.middlewares.app-stripprefix.stripprefix.prefixes=/api"
+      - "traefik.http.routers.app.middlewares=app-stripprefix"
+
+      - "traefik.http.routers.app.priority=10"
+
+      - "traefik.http.services.app.loadbalancer.server.port=8000"
+
     networks:
       - bunvel-network
-    depends_on:
-      postgres:
-        condition: service_healthy
 
   studio:
     container_name: bunvel-studio
     image: bunvel/studio:0.4.0
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 256M
-        reservations:
-          cpus: "0.25"
-          memory: 128M
-    ports:
-      - "3000:3000"
-    environment:
-      - PORT=3000
-      - NODE_ENV=production
-      - VITE_API_URL=${VITE_API_URL}
-      - VITE_BUNVEL_STUDIO_URL=${VITE_BUNVEL_STUDIO_URL}
-    networks:
-      - bunvel-network
     depends_on:
       app:
         condition: service_started
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - VITE_API_URL=/api
+      - VITE_BUNVEL_STUDIO_URL=/
+
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.studio.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.studio.entrypoints=web"
+
+      # 👇 VERY IMPORTANT (set low priority fallback)
+      - "traefik.http.routers.studio.priority=1"
+
+      - "traefik.http.services.studio.loadbalancer.server.port=3000"
+
+    networks:
+      - bunvel-network
 
   postgres:
     container_name: bunvel-postgres
     image: postgres:18.3-bookworm
-    shm_size: 128mb
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 1G
-        reservations:
-          cpus: "0.5"
-          memory: 512M
+    shm_size: 128mb
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -82,51 +117,43 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
       - ./volumes/db:/docker-entrypoint-initdb.d
-    networks:
-      - bunvel-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d bunvel"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 30
       start_period: 5s
+    networks:
+      - bunvel-network
 
   rest:
     container_name: bunvel-rest
     image: postgrest/postgrest:v14.5
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 256M
-        reservations:
-          cpus: "0.25"
-          memory: 128M
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       PGRST_DB_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
       PGRST_DB_SCHEMA: public
       PGRST_DB_ANON_ROLE: ${POSTGRES_USER}
       PGRST_SERVER_PORT: 8001
+
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.rest.rule=PathPrefix(`/rest`)"
+      - "traefik.http.routers.rest.entrypoints=web"
+
+      - "traefik.http.middlewares.rest-stripprefix.stripprefix.prefixes=/rest"
+      - "traefik.http.routers.rest.middlewares=rest-stripprefix"
+
+      - "traefik.http.routers.rest.priority=10"
+
+      - "traefik.http.services.rest.loadbalancer.server.port=8001"
+
     networks:
       - bunvel-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:8001",
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
 
 volumes:
   postgres_data:

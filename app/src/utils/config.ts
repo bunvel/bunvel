@@ -28,9 +28,6 @@ const envSchema = z.object({
   // PostgREST
   POSTGREST_URL: z.url("Invalid PostgREST URL format"),
 
-  // Studio
-  VITE_BUNVEL_STUDIO_URL: z.url("Invalid VITE_BUNVEL_STUDIO_URL format"),
-
   // Rate Limiting
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900000), // 15 minutes
