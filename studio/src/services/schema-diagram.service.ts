@@ -41,7 +41,7 @@ export interface SchemaDiagram {
 }
 
 export const getSchemaDiagram = createServerFn({ method: 'POST' })
-  .inputValidator((schema: string) => schema)
+  .validator((schema: string) => schema)
   .handler(async ({ data: schema }) => {
     try {
       // Get all tables in the schema

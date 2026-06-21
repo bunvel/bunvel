@@ -7,7 +7,7 @@ import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
 
 export const getDatabaseTableIndexes = createServerFn({ method: 'POST' })
-  .inputValidator((data: { schema: string }) => {
+  .validator((data: { schema: string }) => {
     if (!data?.schema) {
       throw new Error('Schema name is required')
     }
@@ -30,7 +30,7 @@ export const getDatabaseTableIndexes = createServerFn({ method: 'POST' })
   })
 
 export const createIndex = createServerFn({ method: 'POST' })
-  .inputValidator((data: CreateIndexParams) => {
+  .validator((data: CreateIndexParams) => {
     if (!data?.schema) {
       throw new Error('Schema name is required')
     }

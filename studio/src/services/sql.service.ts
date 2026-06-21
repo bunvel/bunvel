@@ -3,7 +3,7 @@ import { logWideEvent } from '@/lib/logger'
 import { createServerFn } from '@tanstack/react-start'
 
 export const executeQuery = createServerFn({ method: 'POST' })
-  .inputValidator((d: string) => d)
+  .validator((d: string) => d)
   .handler(async ({ data }) => {
     if (!data?.trim()) {
       throw new Error('Query cannot be empty')

@@ -15,7 +15,7 @@ import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
 
 export const getTables = createServerFn({ method: 'POST' })
-  .inputValidator((data: { schema: string }) => {
+  .validator((data: { schema: string }) => {
     if (!data?.schema) {
       throw new Error('Schema name is required')
     }
@@ -38,7 +38,7 @@ export const getTables = createServerFn({ method: 'POST' })
   })
 
 export const getDatabaseTables = createServerFn({ method: 'POST' })
-  .inputValidator((data: { schema: string }) => {
+  .validator((data: { schema: string }) => {
     if (!data?.schema) {
       throw new Error('Schema name is required')
     }
@@ -62,7 +62,7 @@ export const getDatabaseTables = createServerFn({ method: 'POST' })
   })
 
 export const getDatabaseTableColumns = createServerFn({ method: 'POST' })
-  .inputValidator((data: { oid: string }) => {
+  .validator((data: { oid: string }) => {
     if (!data?.oid) {
       throw new Error('OID is required')
     }
@@ -85,7 +85,7 @@ export const getDatabaseTableColumns = createServerFn({ method: 'POST' })
   })
 
 export const getDatabaseTriggers = createServerFn({ method: 'POST' })
-  .inputValidator((data: { schema: string }) => ({
+  .validator((data: { schema: string }) => ({
     schema: data.schema || 'public',
   }))
   .handler(async ({ data }) => {
@@ -105,7 +105,7 @@ export const getDatabaseTriggers = createServerFn({ method: 'POST' })
   })
 
 export const getDatabaseFunctions = createServerFn({ method: 'POST' })
-  .inputValidator((data: { schema: string }) => ({
+  .validator((data: { schema: string }) => ({
     schema: data.schema || 'public',
   }))
   .handler(async ({ data }) => {
@@ -128,7 +128,7 @@ export const getDatabaseFunctions = createServerFn({ method: 'POST' })
   })
 
 export const deleteTable = createServerFn({ method: 'POST' })
-  .inputValidator((data: DeleteTableParams) => {
+  .validator((data: DeleteTableParams) => {
     if (!data?.schema || !data?.table) {
       throw new Error('Schema and table names are required')
     }
@@ -156,7 +156,7 @@ export const deleteTable = createServerFn({ method: 'POST' })
   })
 
 export const truncateTable = createServerFn({ method: 'POST' })
-  .inputValidator((data: Omit<DeleteTableParams, 'cascade'>) => {
+  .validator((data: Omit<DeleteTableParams, 'cascade'>) => {
     if (!data?.schema || !data?.table) {
       throw new Error('Schema and table names are required')
     }
@@ -183,7 +183,7 @@ export const truncateTable = createServerFn({ method: 'POST' })
   })
 
 export const createTable = createServerFn({ method: 'POST' })
-  .inputValidator((data: CreateTableParams) => {
+  .validator((data: CreateTableParams) => {
     if (!data?.schema || !data?.table) {
       throw new Error('Schema and table names are required')
     }

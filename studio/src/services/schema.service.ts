@@ -31,7 +31,7 @@ export const getSchemas = createServerFn({ method: 'POST' }).handler(
 )
 
 export const createSchema = createServerFn({ method: 'POST' })
-  .inputValidator((d: string) => d)
+  .validator((d: string) => d)
   .handler(async ({ data }) => {
     try {
       // Validate identifier format

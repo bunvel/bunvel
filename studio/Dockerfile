@@ -1,5 +1,5 @@
 # --- Stage 1: Build the application ---
-FROM oven/bun:1.3.10 AS builder
+FROM oven/bun:1.3.14 AS builder
 
 # Set working directory inside the container
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN bun run build
 
 # --- Stage 2: Create a lean production image ---
-FROM oven/bun:1.3.10-slim
+FROM oven/bun:1.3.14-slim
 
 # Set working directory
 WORKDIR /app

@@ -15,7 +15,7 @@ import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
 
 export const getTableMetadata = createServerFn({ method: 'POST' })
-  .inputValidator((d: SchemaTable) => {
+  .validator((d: SchemaTable) => {
     if (!d.table) {
       throw new Error('table is required for getTableMetadata')
     }
@@ -129,7 +129,7 @@ export const getTableMetadata = createServerFn({ method: 'POST' })
   })
 
 export const getTableData = createServerFn({ method: 'POST' })
-  .inputValidator((d: TableDataParams) => ({
+  .validator((d: TableDataParams) => ({
     ...d,
     page: d.page || 1,
     pageSize: d.pageSize || DEFAULT_PAGE_SIZE,
@@ -200,8 +200,8 @@ export const getTableData = createServerFn({ method: 'POST' })
       // Build ORDER BY clause for sorting
       const orderByClause = data.sorts?.length
         ? `ORDER BY ${data.sorts
-            .map((sort) => `"${sort.column}" ${sort.direction.toUpperCase()}`)
-            .join(', ')}`
+          .map((sort) => `"${sort.column}" ${sort.direction.toUpperCase()}`)
+          .join(', ')}`
         : ''
 
       // Get paginated data with filtering and sorting
@@ -230,7 +230,7 @@ export const getTableData = createServerFn({ method: 'POST' })
   })
 
 export const deleteRows = createServerFn({ method: 'POST' })
-  .inputValidator((data: DeleteRowsParams) => {
+  .validator((data: DeleteRowsParams) => {
     if (!data?.schema || !data?.table) {
       throw new Error('Schema and table names are required')
     }
@@ -293,7 +293,7 @@ export const deleteRows = createServerFn({ method: 'POST' })
   })
 
 export const insertRow = createServerFn({ method: 'POST' })
-  .inputValidator((data: CreateRowParams) => {
+  .validator((data: CreateRowParams) => {
     if (!data?.schema || !data?.table) {
       throw new Error('Schema and table names are required')
     }
@@ -356,7 +356,7 @@ export const insertRow = createServerFn({ method: 'POST' })
   })
 
 export const updateRow = createServerFn({ method: 'POST' })
-  .inputValidator((data: UpdateRowParams) => {
+  .validator((data: UpdateRowParams) => {
     if (!data?.schema || !data?.table) {
       throw new Error('Schema and table names are required')
     }
@@ -438,7 +438,7 @@ export const updateRow = createServerFn({ method: 'POST' })
   })
 
 export const addColumn = createServerFn({ method: 'POST' })
-  .inputValidator(
+  .validator(
     (data: {
       schema: string
       table: string

@@ -7,7 +7,7 @@ import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
 
 export const getDatabaseEnums = createServerFn({ method: 'POST' })
-  .inputValidator((data: { schema: string }) => {
+  .validator((data: { schema: string }) => {
     if (!data?.schema) {
       throw new Error('Schema name is required')
     }
@@ -30,7 +30,7 @@ export const getDatabaseEnums = createServerFn({ method: 'POST' })
   })
 
 export const createEnum = createServerFn({ method: 'POST' })
-  .inputValidator((data: CreateEnumParams) => {
+  .validator((data: CreateEnumParams) => {
     if (!data?.schema || !data?.enumName) {
       throw new Error('Schema and enum name are required')
     }
@@ -64,7 +64,7 @@ export const createEnum = createServerFn({ method: 'POST' })
   })
 
 export const deleteEnum = createServerFn({ method: 'POST' })
-  .inputValidator((data: { schema: string; enumName: string }) => {
+  .validator((data: { schema: string; enumName: string }) => {
     if (!data?.schema || !data?.enumName) {
       throw new Error('Schema and enum name are required')
     }
