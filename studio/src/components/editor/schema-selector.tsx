@@ -10,12 +10,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useSchemas } from '@/hooks/queries/useSchemas'
 import type { Schema } from '@/types/database'
 import type { SchemaTable } from '@/types/schema'
-import {
-  
-  useNavigate,
-  useSearch
-} from '@tanstack/react-router'
-import type {NavigateOptions} from '@tanstack/react-router';
+import { useNavigate, useSearch } from '@tanstack/react-router'
+import type { NavigateOptions } from '@tanstack/react-router'
 import { useEffect, useEffectEvent } from 'react'
 import { CreateSchemaSheet } from './create-schema-sheet'
 

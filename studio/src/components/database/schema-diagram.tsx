@@ -5,7 +5,7 @@ import type {
   RelationshipEdge,
   TableNode,
 } from '@/services/schema-diagram.service'
-import type { Edge, Node } from '@xyflow/react'
+import type { Connection, Edge, Node } from '@xyflow/react'
 import {
   Background,
   BackgroundVariant,
@@ -21,7 +21,13 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { useTheme } from 'better-themes'
-import { useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { SchemaTableEditorSheet } from './schema-table-editor-sheet'
+import { SchemaForeignKeyDialog } from './schema-foreign-key-dialog'
+import { useExecuteSqlQuery } from '@/hooks/mutations/useExecuteSqlQuery'
+import { useQueryClient } from '@tanstack/react-query'
+import { reactQueryKeys } from '@/utils/react-query-keys'
+import { toast } from 'sonner'
 
 // Custom node component for database tables
 const TableNodeComponent = ({ data }: { data: TableNode }) => {
@@ -97,6 +103,19 @@ interface SchemaDiagramProps {
 
 export const SchemaDiagram = ({ data }: SchemaDiagramProps) => {
   const { theme, systemTheme } = useTheme()
+  const queryClient = useQueryClient()
+  const executeSqlMutation = useExecuteSqlQuery()
+
+  // Selection & overlay states
+  const [editingTable, setEditingTable] = useState<TableNode | null>(null)
+  const [pendingConnection, setPendingConnection] = useState<{
+    sourceTable: string
+    sourceColumn: string
+    targetTable: string
+    targetColumn: string
+    schema: string
+  } | null>(null)
+  const [foreignKeyDialogOpen, setForeignKeyDialogOpen] = useState(false)
 
   // Convert our data to ReactFlow format
   const initialNodes = useMemo<Array<Node>>(
@@ -129,8 +148,88 @@ export const SchemaDiagram = ({ data }: SchemaDiagramProps) => {
     [data.edges],
   )
 
-  const [nodes, , onNodesChange] = useNodesState(initialNodes)
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges)
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+
+  // Sync state with dynamic API data updates
+  useEffect(() => {
+    setNodes(initialNodes)
+  }, [initialNodes, setNodes])
+
+  useEffect(() => {
+    setEdges(initialEdges)
+  }, [initialEdges, setEdges])
+
+  const activeSchema = useMemo(() => {
+    if (data.nodes.length === 0) return 'public'
+    return data.nodes[0].id.split('.')[0] || 'public'
+  }, [data.nodes])
+
+  // Invalidate schema details in cache to force re-render
+  const handleRefresh = useCallback(() => {
+    queryClient.invalidateQueries({
+      queryKey: reactQueryKeys.schemaDiagram.detail(activeSchema),
+    })
+    queryClient.invalidateQueries({
+      queryKey: reactQueryKeys.tables.list(activeSchema),
+    })
+    queryClient.invalidateQueries({
+      queryKey: reactQueryKeys.databaseTables.list(activeSchema),
+    })
+  }, [queryClient, activeSchema])
+
+  // Connection drawn handler
+  const onConnect = useCallback((connection: Connection) => {
+    const { source, target, sourceHandle, targetHandle } = connection
+    if (!source || !target || !sourceHandle || !targetHandle) return
+
+    const [sourceSchema, sourceTable] = source.split('.')
+    const [, targetTable] = target.split('.')
+
+    if (source === target) {
+      toast.error(
+        'Cannot create self-referencing foreign key via drag and drop',
+      )
+      return
+    }
+
+    setPendingConnection({
+      sourceTable,
+      sourceColumn: sourceHandle,
+      targetTable,
+      targetColumn: targetHandle,
+      schema: sourceSchema || 'public',
+    })
+    setForeignKeyDialogOpen(true)
+  }, [])
+
+  // Create FK constraint SQL builder
+  const handleCreateForeignKey = (
+    constraintName: string,
+    onDelete: string,
+    onUpdate: string,
+  ) => {
+    if (!pendingConnection) return
+
+    const { schema, sourceTable, sourceColumn, targetTable, targetColumn } =
+      pendingConnection
+    const sql = `ALTER TABLE "${schema}"."${sourceTable}" ADD CONSTRAINT "${constraintName}" FOREIGN KEY ("${sourceColumn}") REFERENCES "${schema}"."${targetTable}" ("${targetColumn}") ON DELETE ${onDelete} ON UPDATE ${onUpdate};`
+
+    executeSqlMutation.mutate(sql, {
+      onSuccess: () => {
+        toast.success(`Foreign key constraint "${constraintName}" created`)
+        handleRefresh()
+        setForeignKeyDialogOpen(false)
+        setPendingConnection(null)
+      },
+      onError: (error) => {
+        toast.error('Failed to create foreign key relationship', {
+          description:
+            error instanceof Error ? error.message : 'Unknown database error',
+        })
+      },
+    })
+  }
 
   const getEditorTheme = () => {
     if (theme === 'system') {
@@ -140,13 +239,20 @@ export const SchemaDiagram = ({ data }: SchemaDiagramProps) => {
   }
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative">
       <ReactFlow
         colorMode={getEditorTheme()}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onNodeDoubleClick={(_, node) => {
+          const fullNode = data.nodes.find((n) => n.id === node.id)
+          if (fullNode) {
+            setEditingTable(fullNode)
+          }
+        }}
         nodeTypes={nodeTypes}
         connectionMode={ConnectionMode.Loose}
         fitView
@@ -155,6 +261,24 @@ export const SchemaDiagram = ({ data }: SchemaDiagramProps) => {
         <Controls />
         <MiniMap />
       </ReactFlow>
+
+      {/* Side sheet column designer */}
+      <SchemaTableEditorSheet
+        open={editingTable !== null}
+        onOpenChange={(open) => !open && setEditingTable(null)}
+        schema={activeSchema}
+        tableNode={editingTable}
+        onSave={handleRefresh}
+      />
+
+      {/* Confirmation dialog for FK drawing */}
+      <SchemaForeignKeyDialog
+        open={foreignKeyDialogOpen}
+        onOpenChange={setForeignKeyDialogOpen}
+        connection={pendingConnection}
+        onConfirm={handleCreateForeignKey}
+        isPending={executeSqlMutation.isPending}
+      />
     </div>
   )
 }

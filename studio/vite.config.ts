@@ -9,7 +9,7 @@ const config = defineConfig({
   resolve: { tsconfigPaths: true },
   plugins: [
     devtools(),
-    nitro({ preset: "bun" }),
+    nitro({ preset: 'bun' }),
     tailwindcss(),
     tanstackStart(),
     viteReact(),

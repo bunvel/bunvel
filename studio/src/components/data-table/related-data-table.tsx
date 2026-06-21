@@ -92,7 +92,10 @@ export const RelatedDataTable = function RelatedDataTable({
                         }}
                       >
                         <div className="text-sm">
-                          {formatCellValue(row[column.column_name])}
+                          {formatCellValue(
+                            row[column.column_name],
+                            column.data_type,
+                          )}
                         </div>
                       </TableCell>
                     ))}

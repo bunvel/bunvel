@@ -132,19 +132,22 @@ export function useTableManager(): UseTableManagerReturn {
     e.stopPropagation()
     removeTable(tableKey)
 
-    // If removing active table, navigate to next available table
-    if (tabs.activeTableKey === tableKey && tabs.selectedTables.length > 1) {
+    // If removing active table, navigate to next available table or clear search params if last tab is closed
+    const currentActiveKey =
+      schema && table ? `${schema}.${table}` : tabs.activeTableKey
+    if (currentActiveKey === tableKey) {
       const remainingTables = tabs.selectedTables.filter(
         (t: string) => t !== tableKey,
       )
-      const [newSchema, newTable] = remainingTables[0]?.split('.') || []
-      const newActiveTable = remainingTables[0] || null
-      setActiveTable(newActiveTable)
-      navigate(
-        newTable
-          ? { search: { schema: newSchema, table: newTable } as any }
-          : { search: {} as any },
-      )
+      if (remainingTables.length > 0) {
+        const nextActive = remainingTables[0]
+        const [newSchema, newTable] = nextActive.split('.')
+        setActiveTable(nextActive)
+        navigate({ search: { schema: newSchema, table: newTable } as any })
+      } else {
+        setActiveTable(null)
+        navigate({ search: {} as any })
+      }
     }
   }
 

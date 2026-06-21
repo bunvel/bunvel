@@ -199,7 +199,10 @@ export function ReferenceSelectorSheet({
                           }}
                         >
                           <div className="text-sm max-w-32 truncate">
-                            {formatCellValue(row[column.column_name])}
+                            {formatCellValue(
+                              row[column.column_name],
+                              column.data_type,
+                            )}
                           </div>
                         </TableCell>
                       ))}

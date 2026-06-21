@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { FilterOperator } from '@/constants/filter'
-import { FilterOperatorLabels } from '@/constants/filter'
+import { FilterOperatorLabels, FilterOperatorTypes } from '@/constants/filter'
 import { useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTableManager } from '@/hooks/use-table-manager'
 import type {
@@ -44,6 +44,30 @@ import { Filter, Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
 import { SortableItem } from '../../common/sortable-item'
+
+function getFilterTypeForDataType(
+  dataType: string,
+): 'TEXT' | 'NUMBER' | 'DATE' | 'BOOLEAN' {
+  const dt = dataType.toLowerCase()
+  if (
+    dt.includes('int') ||
+    dt.includes('num') ||
+    dt.includes('double') ||
+    dt.includes('real') ||
+    dt.includes('decimal') ||
+    dt.includes('float') ||
+    dt === 'numeric'
+  ) {
+    return 'NUMBER'
+  }
+  if (dt.includes('date') || dt.includes('time') || dt.includes('timestamp')) {
+    return 'DATE'
+  }
+  if (dt.includes('bool')) {
+    return 'BOOLEAN'
+  }
+  return 'TEXT'
+}
 
 interface FilterButtonProps {
   schema?: string
@@ -81,10 +105,7 @@ export function FilterButton({
 
   const { data: tableMetadata } = useTableMetadata(schema, table)
   const columns = tableMetadata?.columns || []
-  const availableColumns = columns.filter(
-    (col: TableColumnMetadata) =>
-      !pendingFilters.some((filter) => filter.column === col.column_name),
-  )
+  const availableColumns = columns
 
   // Sync pending filters when dropdown opens
   useEffect(() => {
@@ -211,63 +232,117 @@ export function FilterButton({
                   >
                     <div className="flex items-center gap-2 w-full">
                       <div className="flex-1 grid grid-cols-3 gap-2">
-                        <Select
-                          value={filter.column}
-                          onValueChange={(value: string | null) => {
-                            if (value !== null) {
-                              handleUpdateFilter(filter.id, { column: value })
-                            }
-                          }}
-                        >
-                          <SelectTrigger className="h-8 w-full">
-                            <SelectValue title="Column" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {availableColumns.map(
-                              (col: TableColumnMetadata) => (
-                                <SelectItem
-                                  key={col.column_name}
-                                  value={col.column_name}
-                                >
-                                  {col.column_name}
-                                </SelectItem>
-                              ),
-                            )}
-                            {availableColumns.length === 0 && (
-                              <div className="text-sm text-muted-foreground px-2 py-1.5">
-                                No columns available
-                              </div>
-                            )}
-                          </SelectContent>
-                        </Select>
+                        {(() => {
+                          const selectedCol = columns.find(
+                            (col: TableColumnMetadata) =>
+                              col.column_name === filter.column,
+                          )
+                          const filterType = selectedCol
+                            ? getFilterTypeForDataType(selectedCol.data_type)
+                            : 'TEXT'
+                          const allowedOperators =
+                            FilterOperatorTypes[filterType]
 
-                        <Select
-                          value={filter.operator}
-                          onValueChange={(value: FilterOperator | null) => {
-                            if (value !== null) {
-                              handleUpdateFilter(filter.id, {
-                                operator: value,
-                              })
-                            } else {
-                              handleUpdateFilter(filter.id, {
-                                operator: '=',
-                              })
-                            }
-                          }}
-                        >
-                          <SelectTrigger className="h-8 w-full">
-                            <SelectValue title="Operator" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.entries(FilterOperatorLabels).map(
-                              ([operator, label]) => (
-                                <SelectItem key={operator} value={operator}>
-                                  {String(label)}
-                                </SelectItem>
-                              ),
-                            )}
-                          </SelectContent>
-                        </Select>
+                          return (
+                            <>
+                              <Select
+                                value={filter.column}
+                                onValueChange={(value: string | null) => {
+                                  if (value !== null) {
+                                    const newCol = columns.find(
+                                      (col: TableColumnMetadata) =>
+                                        col.column_name === value,
+                                    )
+                                    const newFilterType = newCol
+                                      ? getFilterTypeForDataType(
+                                          newCol.data_type,
+                                        )
+                                      : 'TEXT'
+                                    const newAllowedOps =
+                                      FilterOperatorTypes[newFilterType]
+                                    const isOpValid = newAllowedOps.includes(
+                                      filter.operator as any,
+                                    )
+                                    const defaultOp = newAllowedOps[0] || '='
+
+                                    handleUpdateFilter(filter.id, {
+                                      column: value,
+                                      operator: isOpValid
+                                        ? filter.operator
+                                        : (defaultOp as any),
+                                      value:
+                                        (isOpValid
+                                          ? filter.operator
+                                          : defaultOp) === 'IS NULL' ||
+                                        (isOpValid
+                                          ? filter.operator
+                                          : defaultOp) === 'IS NOT NULL'
+                                          ? null
+                                          : filter.value,
+                                    })
+                                  }
+                                }}
+                              >
+                                <SelectTrigger className="h-8 w-full">
+                                  <SelectValue title="Column" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {availableColumns.map(
+                                    (col: TableColumnMetadata) => (
+                                      <SelectItem
+                                        key={col.column_name}
+                                        value={col.column_name}
+                                      >
+                                        {col.column_name}
+                                      </SelectItem>
+                                    ),
+                                  )}
+                                  {availableColumns.length === 0 && (
+                                    <div className="text-sm text-muted-foreground px-2 py-1.5">
+                                      No columns available
+                                    </div>
+                                  )}
+                                </SelectContent>
+                              </Select>
+
+                              <Select
+                                value={filter.operator}
+                                onValueChange={(
+                                  value: FilterOperator | null,
+                                ) => {
+                                  if (value !== null) {
+                                    handleUpdateFilter(filter.id, {
+                                      operator: value,
+                                      value:
+                                        value === 'IS NULL' ||
+                                        value === 'IS NOT NULL'
+                                          ? null
+                                          : filter.value,
+                                    })
+                                  } else {
+                                    handleUpdateFilter(filter.id, {
+                                      operator: '=',
+                                    })
+                                  }
+                                }}
+                              >
+                                <SelectTrigger className="h-8 w-full">
+                                  <SelectValue title="Operator" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {allowedOperators.map((op) => {
+                                    const label = FilterOperatorLabels[op]
+                                    return (
+                                      <SelectItem key={op} value={op}>
+                                        {String(label)}
+                                      </SelectItem>
+                                    )
+                                  })}
+                                </SelectContent>
+                              </Select>
+                            </>
+                          )
+                        })()}
 
                         {filter.operator !== 'IS NULL' &&
                           filter.operator !== 'IS NOT NULL' && (

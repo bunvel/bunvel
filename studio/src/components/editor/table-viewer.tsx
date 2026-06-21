@@ -6,6 +6,7 @@ import type { ColumnDef } from '@tanstack/react-table'
 import { DataTableHeaderCell } from '@/components/data-table/data-table-header-cell'
 import { NewColumnForm } from './new-column-form'
 import { TableToolbar } from './table-toolbar'
+import { useMemo } from 'react'
 
 export function TableViewer() {
   const {
@@ -17,20 +18,44 @@ export function TableViewer() {
     error,
     rowSelection,
     pagination,
+    sorts,
     handleRowSelectionChange,
     handleRowSelectionStateChange,
     handlePaginationChange,
+    handleSortChange,
   } = useTableManager()
+
+  const sorting = useMemo(() => {
+    return sorts.map((s) => ({
+      id: s.column,
+      desc: s.direction === 'desc',
+    }))
+  }, [sorts])
+
+  const handleSortingChange = (newSorting: any) => {
+    const mappedSorts = newSorting.map((s: any) => ({
+      column: s.id,
+      direction: s.desc ? 'desc' : 'asc',
+    }))
+    handleSortChange(mappedSorts)
+  }
 
   const columns: Array<ColumnDef<TableRow>> = !metadata?.columns
     ? []
     : [
         ...metadata.columns.map((column: any) => ({
           id: column.column_name,
-          header: () => <DataTableHeaderCell column={column} className="p-2" />,
+          header: () => (
+            <DataTableHeaderCell
+              column={column}
+              className="p-2 cursor-pointer select-none"
+              sorts={sorts}
+              onSortChange={handleSortChange}
+            />
+          ),
           accessorKey: column.column_name,
           cell: (info: any) => {
-            return formatCellValue(info.getValue())
+            return formatCellValue(info.getValue(), column.data_type)
           },
           meta: {
             dataType: column.data_type,
@@ -84,10 +109,12 @@ export function TableViewer() {
           onRowSelectionChange={handleRowSelectionChange}
           onRowSelectionStateChange={handleRowSelectionStateChange}
           onPaginationChange={handlePaginationChange}
+          onSortingChange={handleSortingChange}
           pageCount={tableData?.totalPages || 0}
           state={{
             pagination,
             rowSelection,
+            sorting,
           }}
         />
       </div>

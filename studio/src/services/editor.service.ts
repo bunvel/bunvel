@@ -200,8 +200,8 @@ export const getTableData = createServerFn({ method: 'POST' })
       // Build ORDER BY clause for sorting
       const orderByClause = data.sorts?.length
         ? `ORDER BY ${data.sorts
-          .map((sort) => `"${sort.column}" ${sort.direction.toUpperCase()}`)
-          .join(', ')}`
+            .map((sort) => `"${sort.column}" ${sort.direction.toUpperCase()}`)
+            .join(', ')}`
         : ''
 
       // Get paginated data with filtering and sorting

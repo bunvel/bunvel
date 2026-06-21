@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 import React from 'react'
 
 /**
@@ -7,9 +8,9 @@ import React from 'react'
  */
 export function formatDataType(dataType: string): string {
   if (!dataType) return dataType
-  
+
   const type = dataType.toLowerCase().trim()
-  
+
   // Common type mappings
   const typeMap: Record<string, string> = {
     'timestamp with time zone': 'timestamptz',
@@ -18,20 +19,20 @@ export function formatDataType(dataType: string): string {
     'time without time zone': 'time',
     'double precision': 'float8',
     'character varying': 'varchar',
-    'character': 'char',
-    'boolean': 'bool',
-    'integer': 'int',
-    'serial': 'serial4',
-    'bigserial': 'serial8',
-    'decimal': 'numeric',
+    character: 'char',
+    boolean: 'bool',
+    integer: 'int',
+    serial: 'serial4',
+    bigserial: 'serial8',
+    decimal: 'numeric',
   }
-  
+
   // Check for array types (e.g., integer[], text[])
   if (type.endsWith('[]')) {
     const baseType = type.slice(0, -2)
     return `${formatDataType(baseType)}[]`
   }
-  
+
   // Check for length-specified types (e.g., varchar(255))
   const lengthMatch = type.match(/^([a-z\s]+)\(\d+\)$/i)
   if (lengthMatch) {
@@ -39,7 +40,7 @@ export function formatDataType(dataType: string): string {
     const length = type.match(/\(\d+\)/)?.[0] || ''
     return `${formatDataType(baseType)}${length}`
   }
-  
+
   // Return mapped type or original if no mapping exists
   return typeMap[type] || type
 }
@@ -47,12 +48,27 @@ export function formatDataType(dataType: string): string {
 /**
  * Formats a cell value for consistent display in tables
  * @param value - The value to format
+ * @param dataType - The optional database data type
  * @returns Formatted React node representation of the value
  */
-export function formatCellValue(value: unknown): React.ReactNode {
+export function formatCellValue(
+  value: unknown,
+  dataType?: string,
+): React.ReactNode {
   // Handle null/undefined
   if (value == null) {
-    return <span className="italic text-muted-foreground">NULL</span>
+    return <span className="italic text-muted-foreground text-xs">NULL</span>
+  }
+
+  const type = dataType?.toLowerCase() || ''
+
+  // Handle booleans
+  if (typeof value === 'boolean' || type === 'boolean') {
+    const boolVal =
+      typeof value === 'boolean'
+        ? value
+        : String(value).toLowerCase() === 'true'
+    return boolVal ? 'TRUE' : 'FALSE'
   }
 
   // Handle arrays
@@ -64,20 +80,51 @@ export function formatCellValue(value: unknown): React.ReactNode {
         ? `, ... +${value.length - MAX_ARRAY_ITEMS} more`
         : ''
 
-    return `[${items
-      .map((v) => (typeof v === 'object' ? JSON.stringify(v) : String(v)))
-      .join(', ')}${suffix}]`
+    return (
+      <span
+        className="font-mono text-xs max-w-[250px] truncate block"
+        title={JSON.stringify(value)}
+      >
+        {`[${items
+          .map((v) => (typeof v === 'object' ? JSON.stringify(v) : String(v)))
+          .join(', ')}${suffix}]`}
+      </span>
+    )
   }
 
-  // Handle dates
-  if (value instanceof Date) {
-    return value.toISOString()
-  }
-
-  // Handle objects (non-array, non-date)
-  if (typeof value === 'object') {
+  // Handle dates or timestamp fields
+  if (
+    value instanceof Date ||
+    type.includes('timestamp') ||
+    type === 'date' ||
+    type.includes('time')
+  ) {
     try {
-      return JSON.stringify(value)
+      const dateVal = value instanceof Date ? value : new Date(String(value))
+      if (!isNaN(dateVal.getTime())) {
+        return (
+          <span className="font-mono text-xs" title={dateVal.toISOString()}>
+            {format(dateVal, 'yyyy-MM-dd HH:mm:ss')}
+          </span>
+        )
+      }
+    } catch {
+      // Fallback if Date parsing fails
+    }
+  }
+
+  // Handle JSON and objects
+  if (typeof value === 'object' || type === 'json' || type === 'jsonb') {
+    try {
+      const strVal = typeof value === 'string' ? value : JSON.stringify(value)
+      return (
+        <span
+          className="font-mono text-xs bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded max-w-[200px] truncate block"
+          title={strVal}
+        >
+          {strVal}
+        </span>
+      )
     } catch {
       return String(value)
     }
@@ -85,16 +132,48 @@ export function formatCellValue(value: unknown): React.ReactNode {
 
   // Handle strings
   if (typeof value === 'string') {
+    if (!value) {
+      return (
+        <span className="italic text-muted-foreground text-xs">(empty)</span>
+      )
+    }
+
+    // Check if the string is a valid image URL
+    const IMAGE_URL_REGEX = /\.(png|jpe?g|gif|webp|svg|bmp)(?:\?.*)?$/i
+    const isImageUrl =
+      value.startsWith('http://') ||
+      value.startsWith('https://') ||
+      value.startsWith('/')
+
+    if (isImageUrl && IMAGE_URL_REGEX.test(value)) {
+      return (
+        <div className="flex items-center gap-2">
+          <img
+            src={value}
+            alt="Preview"
+            className="size-6 object-cover rounded border bg-muted shadow-sm transition-transform hover:scale-150 duration-200"
+            onError={(e) => {
+              // Hide image preview on failure and just leave the URL text
+              e.currentTarget.style.display = 'none'
+            }}
+          />
+          <span
+            className="truncate max-w-[150px] font-mono text-xs"
+            title={value}
+          >
+            {value}
+          </span>
+        </div>
+      )
+    }
+
     return (
-      value || <span className="italic text-muted-foreground">(empty)</span>
+      <span className="truncate block max-w-[300px]" title={value}>
+        {value}
+      </span>
     )
   }
 
-  // Handle booleans
-  if (typeof value === 'boolean') {
-    return value ? 'TRUE' : 'FALSE'
-  }
-
   // Handle numbers, bigints, symbols, etc.
-  return String(value)
+  return <span className="font-mono text-xs">{String(value)}</span>
 }

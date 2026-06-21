@@ -1,10 +1,11 @@
 import { cn } from '@/lib/utils'
-import {
-  Key01Icon,
-  Link02Icon,
-} from '@hugeicons/core-free-icons'
+import { Key01Icon, Link02Icon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface ColumnKeyIndicatorProps {
   isPrimaryKey?: boolean
@@ -12,7 +13,11 @@ interface ColumnKeyIndicatorProps {
   className?: string
 }
 
-export function ColumnKeyIndicator({ isPrimaryKey, isForeignKey, className }: ColumnKeyIndicatorProps) {
+export function ColumnKeyIndicator({
+  isPrimaryKey,
+  isForeignKey,
+  className,
+}: ColumnKeyIndicatorProps) {
   if (!isPrimaryKey && !isForeignKey) {
     return null
   }

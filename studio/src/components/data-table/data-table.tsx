@@ -41,6 +41,7 @@ interface DataTableProps<TData, TValue = unknown> {
     pageIndex: number
     pageSize: number
   }) => void
+  onSortingChange?: (sorting: SortingState) => void
   pageCount: number
   state: {
     pagination: { pageIndex: number; pageSize: number }
@@ -61,6 +62,7 @@ export function DataTable<TData, TValue = unknown>({
   onRowSelectionChange,
   onRowSelectionStateChange,
   onPaginationChange,
+  onSortingChange,
   pageCount,
   state,
 }: DataTableProps<TData, TValue>) {
@@ -116,8 +118,26 @@ export function DataTable<TData, TValue = unknown>({
       columnFilters: state.columnFilters,
       pagination: state.pagination,
     },
+    getRowId: (row: any, index: number) => {
+      if (metadata?.primary_keys?.length) {
+        return metadata.primary_keys
+          .map((pk: string) => String(row[pk]))
+          .join('::')
+      }
+      const offset = state.pagination
+        ? state.pagination.pageIndex * state.pagination.pageSize
+        : 0
+      return String(offset + index)
+    },
     enableRowSelection,
     onRowSelectionChange: onRowSelectionStateChange,
+    onSortingChange: (updater) => {
+      if (onSortingChange) {
+        const newSorting =
+          typeof updater === 'function' ? updater(state.sorting || []) : updater
+        onSortingChange(newSorting)
+      }
+    },
     manualPagination: true, // Enable manual pagination
     pageCount,
     onPaginationChange: (updater) => {
@@ -231,7 +251,10 @@ export function DataTable<TData, TValue = unknown>({
                             <div className="p-2"></div>
                           ) : (
                             <DataTableCell
-                              value={formatCellValue(cell.getValue())}
+                              value={formatCellValue(
+                                cell.getValue(),
+                                columnLookup.get(cell.column.id)?.data_type,
+                              )}
                               rawValue={cell.getValue()}
                               isForeignKey={
                                 columnLookup.get(cell.column.id)
