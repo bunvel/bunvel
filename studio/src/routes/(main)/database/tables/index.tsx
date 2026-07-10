@@ -1,16 +1,16 @@
 import { TableKindIcon } from '@/components/common/table-kind-icon'
 import { DatabaseTable } from '@/components/database/database-table'
-import { TableFormSheet } from '@/components/editor/table-form-sheet'
+import { TableFormSheet } from '@/components/sheets/table-form-sheet'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { PLACEHOLDERS } from '@/constants/ui'
 import { useDatabaseTables } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types/components'
 import type { DatabaseTables } from '@/types/database'
-import { PLACEHOLDERS } from '@/constants/ui'
 import { LayoutTwoColumnIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { parseAsString, useQueryStates, createStandardSchemaV1 } from 'nuqs'
+import { createStandardSchemaV1, parseAsString, useQueryStates } from 'nuqs'
 
 export const Route = createFileRoute('/(main)/database/tables/')({
   component: RouteComponent,
@@ -36,11 +36,7 @@ function RouteComponent() {
     schema: parseAsString.withDefault('public'),
   })
 
-  const {
-    data: tables = [],
-    isLoading,
-    error,
-  } = useDatabaseTables(schema)
+  const { data: tables = [], isLoading, error } = useDatabaseTables(schema)
 
   // Custom body row
   const bodyRow = (item: DatabaseTables, index: number) => {

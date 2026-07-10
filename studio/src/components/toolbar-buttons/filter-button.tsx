@@ -43,7 +43,7 @@ import {
 import { Filter, Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useState } from 'react'
-import { SortableItem } from '../../common/sortable-item'
+import { SortableItem } from '../common/sortable-item'
 
 function getFilterTypeForDataType(
   dataType: string,

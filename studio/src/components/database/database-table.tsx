@@ -1,4 +1,4 @@
-import { SchemaSelector } from '@/components/editor/schema-selector'
+import { SchemaSelector } from '@/components/database/schema/schema-selector'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {

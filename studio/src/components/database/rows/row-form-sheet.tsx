@@ -16,8 +16,8 @@ import type { ColumnMetadata } from '@/types/table'
 import { Edit, Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import React, { useCallback, useMemo, useState } from 'react'
-import { FieldSection } from './FieldSection'
-import { ReferenceSelectorSheet } from './reference-selector-sheet'
+import { FieldSection } from '../columns/field-section'
+import { ReferenceSelectorSheet } from '../foreign-keys/reference-selector-sheet'
 
 interface RowFormSheetProps {
   schema: string

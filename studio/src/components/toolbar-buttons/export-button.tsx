@@ -2,7 +2,7 @@ import type { ExportFormat } from '@/constants/app'
 import { BUTTON_LABELS } from '@/constants/ui'
 import { useExport } from '@/hooks/use-export'
 import { useTableManager } from '@/hooks/use-table-manager'
-import { BaseExportButton } from '../../common/base-export-button'
+import { BaseExportButton } from '../common/base-export-button'
 
 export function ExportButton() {
   const { selectedRows, table, schema } = useTableManager()

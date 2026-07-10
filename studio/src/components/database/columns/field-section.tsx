@@ -1,5 +1,5 @@
 import type { ColumnMetadata } from '@/types/table'
-import { FieldRenderer } from './FieldRenderer'
+import { FieldRenderer } from './field-renderer'
 
 interface FieldSectionProps {
   title: string

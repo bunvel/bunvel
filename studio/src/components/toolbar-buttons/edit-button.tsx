@@ -1,7 +1,7 @@
-import { RowFormSheet } from '@/components/editor/row-form-sheet'
+import { RowFormSheet } from '@/components/database/rows/row-form-sheet'
 import { Button } from '@/components/ui/button'
-import { useTableManager } from '@/hooks/use-table-manager'
 import { BUTTON_LABELS } from '@/constants/ui'
+import { useTableManager } from '@/hooks/use-table-manager'
 import { isReadonlySchema } from '@/utils/func'
 
 export function EditButton() {

@@ -23,10 +23,10 @@ import { validateForeignKeyTypes, validateTableForm } from '@/utils/validation'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
-import { TableBasicInfo } from './TableBasicInfo'
-import { TableColumnsSection } from './TableColumnsSection'
-import { TableForeignKeysSection } from './TableForeignKeysSection'
-import { ForeignKeySheet } from './foreign-key-sheet'
+import { ForeignKeySheet } from '../database/foreign-keys/foreign-key-sheet'
+import { TableBasicInfo } from '../database/tables/table-basic-info'
+import { TableColumnsSection } from '../database/tables/table-columns-section'
+import { TableForeignKeysSection } from '../database/tables/table-foreign-keys-section'
 
 interface TableFormSheetProps {
   schema: string
@@ -245,7 +245,7 @@ export function TableFormSheet({ schema, children }: TableFormSheetProps) {
           tableName={formValues.name}
           columns={formValues.columns}
           existingForeignKey={editingForeignKey}
-          onSave={(foreignKey) =>
+          onSave={(foreignKey: ForeignKeyDefinition) =>
             handleForeignKeySave(foreignKey, setFormValues)
           }
         />

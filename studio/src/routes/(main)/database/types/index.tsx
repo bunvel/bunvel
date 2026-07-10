@@ -1,11 +1,11 @@
 import { DatabaseTable } from '@/components/database/database-table'
-import { EnumFormSheet } from '@/components/editor/enum-form-sheet'
+import { EnumFormSheet } from '@/components/sheets/enum-form-sheet'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { PLACEHOLDERS } from '@/constants/ui'
 import { useDatabaseEnums } from '@/hooks/queries/useEnums'
 import type { TableColumn } from '@/types/components'
-import { PLACEHOLDERS } from '@/constants/ui'
 import { createFileRoute } from '@tanstack/react-router'
-import { parseAsString, useQueryStates, createStandardSchemaV1 } from 'nuqs'
+import { createStandardSchemaV1, parseAsString, useQueryStates } from 'nuqs'
 
 export const Route = createFileRoute('/(main)/database/types/')({
   component: RouteComponent,

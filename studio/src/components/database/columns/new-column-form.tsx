@@ -22,9 +22,9 @@ import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { ColumnConstraints } from './ColumnConstraints'
-import { ForeignKeySheet } from './foreign-key-sheet'
-import { ForeignKeyCard } from './ForeignKeyCard'
+import { ForeignKeyCard } from '../foreign-keys/foreign-key-card'
+import { ForeignKeySheet } from '../foreign-keys/foreign-key-sheet'
+import { ColumnConstraints } from './column-constraints'
 
 interface NewColumnFormProps {
   schema: string

@@ -2,11 +2,11 @@ import { DataTypeSelector } from '@/components/common/data-type-selector'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import type { ColumnDefinition } from '@/types/database'
 import { PLACEHOLDERS, TABLE_FORM_MESSAGES } from '@/constants/ui'
+import type { ColumnDefinition } from '@/types/database'
 import { Plus } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ColumnActions } from './ColumnActions'
+import { ColumnActions } from '../columns/column-actions'
 
 interface TableColumnsSectionProps {
   columns: Array<ColumnDefinition>

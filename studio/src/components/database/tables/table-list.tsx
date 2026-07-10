@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/sidebar'
 
 import { TableKindIcon } from '@/components/common/table-kind-icon'
+import { TableFormSheet } from '@/components/sheets/table-form-sheet'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -17,12 +18,14 @@ import { TableIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
-import { TableFormSheet } from './table-form-sheet'
 import { TableListAction } from './table-list-action'
 
 export function TableList() {
   const navigate = useNavigate()
-  const search = useSearch({ strict: false }) as { schema?: string; table?: string }
+  const search = useSearch({ strict: false }) as {
+    schema?: string
+    table?: string
+  }
   const { schema } = search
   const { data: tables = [], isLoading, error, refetch } = useTables(schema)
   const [searchQuery, setSearchQuery] = useState('')

@@ -1,12 +1,12 @@
 import { DataTable } from '@/components/data-table/data-table'
+import { DataTableHeaderCell } from '@/components/data-table/data-table-header-cell'
 import { useTableManager } from '@/hooks/use-table-manager'
 import type { TableRow } from '@/types/table'
 import { formatCellValue } from '@/utils/format'
 import type { ColumnDef } from '@tanstack/react-table'
-import { DataTableHeaderCell } from '@/components/data-table/data-table-header-cell'
-import { NewColumnForm } from './new-column-form'
-import { TableToolbar } from './table-toolbar'
 import { useMemo } from 'react'
+import { NewColumnForm } from '../columns/new-column-form'
+import { TableToolbar } from './table-toolbar'
 
 export function TableViewer() {
   const {

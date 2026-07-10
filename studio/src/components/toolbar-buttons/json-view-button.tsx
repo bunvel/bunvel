@@ -1,4 +1,4 @@
-import { JsonViewSheet } from '@/components/editor/json-view-sheet'
+import { JsonViewSheet } from '@/components/sheets/json-view-sheet'
 import { Button } from '@/components/ui/button'
 import { useTableManager } from '@/hooks/use-table-manager'
 import { Code } from '@hugeicons/core-free-icons'

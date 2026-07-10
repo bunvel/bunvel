@@ -1,4 +1,4 @@
-import { RowFormSheet } from '@/components/editor/row-form-sheet'
+import { RowFormSheet } from '@/components/database/rows/row-form-sheet'
 import { Button } from '@/components/ui/button'
 import { BUTTON_LABELS } from '@/constants/ui'
 import { useTableManager } from '@/hooks/use-table-manager'

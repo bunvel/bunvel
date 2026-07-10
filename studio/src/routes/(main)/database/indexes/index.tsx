@@ -1,5 +1,5 @@
 import { DatabaseTable } from '@/components/database/database-table'
-import { IndexFormSheet } from '@/components/editor/index-form-sheet'
+import { IndexFormSheet } from '@/components/sheets/index-form-sheet'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -16,7 +16,7 @@ import { useDatabaseIndexes } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types/components'
 import type { DatabaseTableIndexes } from '@/types/database'
 import { createFileRoute } from '@tanstack/react-router'
-import { parseAsString, useQueryStates, createStandardSchemaV1 } from 'nuqs'
+import { createStandardSchemaV1, parseAsString, useQueryStates } from 'nuqs'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/(main)/database/indexes/')({
@@ -44,11 +44,7 @@ function RouteComponent() {
     schema: parseAsString.withDefault('public'),
   })
 
-  const {
-    data: tables = [],
-    isLoading,
-    error,
-  } = useDatabaseIndexes(schema)
+  const { data: tables = [], isLoading, error } = useDatabaseIndexes(schema)
 
   // Custom body row
   const bodyRow = (item: DatabaseTableIndexes, index: number) => {

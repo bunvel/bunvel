@@ -1,3 +1,4 @@
+import { CreateSchemaSheet } from '@/components/sheets/create-schema-sheet'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -9,14 +10,16 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSchemas } from '@/hooks/queries/useSchemas'
 import type { Schema } from '@/types/database'
-import { useNavigate, useSearch } from '@tanstack/react-router'
 import type { NavigateOptions } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useEffect, useEffectEvent } from 'react'
-import { CreateSchemaSheet } from './create-schema-sheet'
 
 export function SchemaSelector({ hideCreate = true }: { hideCreate: boolean }) {
   const navigate = useNavigate()
-  const search = useSearch({ strict: false }) as { schema?: string; table?: string }
+  const search = useSearch({ strict: false }) as {
+    schema?: string
+    table?: string
+  }
   const { data: schemas, error, isFetching, refetch } = useSchemas()
 
   // Calculate derived state
