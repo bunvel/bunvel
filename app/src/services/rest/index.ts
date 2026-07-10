@@ -30,26 +30,23 @@ export const restService = new Elysia({
       const targetWithQuery = url.search ? `${target}${url.search}` : target;
 
       const headers = new Headers(request.headers);
-      headers.set("Content-Type", JSON_CONTENT_TYPE);
       headers.set("Accept", JSON_CONTENT_TYPE);
+      headers.set("Content-Type", JSON_CONTENT_TYPE);
+      headers.delete("host");
 
-      const init: RequestInit = {
+      const response = await fetch(targetWithQuery, {
         method: request.method,
         headers,
         body: ["GET", "HEAD"].includes(request.method)
           ? undefined
           : request.body,
-      };
+      });
 
-      const response = await fetch(targetWithQuery, init);
       set.status = response.status;
-
-      const contentType = response.headers.get("content-type") || "";
-      const result = contentType.includes(JSON_CONTENT_TYPE)
-        ? await response.json()
-        : await response.text();
-
-      return contentType.includes(JSON_CONTENT_TYPE) ? result : result;
+      return new Response(response.body, {
+        status: response.status,
+        headers: response.headers,
+      });
     } catch (error) {
       throw new InternalServerErrorException({
         error: "Internal server error",

@@ -3,12 +3,18 @@ import { EnumFormSheet } from '@/components/editor/enum-form-sheet'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseEnums } from '@/hooks/queries/useEnums'
 import type { TableColumn } from '@/types/components'
-import type { SchemaTable } from '@/types/schema'
 import { PLACEHOLDERS } from '@/constants/ui'
-import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import { parseAsString, useQueryStates, createStandardSchemaV1 } from 'nuqs'
 
 export const Route = createFileRoute('/(main)/database/types/')({
   component: RouteComponent,
+  validateSearch: createStandardSchemaV1(
+    {
+      schema: parseAsString.withDefault('public'),
+    },
+    { partialOutput: true },
+  ),
 })
 
 // Define the table columns
@@ -19,8 +25,9 @@ const columns: Array<TableColumn> = [
 ]
 
 function RouteComponent() {
-  const search = useSearch({ strict: false }) as Partial<SchemaTable>
-  const schema = search.schema || 'public'
+  const [{ schema }] = useQueryStates({
+    schema: parseAsString.withDefault('public'),
+  })
 
   const { data: enums = [], isLoading, error } = useDatabaseEnums(schema)
 

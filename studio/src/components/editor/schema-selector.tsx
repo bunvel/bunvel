@@ -9,7 +9,6 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { useSchemas } from '@/hooks/queries/useSchemas'
 import type { Schema } from '@/types/database'
-import type { SchemaTable } from '@/types/schema'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import type { NavigateOptions } from '@tanstack/react-router'
 import { useEffect, useEffectEvent } from 'react'
@@ -17,7 +16,7 @@ import { CreateSchemaSheet } from './create-schema-sheet'
 
 export function SchemaSelector({ hideCreate = true }: { hideCreate: boolean }) {
   const navigate = useNavigate()
-  const search = useSearch({ strict: false }) as SchemaTable
+  const search = useSearch({ strict: false }) as { schema?: string; table?: string }
   const { data: schemas, error, isFetching, refetch } = useSchemas()
 
   // Calculate derived state
@@ -29,7 +28,7 @@ export function SchemaSelector({ hideCreate = true }: { hideCreate: boolean }) {
   // Handle navigation effect with latest navigate function
   const handleAutoNavigate = useEffectEvent((schema: string) => {
     navigate({
-      search: (prev: SchemaTable) => ({
+      search: (prev: { schema?: string; table?: string }) => ({
         ...prev,
         schema,
       }),
@@ -82,7 +81,7 @@ export function SchemaSelector({ hideCreate = true }: { hideCreate: boolean }) {
 
   const handleSchemaChange = (value: string | null) => {
     navigate({
-      search: (prev: SchemaTable) => ({
+      search: (prev: { schema?: string; table?: string }) => ({
         ...prev,
         schema: value || defaultSchema,
         table: undefined,

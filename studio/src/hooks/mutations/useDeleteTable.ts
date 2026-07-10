@@ -1,3 +1,5 @@
+"use client"
+
 import { queryClient } from '@/lib/query-client'
 import { deleteTable } from '@/services/table.service'
 import { reactQueryKeys } from '@/utils/react-query-keys'
@@ -12,7 +14,6 @@ export function useDeleteTable() {
     mutationFn: (params: { schema: string; table: string; cascade: boolean }) =>
       deleteTable({ data: params }),
     onSuccess: (_, { schema, table }) => {
-      // Invalidate and refetch tables query
       queryClient.invalidateQueries({
         queryKey: reactQueryKeys.tables.list(schema),
       })
@@ -20,6 +21,13 @@ export function useDeleteTable() {
       removeTableBySchema(schema, table)
 
       toast.success('Table deleted successfully')
+    },
+    onError: (error: unknown) => {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to delete table. Please try again.'
+      toast.error(message)
     },
   })
 }

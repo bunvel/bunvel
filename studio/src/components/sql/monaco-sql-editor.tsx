@@ -5,9 +5,10 @@ import { useSqlManager } from '@/hooks/use-sql-manager'
 import { SQL_COMPLETIONS } from '@/utils/sql/sql-completions'
 import { Editor } from '@monaco-editor/react'
 import { useTheme } from 'better-themes'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export function MonacoSqlEditor() {
+  const [isBrowser, setIsBrowser] = useState(false)
   const editorRef = useRef<any>(null)
   const completionProviderRef = useRef<any>(null)
   const completionsRef = useRef<Array<any>>([])
@@ -201,6 +202,10 @@ export function MonacoSqlEditor() {
   }
 
   useEffect(() => {
+    setIsBrowser(true)
+  }, [])
+
+  useEffect(() => {
     // Focus the editor when mounted
     if (editorRef.current) {
       editorRef.current.focus()
@@ -214,6 +219,10 @@ export function MonacoSqlEditor() {
     }
   }, [])
 
+  if (!isBrowser) {
+    return <div className="h-full w-full bg-slate-100" />
+  }
+
   return (
     <div className="h-full w-full">
       <Editor
@@ -221,7 +230,7 @@ export function MonacoSqlEditor() {
         height="100%"
         language="sql"
         value={query}
-        onChange={(value) => setQuery(value || '')}
+        onChange={(value: any) => setQuery(value || '')}
         onMount={handleEditorDidMount}
         theme={getEditorTheme()}
         options={{

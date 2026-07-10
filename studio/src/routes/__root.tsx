@@ -1,7 +1,7 @@
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-
+import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import { DefaultCatchBoundary } from '@/components/error/DefaultCatchBoundary'
 import { NotFound } from '@/components/error/NotFound'
 import { Toaster } from '@/components/ui/sonner'
@@ -65,7 +65,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         >
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
-              {children}
+              <NuqsAdapter>
+                {children}
+              </NuqsAdapter>
               <Toaster />
             </TooltipProvider>
           </QueryClientProvider>

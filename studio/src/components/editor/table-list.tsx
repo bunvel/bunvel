@@ -13,7 +13,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { PLACEHOLDERS } from '@/constants/ui'
 import { useTables } from '@/hooks/queries/useTables'
 import type { Table } from '@/types/database'
-import type { SchemaTable } from '@/types/schema'
 import { TableIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
@@ -23,7 +22,7 @@ import { TableListAction } from './table-list-action'
 
 export function TableList() {
   const navigate = useNavigate()
-  const search = useSearch({ strict: false }) as SchemaTable
+  const search = useSearch({ strict: false }) as { schema?: string; table?: string }
   const { schema } = search
   const { data: tables = [], isLoading, error, refetch } = useTables(schema)
   const [searchQuery, setSearchQuery] = useState('')

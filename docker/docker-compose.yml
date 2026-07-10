@@ -47,7 +47,7 @@ services:
 
   postgres:
     container_name: bunvel-postgres
-    image: postgres:18.4-bookworm
+    image: postgres:18.4
     restart: unless-stopped
     shm_size: 128mb
     environment:
@@ -69,7 +69,7 @@ services:
 
   rest:
     container_name: bunvel-rest
-    image: postgrest/postgrest:v14.5
+    image: postgrest/postgrest:v14.14
     restart: unless-stopped
     ports:
       - "8001:8001"

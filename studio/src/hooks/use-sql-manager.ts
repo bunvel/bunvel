@@ -1,4 +1,5 @@
-import { useSqlStore } from '@/stores/sql-store'
+import { sqlTabsActions, useSqlTabsStore } from '@/stores/sql-tabs-store'
+import { sqlUiActions, useSqlUiStore } from '@/stores/sql-ui-store'
 import type { QueryHistoryItem } from '@/types/history'
 import type { SqlTab } from '@/types/tabs'
 import { useEffect } from 'react'
@@ -49,25 +50,25 @@ export interface UseSqlManagerReturn {
 }
 
 export function useSqlManager(): UseSqlManagerReturn {
-  // Zustand store selectors
-  const activeTabId = useSqlStore((state) => state.activeTabId)
-  const tabs = useSqlStore((state) => state.tabs)
-  const queryHistory = useSqlStore((state) => state.queryHistory)
-  const showSidebar = useSqlStore((state) => state.showSidebar)
-  const selectedQuery = useSqlStore((state) => state.selectedQuery)
+  // TanStack Store selectors
+  const activeTabId = useSqlTabsStore((state) => state.activeTabId)
+  const tabs = useSqlTabsStore((state) => state.tabs)
+  const queryHistory = useSqlUiStore((state) => state.queryHistory)
+  const showSidebar = useSqlUiStore((state) => state.showSidebar)
+  const selectedQuery = useSqlUiStore((state) => state.selectedQuery)
 
   // Store actions
-  const setActiveTabId = useSqlStore((state) => state.setActiveTabId)
-  const addTab = useSqlStore((state) => state.addTab)
-  const removeTab = useSqlStore((state) => state.removeTab)
-  const updateTabQuery = useSqlStore((state) => state.updateTabQuery)
-  const updateTabExecution = useSqlStore((state) => state.updateTabExecution)
-  const createNewQueryTab = useSqlStore((state) => state.createNewQueryTab)
-  const addToHistory = useSqlStore((state) => state.addToHistory)
-  const clearHistory = useSqlStore((state) => state.clearHistory)
-  const selectFromHistory = useSqlStore((state) => state.selectFromHistory)
-  const setShowSidebar = useSqlStore((state) => state.setShowSidebar)
-  const setSelectedQuery = useSqlStore((state) => state.setSelectedQuery)
+  const setActiveTabId = sqlTabsActions.setActiveTabId
+  const addTab = sqlTabsActions.addTab
+  const removeTab = sqlTabsActions.removeTab
+  const updateTabQuery = sqlTabsActions.updateTabQuery
+  const updateTabExecution = sqlTabsActions.updateTabExecution
+  const createNewQueryTab = sqlTabsActions.createNewQueryTab
+  const addToHistory = sqlUiActions.addToHistory
+  const clearHistory = sqlUiActions.clearHistory
+  const selectFromHistory = sqlUiActions.selectFromHistory
+  const setShowSidebar = sqlUiActions.setShowSidebar
+  const setSelectedQuery = sqlUiActions.setSelectedQuery
 
   // Computed values
   const activeTab = tabs.find((tab) => tab.id === activeTabId) || null

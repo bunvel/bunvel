@@ -1,3 +1,5 @@
+"use client"
+
 import { ConfirmDeleteDialog } from '@/components/common/confirm-delete-dialog'
 import {
   DropdownMenu,
@@ -19,16 +21,25 @@ import { toast } from 'sonner'
 export function TableListAction({ schema, table }: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isTruncateDialogOpen, setIsTruncateDialogOpen] = useState(false)
-  const { mutate: deleteTable, isPending: isDeleting } = useDeleteTable()
+  const { mutateAsync: deleteTableAsync, isPending: isDeleting } = useDeleteTable()
   const { mutate: truncateTable, isPending: isTruncating } = useTruncateTable()
   const [, copyToClipboard] = useCopyToClipboard()
 
-  const handleDelete = (cascade: boolean) => {
-    deleteTable({
-      schema,
-      table,
-      cascade,
-    })
+  const handleDelete = async (cascade: boolean) => {
+    try {
+      await deleteTableAsync({
+        schema,
+        table,
+        cascade,
+      })
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to delete table. Please try again.'
+      toast.error(message)
+      throw error
+    }
   }
 
   const handleTruncate = () => {

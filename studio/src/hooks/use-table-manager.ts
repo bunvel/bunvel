@@ -1,8 +1,8 @@
 import { useTableData, useTableMetadata } from '@/hooks/queries/useTableData'
 import { useTables } from '@/hooks/queries/useTables'
-import { useTableStore } from '@/stores/table-store'
+import { tableStateActions, useTableStateStore } from '@/stores/table-state-store'
+import { tableTabsActions, useTableTabsStore } from '@/stores/table-tabs-store'
 import type { TableKind } from '@/types/database'
-import type { SchemaTable } from '@/types/schema'
 import type {
   FilterConfig,
   PaginationConfig,
@@ -63,31 +63,36 @@ export interface UseTableManagerReturn {
 }
 
 export function useTableManager(): UseTableManagerReturn {
-  const { schema, table } = useSearch({ strict: false }) as SchemaTable
+  const { schema, table } = useSearch({ strict: false }) as {
+    schema?: string
+    table?: string
+  }
   const navigate = useNavigate()
 
-  // Zustand store hooks for tab management
-  const tabs = useTableStore((state) => state.tabs)
-  const addTable = useTableStore((state) => state.addTable)
-  const removeTable = useTableStore((state) => state.removeTable)
-  const removeTableBySchema = useTableStore(
-    (state) => state.removeTableBySchema,
-  )
-  const setActiveTable = useTableStore((state) => state.setActiveTable)
+  // TanStack Store hooks for tab management
+  const tabs = useTableTabsStore((state) => state.tabs)
+  const addTable = tableTabsActions.addTable
+  const removeTable = tableTabsActions.removeTable
+  const removeTableBySchema = tableTabsActions.removeTableBySchema
+  const setActiveTable = tableTabsActions.setActiveTable
 
-  // Zustand store hooks for table state
-  const setTableState = useTableStore((state) => state.setTableState)
-  const setSelectedRows = useTableStore((state) => state.setSelectedRows)
-  const setRowSelection = useTableStore((state) => state.setRowSelection)
-  const setPagination = useTableStore((state) => state.setPagination)
-  const setSorts = useTableStore((state) => state.setSorts)
-  const setFilters = useTableStore((state) => state.setFilters)
+  // TanStack Store hooks for table state
+  const setTableState = tableStateActions.setTableState
+  const setSelectedRows = tableStateActions.setSelectedRows
+  const setRowSelection = tableStateActions.setRowSelection
+  const setPagination = tableStateActions.setPagination
+  const setSorts = tableStateActions.setSorts
+  const setFilters = tableStateActions.setFilters
+  const cleanupTableState = tableStateActions.cleanupTableState
 
-  // Get current table key
-  const currentTableKey = schema && table ? `${schema}.${table}` : null
+  // Derive schema/table from URL or active tab fallback
+  const activeTableKey = tabs.activeTableKey
+  const resolvedSchema = schema || activeTableKey?.split('.')?.[0]
+  const resolvedTable = table || activeTableKey?.split('.')?.[1]
+  const currentTableKey = resolvedSchema && resolvedTable ? `${resolvedSchema}.${resolvedTable}` : null
 
   // Get current table state with proper subscription
-  const tableState = useTableStore((state) =>
+  const tableState = useTableStateStore((state) =>
     currentTableKey ? state.tableStates[currentTableKey] : null,
   )
 
@@ -103,8 +108,9 @@ export function useTableManager(): UseTableManagerReturn {
   useEffect(() => {
     if (schema && table) {
       addTable(schema, table, MAX_TABLE_TABS)
+      setActiveTable(`${schema}.${table}`)
     }
-  }, [schema, table, addTable])
+  }, [schema, table, addTable, setActiveTable])
 
   // Restore active table from store to URL when component mounts and URL has no table
   useEffect(() => {
@@ -121,7 +127,7 @@ export function useTableManager(): UseTableManagerReturn {
     }
   }, [schema, table, tabs.activeTableKey, tabs.selectedTables, navigate])
 
-  // Tab management functions - direct Zustand implementation
+  // Tab management functions - direct TanStack Store implementation
   const handleTabChange = (value: string) => {
     const [newSchema, newTable] = value.split('.')
     setActiveTable(value)
@@ -131,6 +137,7 @@ export function useTableManager(): UseTableManagerReturn {
   const handleTabClose = (e: React.MouseEvent, tableKey: string) => {
     e.stopPropagation()
     removeTable(tableKey)
+    cleanupTableState(tableKey)
 
     // If removing active table, navigate to next available table or clear search params if last tab is closed
     const currentActiveKey =
@@ -263,7 +270,7 @@ export function useTableManager(): UseTableManagerReturn {
   const sorts = tableState?.sorts || []
   const filters = tableState?.filters || []
 
-  // Tab state from Zustand store
+  // Tab state from TanStack Store
   const selectedTables = tabs.selectedTables
   const activeTable =
     schema && table ? `${schema}.${table}` : tabs.activeTableKey || undefined

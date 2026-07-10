@@ -15,12 +15,18 @@ import { PLACEHOLDERS } from '@/constants/ui'
 import { useDatabaseIndexes } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types/components'
 import type { DatabaseTableIndexes } from '@/types/database'
-import type { SchemaTable } from '@/types/schema'
-import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import { parseAsString, useQueryStates, createStandardSchemaV1 } from 'nuqs'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/(main)/database/indexes/')({
   component: RouteComponent,
+  validateSearch: createStandardSchemaV1(
+    {
+      schema: parseAsString.withDefault('public'),
+    },
+    { partialOutput: true },
+  ),
 })
 
 // Define the table columns
@@ -34,14 +40,15 @@ const columns: Array<TableColumn> = [
 function RouteComponent() {
   const [selectedIndex, setSelectedIndex] =
     useState<DatabaseTableIndexes | null>(null)
-  const search = useSearch({ strict: false }) as Partial<SchemaTable>
-  const { schema } = search
+  const [{ schema }] = useQueryStates({
+    schema: parseAsString.withDefault('public'),
+  })
 
   const {
     data: tables = [],
     isLoading,
     error,
-  } = useDatabaseIndexes(schema || 'public')
+  } = useDatabaseIndexes(schema)
 
   // Custom body row
   const bodyRow = (item: DatabaseTableIndexes, index: number) => {

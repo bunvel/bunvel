@@ -18,10 +18,9 @@ new Elysia()
   .use(
     rateLimit({
       max: env.RATE_LIMIT_MAX_REQUESTS,
-      skip: (request) => {
-        // Skip rate limiting for health checks
-        return request.url == "/";
-      },
+      duration: env.RATE_LIMIT_WINDOW_MS,
+      headers: true,
+      skip: (request) => request.url === "/",
     }),
   )
 
@@ -34,4 +33,4 @@ new Elysia()
   // Application routes
   .use(restService)
   .use(metaService)
-  .listen(env.PORT || "8000");
+  .listen({ port: env.PORT, hostname: "0.0.0.0" });

@@ -26,8 +26,6 @@ const sqlTemplates: Array<SqlTemplate> = [
       'Complete todo app setup with table, sample data, and performance indexes',
     query: SQL_TEMPLATE_QUERIES.todoComplete,
     icon: FileText,
-    category: 'basic',
-    difficulty: 'beginner',
   },
   {
     id: 'users-uuid-complete',
@@ -36,8 +34,6 @@ const sqlTemplates: Array<SqlTemplate> = [
       'User management system with UUID primary keys, sample data, and indexes',
     query: SQL_TEMPLATE_QUERIES.usersUuidComplete,
     icon: Users,
-    category: 'basic',
-    difficulty: 'beginner',
   },
   {
     id: 'posts-complete',
@@ -46,8 +42,6 @@ const sqlTemplates: Array<SqlTemplate> = [
       'Complete blog system with authors, posts, comments, and optimized indexes',
     query: SQL_TEMPLATE_QUERIES.postsComplete,
     icon: PenTool,
-    category: 'blog',
-    difficulty: 'intermediate',
   },
   {
     id: 'ecommerce-basic',
@@ -56,8 +50,6 @@ const sqlTemplates: Array<SqlTemplate> = [
       'Basic e-commerce system with products, categories, orders, and order items',
     query: SQL_TEMPLATE_QUERIES.ecommerceBasic,
     icon: TableIcon,
-    category: 'ecommerce',
-    difficulty: 'intermediate',
   },
   {
     id: 'analytics-events',
@@ -66,17 +58,8 @@ const sqlTemplates: Array<SqlTemplate> = [
       'Event tracking system with JSONB properties for analytics data',
     query: SQL_TEMPLATE_QUERIES.analyticsEvents,
     icon: Home01Icon,
-    category: 'analytics',
-    difficulty: 'advanced',
   },
 ]
-
-const categoryColors = {
-  basic: 'text-green-500',
-  blog: 'text-blue-500',
-  ecommerce: 'text-purple-500',
-  analytics: 'text-orange-500',
-}
 
 interface SqlTemplatesProps {
   onSelect: (query: string, title: string) => void
@@ -121,19 +104,7 @@ export function SqlTemplates({ onSelect, className }: SqlTemplatesProps) {
                     />
                   </span>
                   <div className="flex-1 text-left">
-                    <div className="flex items-center gap-2">
-                      <div className="text-sm font-medium">{template.name}</div>
-                      {template.category && (
-                        <span
-                          className={cn(
-                            'text-xs px-1.5 py-0.5 rounded-full bg-muted',
-                            categoryColors[template.category],
-                          )}
-                        >
-                          {template.category}
-                        </span>
-                      )}
-                    </div>
+                    <div className="text-sm font-medium">{template.name}</div>
                     <div className="text-xs text-muted-foreground">
                       {template.description}
                     </div>

@@ -3,12 +3,18 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { useDatabaseFunctions } from '@/hooks/queries/useTables'
 import type { TableColumn } from '@/types/components'
 import type { DatabaseFunction } from '@/types/database'
-import type { SchemaTable } from '@/types/schema'
 import { PLACEHOLDERS } from '@/constants/ui'
-import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import { parseAsString, useQueryStates, createStandardSchemaV1 } from 'nuqs'
 
 export const Route = createFileRoute('/(main)/database/functions/')({
   component: RouteComponent,
+  validateSearch: createStandardSchemaV1(
+    {
+      schema: parseAsString.withDefault('public'),
+    },
+    { partialOutput: true },
+  ),
 })
 
 // Define the table columns
@@ -20,14 +26,15 @@ const columns: Array<TableColumn> = [
 ]
 
 function RouteComponent() {
-  const search = useSearch({ strict: false }) as Partial<SchemaTable>
-  const { schema } = search
+  const [{ schema }] = useQueryStates({
+    schema: parseAsString.withDefault('public'),
+  })
 
   const {
     data: functions = [],
     isLoading,
     error,
-  } = useDatabaseFunctions(schema || 'public')
+  } = useDatabaseFunctions(schema)
 
   // Custom body row
   const bodyRow = (func: DatabaseFunction, index: number) => {

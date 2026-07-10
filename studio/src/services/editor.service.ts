@@ -4,7 +4,6 @@ import { apiClient, handleApiError } from '@/lib/api-client'
 import { logWideEvent } from '@/lib/logger'
 import { SQL_QUERIES } from '@/lib/sql-queries'
 import type { CreateRowParams, UpdateRowParams } from '@/types/database'
-import type { SchemaTable } from '@/types/schema'
 import type {
   ColumnMetadata,
   DeleteRowsParams,
@@ -15,11 +14,11 @@ import { QUERY_OPERATION_KEYS } from '@/utils/query-keys'
 import { createServerFn } from '@tanstack/react-start'
 
 export const getTableMetadata = createServerFn({ method: 'POST' })
-  .validator((d: SchemaTable) => {
+  .validator((d: { schema: string; table?: string }) => {
     if (!d.table) {
       throw new Error('table is required for getTableMetadata')
     }
-    return d as Required<SchemaTable>
+    return d as { schema: string; table: string }
   })
   .handler(async ({ data }) => {
     try {

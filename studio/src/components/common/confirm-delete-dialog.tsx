@@ -26,7 +26,7 @@ export function ConfirmDeleteDialog({
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onConfirm: (cascade: boolean) => void
+  onConfirm: (cascade: boolean) => Promise<void> | void
   isLoading: boolean
   title: string
   description: string
@@ -37,9 +37,13 @@ export function ConfirmDeleteDialog({
 }) {
   const [cascade, setCascade] = useState(false)
 
-  const handleConfirm = () => {
-    onConfirm(cascade)
-    onOpenChange(false)
+  const handleConfirm = async () => {
+    try {
+      await onConfirm(cascade)
+      onOpenChange(false)
+    } catch {
+      // Keep dialog open so users can see the failure and retry.
+    }
   }
 
   return (

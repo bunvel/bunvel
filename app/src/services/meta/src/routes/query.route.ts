@@ -4,11 +4,11 @@ import {
   InternalServerErrorException,
 } from "elysia-http-exception";
 import { db } from "../../../../database";
-import { queryLogger } from "../../../../plugins/logging";
 import {
   MAX_PARAMS_LENGTH,
   MAX_QUERY_LENGTH,
 } from "../../../../utils/constant";
+import { queryLogger } from "../../../../plugins/logging";
 
 export const queryRoutes = new Elysia({ prefix: "/query" }).post(
   "/",
@@ -40,34 +40,10 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
     }
 
     try {
-      queryLogger.info({
-        event: "sql.query.executed",
-        query: query,
-        params: body.params,
-      });
-
       // Execute query with or without parameters
-      const result = await db.begin(async (tx) => {
-        return body.params
-          ? await tx.unsafe(query, body.params)
-          : await tx.unsafe(query);
-      });
-
-      // Handle empty result set
-      if (
-        Array.isArray(result) &&
-        Array.isArray(result[0]) &&
-        result[0].length === 0
-      ) {
-        return [];
-      }
-
-      const resultCount = Array.isArray(result) ? result.length : 1;
-      queryLogger.info({
-        event: "sql.query.completed",
-        query: query,
-        resultCount: resultCount,
-      });
+      const result = await db.begin(async (tx) =>
+        body.params ? await tx.unsafe(query, body.params) : await tx.unsafe(query),
+      );
 
       return result;
     } catch (error) {

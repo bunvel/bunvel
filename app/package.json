@@ -2,12 +2,13 @@
   "name": "app",
   "version": "0.0.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --compile --outfile=bunvel-app --sourcemap=inline --minify-whitespace --minify-syntax",
+    "start": "./bunvel-app",
+    "typecheck": "bun x tsc --noEmit"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.2",
-    "@elysiajs/jwt": "^1.4.2",
     "elysia": "^1.4.29",
     "elysia-http-exception": "^0.1.5",
     "elysia-rate-limit": "^4.6.2",

@@ -21,12 +21,17 @@ const envSchema = z.object({
     .min(32, "JWT_REFRESH_SECRET must be at least 32 characters"),
 
   // Database
+  POSTGRES_HOST: z.string().default("postgres"),
+  POSTGRES_PORT: z.coerce.number().int().positive().default(5432),
   POSTGRES_USER: z.string().min(1, "POSTGRES_USER is required"),
   POSTGRES_PASSWORD: z.string().min(1, "POSTGRES_PASSWORD is required"),
   POSTGRES_DB: z.string().min(1, "POSTGRES_DB is required"),
 
   // PostgREST
   POSTGREST_URL: z.url("Invalid PostgREST URL format"),
+
+  // Frontend
+  VITE_BUNVEL_STUDIO_URL: z.string().url().optional(),
 
   // Rate Limiting
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),

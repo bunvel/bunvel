@@ -17,8 +17,6 @@ export interface SqlTemplate {
   description: string
   query: string
   icon: IconSvgElement
-  category?: any
-  difficulty?: 'beginner' | 'intermediate' | 'advanced'
 }
 
 export interface TableListActionProps {
