@@ -1,13 +1,12 @@
-import { useSelector } from '@tanstack/react-store'
-import { Store } from '@tanstack/store'
-import type {
-  FilterConfig,
-  PaginationConfig,
-  SortConfig,
-  TableRow,
-  TableState,
-} from '@/types/table'
 import { DEFAULT_PAGE_SIZE } from '@/constants/app'
+import type {
+    FilterConfig,
+    PaginationConfig,
+    SortConfig,
+    TableRow,
+    TableState,
+} from '@/types/table'
+import { createStore } from './create-store'
 
 export interface TableStateStoreState {
   tableStates: Record<string, TableState>
@@ -40,76 +39,75 @@ const DEFAULT_TABLE_STATE: TableState = {
   filters: [],
 }
 
-const tableStateStore = new Store<TableStateStoreState>({
-  tableStates: {},
-})
-
-export const tableStateActions: TableStateActions = {
-  setTableState: (tableKey: string, state: Partial<TableState>) => {
-    tableStateStore.setState((prev) => ({
-      ...prev,
-      tableStates: {
-        ...prev.tableStates,
-        [tableKey]: {
-          ...DEFAULT_TABLE_STATE,
-          ...prev.tableStates[tableKey],
-          ...state,
-        },
+const { store: tableStateStore, actions: tableStateActions, useStore: useTableStateStore } =
+  createStore<TableStateStoreState, TableStateActions>({
+    name: 'table-state',
+    initialState: {
+      tableStates: {},
+    },
+    actions: (setState, getState) => ({
+      setTableState: (tableKey, state) => {
+        setState((prev) => ({
+          ...prev,
+          tableStates: {
+            ...prev.tableStates,
+            [tableKey]: {
+              ...DEFAULT_TABLE_STATE,
+              ...prev.tableStates[tableKey],
+              ...state,
+            },
+          },
+        }))
       },
-    }))
-  },
 
-  getTableState: (tableKey: string) => {
-    const { tableStates } = tableStateStore.get()
-    return tableStates[tableKey] || DEFAULT_TABLE_STATE
-  },
-
-  resetTableState: (tableKey: string) => {
-    tableStateStore.setState((prev) => ({
-      ...prev,
-      tableStates: {
-        ...prev.tableStates,
-        [tableKey]: DEFAULT_TABLE_STATE,
+      getTableState: (tableKey) => {
+        const { tableStates } = getState()
+        return tableStates[tableKey] || DEFAULT_TABLE_STATE
       },
-    }))
-  },
 
-  clearAllTableStates: () => {
-    tableStateStore.setState(() => ({ tableStates: {} }))
-  },
+      resetTableState: (tableKey) => {
+        setState((prev) => ({
+          ...prev,
+          tableStates: {
+            ...prev.tableStates,
+            [tableKey]: DEFAULT_TABLE_STATE,
+          },
+        }))
+      },
 
-  setSelectedRows: (tableKey: string, selectedRows: Array<TableRow>) => {
-    tableStateActions.setTableState(tableKey, { selectedRows })
-  },
+      clearAllTableStates: () => {
+        setState(() => ({ tableStates: {} }))
+      },
 
-  setRowSelection: (
-    tableKey: string,
-    rowSelection: Record<string, boolean>,
-  ) => {
-    tableStateActions.setTableState(tableKey, { rowSelection })
-  },
+      setSelectedRows: (tableKey, selectedRows) => {
+        tableStateActions.setTableState(tableKey, { selectedRows })
+      },
 
-  setPagination: (tableKey: string, pagination: PaginationConfig) => {
-    tableStateActions.setTableState(tableKey, { pagination })
-  },
+      setRowSelection: (tableKey, rowSelection) => {
+        tableStateActions.setTableState(tableKey, { rowSelection })
+      },
 
-  setSorts: (tableKey: string, sorts: Array<SortConfig>) => {
-    tableStateActions.setTableState(tableKey, { sorts })
-  },
+      setPagination: (tableKey, pagination) => {
+        tableStateActions.setTableState(tableKey, { pagination })
+      },
 
-  setFilters: (tableKey: string, filters: Array<FilterConfig>) => {
-    tableStateActions.setTableState(tableKey, { filters })
-  },
+      setSorts: (tableKey, sorts) => {
+        tableStateActions.setTableState(tableKey, { sorts })
+      },
 
-  cleanupTableState: (tableKey: string) => {
-    tableStateStore.setState((prev) => {
-      const newTableStates = { ...prev.tableStates }
-      delete newTableStates[tableKey]
-      return { ...prev, tableStates: newTableStates }
-    })
-  },
-}
+      setFilters: (tableKey, filters) => {
+        tableStateActions.setTableState(tableKey, { filters })
+      },
 
-export function useTableStateStore<T>(selector: (state: TableStateStoreState) => T): T {
-  return useSelector(tableStateStore, selector)
-}
+      cleanupTableState: (tableKey) => {
+        setState((prev) => {
+          const newTableStates = { ...prev.tableStates }
+          delete newTableStates[tableKey]
+          return { ...prev, tableStates: newTableStates }
+        })
+      },
+    }),
+  })
+
+export { tableStateActions, tableStateStore, useTableStateStore }
+

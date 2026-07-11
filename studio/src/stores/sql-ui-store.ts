@@ -1,37 +1,10 @@
-import { useSelector } from '@tanstack/react-store'
-import { Store } from '@tanstack/store'
 import type { QueryHistoryItem } from '@/types/history'
-import { logger } from '@/lib/logger'
+import { createStore } from './create-store'
+import { createPersistence } from './persistence'
 
-const QUERY_HISTORY_KEY = 'bunvel-query-history'
-
-const loadQueryHistory = (): Array<QueryHistoryItem> => {
-  if (typeof window === 'undefined') return []
-
-  try {
-    const stored = window.localStorage.getItem(QUERY_HISTORY_KEY)
-    return stored ? JSON.parse(stored) : []
-  } catch (error) {
-    logger.error({
-      msg: 'Failed to load query history from localStorage',
-      error,
-    })
-    return []
-  }
-}
-
-const saveQueryHistory = (history: Array<QueryHistoryItem>) => {
-  if (typeof window === 'undefined') return
-
-  try {
-    window.localStorage.setItem(QUERY_HISTORY_KEY, JSON.stringify(history))
-  } catch (error) {
-    logger.error({
-      msg: 'Failed to save query history to localStorage',
-      error,
-    })
-  }
-}
+const queryHistoryPersistence = createPersistence<Array<QueryHistoryItem>>({
+  key: 'bunvel-query-history',
+})
 
 export interface SqlUiState {
   queryHistory: Array<QueryHistoryItem>
@@ -48,52 +21,54 @@ export interface SqlUiActions {
   setSelectedQuery: (query: string) => void
 }
 
-const sqlUiStore = new Store<SqlUiState>({
-  queryHistory: loadQueryHistory(),
-  showSidebar: true,
-  selectedQuery: '',
-})
+const { store: sqlUiStore, actions: sqlUiActions, useStore: useSqlUiStore } =
+  createStore<SqlUiState, SqlUiActions>({
+    name: 'sql-ui',
+    initialState: {
+      queryHistory: queryHistoryPersistence.load() || [],
+      showSidebar: true,
+      selectedQuery: '',
+    },
+    actions: (setState) => ({
+      setQueryHistory: (history) => {
+        setState((prev) => ({ ...prev, queryHistory: history }))
+        queryHistoryPersistence.save(history)
+      },
 
-export const sqlUiActions: SqlUiActions = {
-  setQueryHistory: (history: Array<QueryHistoryItem>) => {
-    sqlUiStore.setState((prev) => ({ ...prev, queryHistory: history }))
-    saveQueryHistory(history)
-  },
+      addToHistory: (query, success) => {
+        setState((prev) => {
+          const newHistory = [
+            {
+              id: `history-${Date.now()}`,
+              query,
+              timestamp: Date.now(),
+              success,
+            },
+            ...prev.queryHistory.slice(0, 99),
+          ]
+          queryHistoryPersistence.save(newHistory)
+          return { ...prev, queryHistory: newHistory }
+        })
+      },
 
-  addToHistory: (query: string, success: boolean) => {
-    sqlUiStore.setState((prev) => {
-      const newHistory = [
-        {
-          id: `history-${Date.now()}`,
-          query,
-          timestamp: Date.now(),
-          success,
-        },
-        ...prev.queryHistory.slice(0, 99),
-      ]
-      saveQueryHistory(newHistory)
-      return { ...prev, queryHistory: newHistory }
-    })
-  },
+      clearHistory: () => {
+        setState((prev) => ({ ...prev, queryHistory: [] }))
+        queryHistoryPersistence.save([])
+      },
 
-  clearHistory: () => {
-    sqlUiStore.setState((prev) => ({ ...prev, queryHistory: [] }))
-    saveQueryHistory([])
-  },
+      selectFromHistory: (query) => {
+        setState((prev) => ({ ...prev, selectedQuery: query }))
+      },
 
-  selectFromHistory: (query: string) => {
-    sqlUiStore.setState((prev) => ({ ...prev, selectedQuery: query }))
-  },
+      setShowSidebar: (show) => {
+        setState((prev) => ({ ...prev, showSidebar: show }))
+      },
 
-  setShowSidebar: (show: boolean) => {
-    sqlUiStore.setState((prev) => ({ ...prev, showSidebar: show }))
-  },
+      setSelectedQuery: (query) => {
+        setState((prev) => ({ ...prev, selectedQuery: query }))
+      },
+    }),
+  })
 
-  setSelectedQuery: (query: string) => {
-    sqlUiStore.setState((prev) => ({ ...prev, selectedQuery: query }))
-  },
-}
+export { sqlUiActions, sqlUiStore, useSqlUiStore }
 
-export function useSqlUiStore<T>(selector: (state: SqlUiState) => T): T {
-  return useSelector(sqlUiStore, selector)
-}

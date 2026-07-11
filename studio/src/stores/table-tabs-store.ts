@@ -1,6 +1,5 @@
-import { useSelector } from '@tanstack/react-store'
-import { Store } from '@tanstack/store'
 import type { TableTabsState } from '@/types/table'
+import { createStore } from './create-store'
 
 export interface TableTabsStoreState {
   tabs: TableTabsState
@@ -21,80 +20,82 @@ const DEFAULT_TABS_STATE: TableTabsState = {
   activeTableKey: null,
 }
 
-const tableTabsStore = new Store<TableTabsStoreState>({
-  tabs: DEFAULT_TABS_STATE,
-})
-
-export const tableTabsActions: TableTabsActions = {
-  addTable: (schema: string, table: string, maxTabs?: number) => {
-    const tableKey = `${schema}.${table}`
-    const { tabs } = tableTabsStore.get()
-    const actualMaxTabs = maxTabs ?? tabs.maxTabs
-
-    tableTabsStore.setState((prev) => ({
-      ...prev,
-      tabs: {
-        ...prev.tabs,
-        selectedTables: prev.tabs.selectedTables.includes(tableKey)
-          ? prev.tabs.selectedTables
-          : prev.tabs.selectedTables.length >= actualMaxTabs
-            ? [
-                ...prev.tabs.selectedTables.slice(0, actualMaxTabs - 1),
-                tableKey,
-              ]
-            : [...prev.tabs.selectedTables, tableKey],
-      },
-    }))
-  },
-
-  removeTable: (tableKey: string) => {
-    tableTabsStore.setState((prev) => ({
-      ...prev,
-      tabs: {
-        ...prev.tabs,
-        selectedTables: prev.tabs.selectedTables.filter(
-          (t: string) => t !== tableKey,
-        ),
-        activeTableKey:
-          prev.tabs.activeTableKey === tableKey
-            ? null
-            : prev.tabs.activeTableKey,
-      },
-    }))
-  },
-
-  removeTableBySchema: (schema: string, table: string) => {
-    const tableKey = `${schema}.${table}`
-    tableTabsActions.removeTable(tableKey)
-  },
-
-  setActiveTable: (tableKey: string | null) => {
-    tableTabsStore.setState((prev) => ({
-      ...prev,
-      tabs: {
-        ...prev.tabs,
-        activeTableKey: tableKey,
-      },
-    }))
-  },
-
-  setMaxTabs: (maxTabs: number) => {
-    tableTabsStore.setState((prev) => ({
-      ...prev,
-      tabs: {
-        ...prev.tabs,
-        maxTabs,
-      },
-    }))
-  },
-
-  clearAllTabs: () => {
-    tableTabsStore.setState(() => ({
+const { store: tableTabsStore, actions: tableTabsActions, useStore: useTableTabsStore } =
+  createStore<TableTabsStoreState, TableTabsActions>({
+    name: 'table-tabs',
+    initialState: {
       tabs: DEFAULT_TABS_STATE,
-    }))
-  },
-}
+    },
+    actions: (setState, getState) => ({
+      addTable: (schema, table, maxTabs) => {
+        const tableKey = `${schema}.${table}`
+        const { tabs } = getState()
+        const actualMaxTabs = maxTabs ?? tabs.maxTabs
 
-export function useTableTabsStore<T>(selector: (state: TableTabsStoreState) => T): T {
-  return useSelector(tableTabsStore, selector)
-}
+        setState((prev) => ({
+          ...prev,
+          tabs: {
+            ...prev.tabs,
+            selectedTables: prev.tabs.selectedTables.includes(tableKey)
+              ? prev.tabs.selectedTables
+              : prev.tabs.selectedTables.length >= actualMaxTabs
+                ? [
+                    ...prev.tabs.selectedTables.slice(0, actualMaxTabs - 1),
+                    tableKey,
+                  ]
+                : [...prev.tabs.selectedTables, tableKey],
+          },
+        }))
+      },
+
+      removeTable: (tableKey) => {
+        setState((prev) => ({
+          ...prev,
+          tabs: {
+            ...prev.tabs,
+            selectedTables: prev.tabs.selectedTables.filter(
+              (t: string) => t !== tableKey,
+            ),
+            activeTableKey:
+              prev.tabs.activeTableKey === tableKey
+                ? null
+                : prev.tabs.activeTableKey,
+          },
+        }))
+      },
+
+      removeTableBySchema: (schema, table) => {
+        const tableKey = `${schema}.${table}`
+        tableTabsActions.removeTable(tableKey)
+      },
+
+      setActiveTable: (tableKey) => {
+        setState((prev) => ({
+          ...prev,
+          tabs: {
+            ...prev.tabs,
+            activeTableKey: tableKey,
+          },
+        }))
+      },
+
+      setMaxTabs: (maxTabs) => {
+        setState((prev) => ({
+          ...prev,
+          tabs: {
+            ...prev.tabs,
+            maxTabs,
+          },
+        }))
+      },
+
+      clearAllTabs: () => {
+        setState(() => ({
+          tabs: DEFAULT_TABS_STATE,
+        }))
+      },
+    }),
+  })
+
+export { tableTabsActions, tableTabsStore, useTableTabsStore }
+
