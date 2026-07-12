@@ -169,7 +169,7 @@ export function TableFormSheet({ schema, children }: TableFormSheetProps) {
         <HugeiconsIcon icon={Plus} className="h-4 w-4" />
         {children}
       </SheetTrigger>
-      <SheetContent side="right" className="bg-card min-w-2xl flex flex-col">
+      <SheetContent side="right" className="bg-card min-w-3xl flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full">
           <SheetHeader className="border-b p-4">
             <SheetTitle>{TABLE_FORM_MESSAGES.CREATE_NEW_TABLE}</SheetTitle>

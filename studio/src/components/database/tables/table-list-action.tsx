@@ -14,6 +14,7 @@ import { isRestrictedSchema } from '@/lib/restricated-schema'
 import type { TableListActionProps } from '@/types/components'
 import { Copy01Icon, MoreVertical, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -25,6 +26,8 @@ export function TableListAction({ schema, table }: TableListActionProps) {
   const { mutate: truncateTable, isPending: isTruncating } = useTruncateTable()
   const [, copyToClipboard] = useCopyToClipboard()
   const isRestricted = isRestrictedSchema(schema)
+  const navigate = useNavigate()
+  const search = useSearch({ strict: false }) as { table?: string; schema?: string }
 
   const handleDelete = async (cascade: boolean) => {
     try {
@@ -33,6 +36,9 @@ export function TableListAction({ schema, table }: TableListActionProps) {
         table,
         cascade,
       })
+      if (search.table === table) {
+        navigate({ search: { schema: search.schema } as any })
+      }
     } catch (error) {
       const message =
         error instanceof Error

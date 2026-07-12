@@ -4,7 +4,7 @@ export function getDefaultColumns(): Array<ColumnDefinition> {
   return [
     {
       name: 'id',
-      type: 'BIGINT',
+      type: 'UUID',
       nullable: false,
       isPrimaryKey: true,
       unique: false,
@@ -13,10 +13,10 @@ export function getDefaultColumns(): Array<ColumnDefinition> {
     {
       name: 'created_at',
       type: 'TIMESTAMP WITH TIME ZONE',
-      nullable: false,
+      nullable: true,
       isPrimaryKey: false,
       unique: false,
-      defaultValue: undefined,
+      defaultValue: 'NOW()',
     },
   ]
 }

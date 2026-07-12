@@ -29,16 +29,15 @@ export const RelatedDataTable = function RelatedDataTable({
   schemaName,
 }: RelatedDataTableProps) {
   return (
-    <div className="w-[500px] max-h-80 bg-background border rounded-lg overflow-hidden">
-      <div className="p-3 text-xs text-muted-foreground bg-secondary border-b">
+    <div className="w-[600px] max-h-[500px] flex flex-col bg-background border rounded-lg overflow-hidden">
+      <div className="p-4 text-xs text-muted-foreground bg-secondary border-b shrink-0">
         Referencing record from
         <span className="text-sm text-foreground font-medium">
           {' '}
           {schemaName}.{tableName}
         </span>
       </div>
-      <div className="flex-1 flex flex-col overflow-hidden border bg-card">
-        <div className="overflow-auto max-h-60">
+      <div className="flex-1 flex flex-col overflow-hidden bg-card min-h-[150px] *:data-[slot=table-container]:flex-1 *:data-[slot=table-container]:overflow-auto!">
           {isLoading ? (
             <div className="p-4 text-center">
               <Spinner />
@@ -66,14 +65,14 @@ export const RelatedDataTable = function RelatedDataTable({
                   {metadata?.columns.map((column) => (
                     <TableHead
                       key={column.column_name}
-                      className="border-r"
+                      className="border-r whitespace-nowrap"
                       style={{
-                        width: 150,
-                        minWidth: 150,
-                        maxWidth: '350px',
+                        width: 200,
+                        minWidth: 200,
+                        maxWidth: '400px',
                       }}
                     >
-                      <DataTableHeaderCell column={column} className="p-2" />
+                      <DataTableHeaderCell column={column} className="p-3" />
                     </TableHead>
                   ))}
                 </TableRow>
@@ -84,11 +83,11 @@ export const RelatedDataTable = function RelatedDataTable({
                     {metadata?.columns.map((column) => (
                       <TableCell
                         key={column.column_name}
-                        className="border p-2"
+                        className="border p-3 px-4 whitespace-nowrap"
                         style={{
-                          width: 150,
-                          minWidth: 150,
-                          maxWidth: '350px',
+                          width: 200,
+                          minWidth: 200,
+                          maxWidth: '400px',
                         }}
                       >
                         <div className="text-sm">
@@ -104,7 +103,6 @@ export const RelatedDataTable = function RelatedDataTable({
               </TableBody>
             </Table>
           )}
-        </div>
       </div>
     </div>
   )

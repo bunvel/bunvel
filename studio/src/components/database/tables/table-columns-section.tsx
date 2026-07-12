@@ -2,6 +2,13 @@ import { DataTypeSelector } from '@/components/common/data-type-selector'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { PLACEHOLDERS, TABLE_FORM_MESSAGES } from '@/constants/ui'
 import type { ColumnDefinition } from '@/types/database'
 import { Plus } from '@hugeicons/core-free-icons'
@@ -19,6 +26,11 @@ interface TableColumnsSectionProps {
   onAddColumn: () => void
   onDeleteColumn: (index: number) => void
   disabled?: boolean
+}
+
+const isDateTimeType = (type: string) => {
+  const upperType = type?.toUpperCase() || ''
+  return upperType.includes('TIMESTAMP') || upperType.includes('DATE') || upperType.includes('TIME')
 }
 
 export function TableColumnsSection({
@@ -44,7 +56,7 @@ export function TableColumnsSection({
       <div className="space-y-4">
         {/* Column Headers */}
         <div className="grid grid-cols-12 gap-2 pb-2 border-b">
-          <div className="col-span-4">
+          <div className="col-span-5">
             <Label className="text-sm font-medium">
               {TABLE_FORM_MESSAGES.COLUMN_NAME}
             </Label>
@@ -69,7 +81,7 @@ export function TableColumnsSection({
           {columns.map((column, index) => (
             <div key={index} className="grid grid-cols-12 gap-2 items-center">
               {/* Column Name */}
-              <div className="col-span-4">
+              <div className="col-span-5">
                 <Input
                   value={column.name}
                   onChange={(e) =>
@@ -95,14 +107,34 @@ export function TableColumnsSection({
 
               {/* Default Value */}
               <div className="col-span-3">
-                <Input
-                  value={column.defaultValue || ''}
-                  onChange={(e) =>
-                    onColumnChange(index, 'defaultValue', e.target.value)
-                  }
-                  placeholder={PLACEHOLDERS.OPTIONAL}
-                  disabled={disabled}
-                />
+                {isDateTimeType(column.type) ? (
+                  <Select
+                    value={column.defaultValue === undefined ? 'null' : column.defaultValue || ''}
+                    onValueChange={(value) =>
+                      onColumnChange(index, 'defaultValue', value === 'null' ? undefined : value)
+                    }
+                    disabled={disabled || column.isPrimaryKey}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={PLACEHOLDERS.OPTIONAL} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="null">NULL</SelectItem>
+                      <SelectItem value="NOW()">NOW()</SelectItem>
+                      <SelectItem value="CURRENT_TIMESTAMP">CURRENT_TIMESTAMP</SelectItem>
+                      <SelectItem value="CURRENT_DATE">CURRENT_DATE</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    value={column.defaultValue || ''}
+                    onChange={(e) =>
+                      onColumnChange(index, 'defaultValue', e.target.value)
+                    }
+                    placeholder={PLACEHOLDERS.OPTIONAL}
+                    disabled={disabled || column.isPrimaryKey}
+                  />
+                )}
               </div>
 
               {/* Actions */}
