@@ -3,8 +3,8 @@ import {
   InternalServerErrorException,
   MethodNotAllowedException,
 } from "elysia-http-exception";
-import { env } from "../../utils/config";
-import { ALLOWED_METHODS, JSON_CONTENT_TYPE } from "../../utils/constant";
+import { env } from "../../config/env";
+import { ALLOWED_METHODS, JSON_CONTENT_TYPE } from "../../config/constants";
 
 export const restService = new Elysia({
   name: "Rest Service",

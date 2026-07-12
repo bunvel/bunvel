@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import { env } from "../../../../utils/config";
+import { env } from "../../../../config/env";
 
 export const projectRoutes = new Elysia({ prefix: "/project" }).get(
   "/",

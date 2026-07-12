@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
 import { Pool } from "pg";
-import { env } from "../utils/config";
+import { env } from "../../config/env";
 
 const pool = new Pool({
   connectionString: env.DATABASE_URL,

@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { projectRoutes } from "./src/routes/project.route";
 import { queryRoutes } from "./src/routes/query.route";
-import { auth } from "../../auth";
+import { auth } from "../auth";
 
 export const metaService = new Elysia({
   name: "Meta Service",

@@ -1,6 +1,6 @@
 import { cors } from "@elysiajs/cors";
-import { env } from "../utils/config";
-import { CORS_CONFIG } from "../utils/constant";
+import { env } from "../config/env";
+import { CORS_CONFIG } from "../config/constants";
 
 export const corsPlugin = cors({
   origin: (request) => {
