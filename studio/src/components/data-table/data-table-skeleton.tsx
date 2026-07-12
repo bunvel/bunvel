@@ -23,9 +23,9 @@ export function DataTableSkeleton({
   const columnCount = enableRowSelection ? columns + 1 : columns
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="bg-card flex flex-col h-full">
       <div className="flex-1 flex flex-col min-h-0">
-        <div className="flex-1 flex flex-col overflow-hidden border">
+        <div className="flex-1 flex flex-col overflow-hidden border [&>[data-slot=table-container]]:h-full [&>[data-slot=table-container]]:!overflow-auto">
           <Table>
             <TableHeader className="sticky top-0 z-10 bg-card">
               <TableRow className="border-b h-10">
@@ -41,7 +41,7 @@ export function DataTableSkeleton({
                 ))}
               </TableRow>
             </TableHeader>
-            <TableBody className="overflow-y-auto">
+            <TableBody>
               {Array.from({ length: rows }).map((_, rowIndex) => (
                 <TableRow
                   key={rowIndex}

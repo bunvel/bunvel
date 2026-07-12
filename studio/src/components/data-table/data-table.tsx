@@ -1,7 +1,6 @@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import type { TableMetadata } from '@/types/table'
-import { formatCellValue } from '@/utils/format'
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -9,11 +8,12 @@ import type {
   VisibilityState,
 } from '@tanstack/react-table'
 import {
+  flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
-import { DataTableCell } from './data-table-cell'
 import { DataTableHeader } from './data-table-header'
 import { DataTablePagination } from './data-table-pagination'
 import { DataTableSkeleton } from './data-table-skeleton'
@@ -44,6 +44,9 @@ interface DataTableProps<TData, TValue = unknown> {
     columnFilters?: ColumnFiltersState
     rowSelection?: Record<string, boolean>
   }
+  manualPagination?: boolean
+  manualSorting?: boolean
+  manualFiltering?: boolean
 }
 
 export function DataTable<TData, TValue = unknown>({
@@ -60,17 +63,12 @@ export function DataTable<TData, TValue = unknown>({
   onSortingChange,
   pageCount,
   state,
+  manualPagination = true,
+  manualSorting = true,
+  manualFiltering = true,
 }: DataTableProps<TData, TValue>) {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
-  // Memoize column lookup for performance
-  const columnLookup = useMemo(() => {
-    const lookup = new Map<string, (typeof metadata.columns)[0]>()
-    metadata.columns.forEach((col: any) => {
-      lookup.set(col.column_name, col)
-    })
-    return lookup
-  }, [metadata.columns])
   // Add selection column if enabled
   const columnsWithSelection = useMemo(() => {
     if (!enableRowSelection) return columns
@@ -93,9 +91,17 @@ export function DataTable<TData, TValue = unknown>({
           />
         )
       },
-      cell: () => {
-        // This is a dummy cell - the actual checkbox is rendered in the main table body
-        return null
+      cell: ({ row }) => {
+        return (
+          <Checkbox
+            checked={row.getIsSelected()}
+            disabled={!row.getCanSelect()}
+            onCheckedChange={row.getToggleSelectedHandler()}
+            aria-label={`Select row ${row.id}`}
+            className="h-4 w-4 shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          />
+        )
       },
       size: 50,
     }
@@ -129,23 +135,30 @@ export function DataTable<TData, TValue = unknown>({
       if (onRowSelectionStateChange) {
         onRowSelectionStateChange(updaterOrValue)
       }
-      
+
       if (onRowSelectionChange) {
-        const newRowSelection = typeof updaterOrValue === 'function' ? updaterOrValue(state.rowSelection || {}) : updaterOrValue
-        
+        const newRowSelection =
+          typeof updaterOrValue === 'function'
+            ? updaterOrValue(state.rowSelection || {})
+            : updaterOrValue
+
         const getRowId = (row: any, index: number) => {
           if (metadata?.primary_keys?.length) {
-            return metadata.primary_keys.map((pk: string) => String(row[pk])).join('::')
+            return metadata.primary_keys
+              .map((pk: string) => String(row[pk]))
+              .join('::')
           }
-          const offset = state.pagination ? state.pagination.pageIndex * state.pagination.pageSize : 0
+          const offset = state.pagination
+            ? state.pagination.pageIndex * state.pagination.pageSize
+            : 0
           return String(offset + index)
         }
-        
+
         const selectedRows = data.filter((row, index) => {
           const id = getRowId(row, index)
           return newRowSelection[id]
         })
-        
+
         onRowSelectionChange(selectedRows)
       }
     },
@@ -156,9 +169,9 @@ export function DataTable<TData, TValue = unknown>({
         onSortingChange(newSorting)
       }
     },
-    manualPagination: true,
-    manualSorting: true,
-    manualFiltering: true,
+    manualPagination,
+    manualSorting,
+    manualFiltering,
     pageCount,
     onPaginationChange: (updater) => {
       const newPagination =
@@ -167,6 +180,7 @@ export function DataTable<TData, TValue = unknown>({
     },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: manualPagination ? undefined : getPaginationRowModel(),
   })
 
   // Show skeleton loading state when loading
@@ -197,7 +211,7 @@ export function DataTable<TData, TValue = unknown>({
   return (
     <div className="bg-card flex flex-col h-full">
       <div className="flex-1 flex flex-col min-h-0">
-        <div className="flex-1 flex flex-col overflow-hidden border">
+        <div className="flex-1 flex flex-col overflow-hidden border *:data-[slot=table-container]:h-full *:data-[slot=table-container]:overflow-auto!">
           {table.getRowModel().rows.length === 0 ? (
             <>
               <Table className="w-auto">
@@ -213,7 +227,7 @@ export function DataTable<TData, TValue = unknown>({
             <Table className="w-auto">
               <DataTableHeader table={table} />
 
-              <TableBody className="overflow-y-auto">
+              <TableBody>
                 {table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
@@ -236,30 +250,9 @@ export function DataTable<TData, TValue = unknown>({
                         }}
                       >
                         <div className="text-sm">
-                          {cell.column.id === 'select' ? (
-                            <Checkbox
-                              checked={cell.row.getIsSelected()}
-                              disabled={!cell.row.getCanSelect()}
-                              onCheckedChange={cell.row.getToggleSelectedHandler()}
-                              aria-label={`Select row ${cell.row.id}`}
-                              className="h-4 w-4 shrink-0"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          ) : cell.column.id === 'empty-column' ? (
-                            <div className="p-2"></div>
-                          ) : (
-                            <DataTableCell
-                              value={formatCellValue(
-                                cell.getValue(),
-                                columnLookup.get(cell.column.id)?.data_type,
-                              )}
-                              rawValue={cell.getValue()}
-                              isForeignKey={
-                                columnLookup.get(cell.column.id)
-                                  ?.is_foreign_key ?? false
-                              }
-                              columnMetadata={columnLookup.get(cell.column.id)}
-                            />
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
                           )}
                         </div>
                       </TableCell>

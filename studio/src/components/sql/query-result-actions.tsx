@@ -12,16 +12,27 @@ export function QueryResultActions() {
   const handleExecute = () => {
     if (!query.trim() || !activeTab) return
 
-    updateTabExecution(activeTab.id, undefined, undefined, true, query)
+    let finalQuery = query.trim()
+    const isSelectQuery = /^\s*(WITH\s+[\s\S]+?)?SELECT\b/i.test(finalQuery)
+    const hasLimit = /\bLIMIT\s+\d+/i.test(finalQuery)
 
-    executeQuery(query, {
+    if (isSelectQuery && !hasLimit) {
+      const confirmRun = window.confirm(
+        'Your query does not have a LIMIT clause and may fetch a large amount of data. Are you sure you want to execute it?'
+      )
+      if (!confirmRun) return
+    }
+
+    updateTabExecution(activeTab.id, undefined, undefined, true, finalQuery)
+
+    executeQuery(finalQuery, {
       onSuccess: (result: any) => {
-        updateTabExecution(activeTab.id, result, undefined, false, query)
-        addToHistory(query, true)
+        updateTabExecution(activeTab.id, result, undefined, false, finalQuery)
+        addToHistory(finalQuery, true)
       },
       onError: (error: any) => {
-        updateTabExecution(activeTab.id, undefined, error, false, query)
-        addToHistory(query, false)
+        updateTabExecution(activeTab.id, undefined, error, false, finalQuery)
+        addToHistory(finalQuery, false)
       },
     })
   }

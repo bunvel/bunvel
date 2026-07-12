@@ -1,4 +1,5 @@
 import { DataTable } from '@/components/data-table/data-table'
+import { DataTableCell } from '@/components/data-table/data-table-cell'
 import { DataTableHeaderCell } from '@/components/data-table/data-table-header-cell'
 import { useTableManager } from '@/hooks/use-table-manager'
 import { isRestrictedSchema } from '@/lib/restricated-schema'
@@ -58,7 +59,14 @@ export function TableViewer() {
             ),
             accessorKey: column.column_name,
             cell: (info: any) => {
-              return formatCellValue(info.getValue(), column.data_type)
+              return (
+                <DataTableCell
+                  value={formatCellValue(info.getValue(), column.data_type)}
+                  rawValue={info.getValue()}
+                  isForeignKey={column.is_foreign_key}
+                  columnMetadata={column}
+                />
+              )
             },
             meta: {
               dataType: column.data_type,
@@ -77,7 +85,14 @@ export function TableViewer() {
             ),
             accessorKey: column.column_name,
             cell: (info: any) => {
-              return formatCellValue(info.getValue(), column.data_type)
+              return (
+                <DataTableCell
+                  value={formatCellValue(info.getValue(), column.data_type)}
+                  rawValue={info.getValue()}
+                  isForeignKey={column.is_foreign_key}
+                  columnMetadata={column}
+                />
+              )
             },
             meta: {
               dataType: column.data_type,

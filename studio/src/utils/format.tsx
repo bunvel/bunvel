@@ -117,6 +117,11 @@ export function formatCellValue(
   if (typeof value === 'object' || type === 'json' || type === 'jsonb') {
     try {
       const strVal = typeof value === 'string' ? value : JSON.stringify(value)
+      
+      if (strVal === '{}' || strVal === '[]') {
+        return <span className="italic text-muted-foreground text-xs">NULL</span>
+      }
+
       return (
         <span
           className="font-mono text-xs bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded max-w-[200px] truncate block"

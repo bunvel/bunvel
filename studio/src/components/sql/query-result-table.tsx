@@ -75,7 +75,7 @@ export function QueryResultTable() {
   // Table state with pagination only
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: Number.MAX_SAFE_INTEGER,
+    pageSize: 50,
   })
 
   const handlePaginationChange = useCallback(
@@ -194,6 +194,7 @@ export function QueryResultTable() {
             }}
             onPaginationChange={handlePaginationChange}
             pageCount={Math.ceil(displayData.length / pagination.pageSize)}
+            manualPagination={false}
           />
         ) : (
           <div className="h-full p-4 overflow-y-auto bg-card">

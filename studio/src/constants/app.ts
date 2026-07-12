@@ -19,6 +19,19 @@ export const DEFAULT_CURRENT_PAGE = 1
 
 export const READONLY_SCHEMAS: ReadonlyArray<string> = ['auth']
 
+// Mutation keywords that are not allowed on restricted schemas
+export const MUTATION_KEYWORDS = [
+  'INSERT',
+  'UPDATE',
+  'DELETE',
+  'DROP',
+  'ALTER',
+  'CREATE',
+  'TRUNCATE',
+  'GRANT',
+  'REVOKE',
+]
+
 export const EXPORT_FORMATS = {
   JSON: 'json',
   CSV: 'csv',
