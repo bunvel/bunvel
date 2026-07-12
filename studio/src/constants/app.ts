@@ -1,6 +1,6 @@
 export const API_URL = import.meta.env.SSR
   ? 'http://app:8000'
-  : process.env.VITE_API_URL
+  : import.meta.env.VITE_API_URL
 
 export const DEFAULT_PAGE_SIZE_OPTIONS = [
   { value: 50, label: '50' },

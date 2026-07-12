@@ -2,40 +2,36 @@ import { AppSidebar } from '@/components/layout/app-sidebar'
 import { SiteHeader } from '@/components/layout/site-header'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { ProjectProvider } from '@/contexts/project-context'
-import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { authClient } from '@/lib/auth-client'
+import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(main)')({
+  beforeLoad: async () => {
+    // 1. Await the session securely from the backend (forwards cookies automatically)
+    const { data: session } = await authClient.getSession();
+
+    // 2. Reject unauthorized users BEFORE loaders run
+    if (!session) {
+      throw redirect({
+        to: '/login',
+      });
+    }
+
+    if (session.user.role !== 'admin') {
+      throw redirect({
+        to: '/login', // Or a dedicated unauthorized page if you have one
+      });
+    }
+
+    // 3. Expose session data to child routes via context
+    return {
+      session,
+    };
+  },
   component: MainLayout,
 })
 
-import { useSession } from '@/lib/auth-client'
-import { Navigate } from '@tanstack/react-router'
-import { Spinner } from '@/components/ui/spinner'
-
 function MainLayout() {
-  const { data: session, isPending } = useSession()
-
-  if (isPending) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-background">
-        <Spinner className="h-8 w-8 text-muted-foreground" />
-      </div>
-    )
-  }
-
-  if (!session) {
-    return <Navigate to="/login" />
-  }
-
-  if (session.user.role !== 'admin') {
-    return (
-      <div className="flex h-screen w-screen flex-col items-center justify-center bg-background p-4 text-center">
-        <h1 className="text-3xl font-bold">Unauthorized</h1>
-        <p className="mt-2 text-muted-foreground">Admin access is required to view the Studio.</p>
-      </div>
-    )
-  }
-
   return (
     <ProjectProvider>
       <div className="[--header-height:calc(--spacing(14))] h-screen flex flex-col overflow-hidden">

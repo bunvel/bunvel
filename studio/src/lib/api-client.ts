@@ -2,6 +2,24 @@ import { API_URL } from '@/constants/app'
 import type { ApiError, ApiResponse } from '@/types/api'
 import { logWideEvent } from './logger'
 
+import { createIsomorphicFn } from '@tanstack/react-start'
+
+export const getIsomorphicHeaders = createIsomorphicFn()
+  .client(() => ({} as Record<string, string>))
+  .server(async () => {
+    try {
+      const { getRequestHeader } = await import('@tanstack/react-start/server');
+      const headers: Record<string, string> = {};
+      const cookie = getRequestHeader('cookie');
+      if (cookie) headers.cookie = cookie;
+      const auth = getRequestHeader('authorization');
+      if (auth) headers.authorization = auth;
+      return headers;
+    } catch {
+      return {};
+    }
+  });
+
 class ApiClient {
   constructor(private baseUrl: string = API_URL || '') {}
 
@@ -9,20 +27,9 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {},
   ): Promise<ApiResponse<T>> {
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-
-    // Auto-forward headers during SSR
-    if (typeof window === 'undefined') {
-      try {
-        const { getRequestHeader } = await import('@tanstack/react-start/server');
-        const cookie = getRequestHeader('cookie');
-        if (cookie) headers.cookie = cookie;
-        const auth = getRequestHeader('authorization');
-        if (auth) headers.authorization = auth;
-      } catch (e) {
-        // Ignore import errors in edge cases
-      }
-    }
+    const defaultHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+    const ssrHeaders = await getIsomorphicHeaders();
+    const headers = { ...defaultHeaders, ...ssrHeaders };
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       headers: { ...headers, ...options.headers },

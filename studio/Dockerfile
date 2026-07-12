@@ -13,6 +13,9 @@ RUN bun install
 # Copy the rest of the source code
 COPY . .
 
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 # Build the application
 RUN bun run build
 
