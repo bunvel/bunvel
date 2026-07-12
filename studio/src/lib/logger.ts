@@ -52,8 +52,8 @@ export const logWideEvent = (event: string, data: Record<string, any>) => {
     service: 'bunvel-studio',
     version: import.meta.env.PACKAGE_VERSION || '0.0.0',
     environment: import.meta.env.MODE,
-    userAgent: navigator.userAgent,
-    url: window.location.href,
+    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'server',
+    url: typeof window !== 'undefined' ? window.location.href : 'server',
     ...data,
   }
 

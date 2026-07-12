@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { useDatabaseStats } from '@/hooks/queries/useDatabaseStats'
-import { useDatabaseTables } from '@/hooks/queries/useTables'
 import {
   ArrowRight,
   Cancel01Icon,
@@ -40,12 +39,6 @@ export const Route = createFileRoute('/(main)/')({
 function Dashboard() {
   const [showNotice, setShowNotice] = useState(true)
   const { data: stats, isLoading: statsLoading } = useDatabaseStats()
-  const { data: tables = [], isLoading: tablesLoading } =
-    useDatabaseTables('public')
-
-  const topTables = [...tables]
-    .sort((a, b) => (b.row_count ?? 0) - (a.row_count ?? 0))
-    .slice(0, 5)
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
@@ -282,108 +275,6 @@ function Dashboard() {
                 </Link>
               }
             />
-          </CardContent>
-        </Card>
-
-        {/* Database Tables Overview (2/3 width) */}
-        <Card className="md:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between pb-4 space-y-0">
-            <div>
-              <CardTitle>Tables Overview</CardTitle>
-              <CardDescription>
-                Top active tables in the public schema.
-              </CardDescription>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              render={
-                <Link to="/editor" search={{ schema: 'public' }}>
-                  View All
-                </Link>
-              }
-            />
-          </CardHeader>
-          <CardContent>
-            {tablesLoading ? (
-              <div className="py-8 flex justify-center">
-                <HugeiconsIcon
-                  icon={Loading03Icon}
-                  className="size-6 animate-spin text-muted-foreground"
-                />
-              </div>
-            ) : topTables.length === 0 ? (
-              <div className="py-8 text-center">
-                <p className="text-muted-foreground text-sm">
-                  No tables found in this schema.
-                </p>
-                <Button
-                  className="mt-4"
-                  size="sm"
-                  render={
-                    <Link to="/editor" search={{ schema: 'public' }}>
-                      Create Table
-                    </Link>
-                  }
-                />
-              </div>
-            ) : (
-              <div className="relative w-full overflow-auto">
-                <table className="w-full caption-bottom text-sm">
-                  <thead className="[&_tr]:border-b">
-                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                      <th className="h-10 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
-                        Table Name
-                      </th>
-                      <th className="h-10 px-4 text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
-                        Columns
-                      </th>
-                      <th className="h-10 px-4 text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
-                        Rows
-                      </th>
-                      <th className="h-10 px-4 text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">
-                        Total Size
-                      </th>
-                      <th className="h-10 px-4 text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="[&_tr:last-child]:border-0">
-                    {topTables.map((table) => (
-                      <tr
-                        key={table.name}
-                        className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                      >
-                        <td className="p-4 align-middle font-medium">
-                          {table.name}
-                        </td>
-                        <td className="p-4 align-middle text-right">
-                          {table.column_count}
-                        </td>
-                        <td className="p-4 align-middle text-right">
-                          {table.row_count.toLocaleString()}
-                        </td>
-                        <td className="p-4 align-middle text-right">
-                          {table.total_size}
-                        </td>
-                        <td className="p-4 align-middle text-right">
-                          <Link
-                            to="/editor"
-                            search={{ schema: 'public', table: table.name }}
-                            className="text-primary hover:underline text-sm font-medium flex items-center justify-end gap-1"
-                          >
-                            Edit
-                            <HugeiconsIcon
-                              icon={ArrowRight}
-                              className="size-3"
-                            />
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>

@@ -12,30 +12,25 @@ const envSchema = z.object({
   DEFAULT_ORGANIZATION: z.string().default("Default Organization"),
   DEFAULT_PROJECT: z.string().default("Default Project"),
 
-  // JWT
-  JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
-  JWT_EXPIRES_IN: z.string().default("15m"),
-  JWT_REFRESH_EXPIRES_IN: z.string().default("7d"),
-  JWT_REFRESH_SECRET: z
-    .string()
-    .min(32, "JWT_REFRESH_SECRET must be at least 32 characters"),
-
   // Database
-  POSTGRES_HOST: z.string().default("postgres"),
-  POSTGRES_PORT: z.coerce.number().int().positive().default(5432),
-  POSTGRES_USER: z.string().min(1, "POSTGRES_USER is required"),
-  POSTGRES_PASSWORD: z.string().min(1, "POSTGRES_PASSWORD is required"),
-  POSTGRES_DB: z.string().min(1, "POSTGRES_DB is required"),
+  DATABASE_URL: z.string().url("Invalid DATABASE_URL format"),
 
   // PostgREST
-  POSTGREST_URL: z.url("Invalid PostgREST URL format"),
+  POSTGREST_URL: z.string().url("Invalid PostgREST URL format").default("http://rest:8001"),
 
   // Frontend
-  VITE_BUNVEL_STUDIO_URL: z.string().url().optional(),
+  VITE_BUNVEL_STUDIO_URL: z.string().url("Invalid VITE_BUNVEL_STUDIO_URL format").optional(),
+  VITE_API_URL: z.string().url("Invalid VITE_API_URL format").optional(),
 
   // Rate Limiting
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900000), // 15 minutes
+
+  // Better Auth
+  BETTER_AUTH_SECRET: z.string().min(32, "BETTER_AUTH_SECRET must be at least 32 characters"),
+  BETTER_AUTH_URL: z.string().url("Invalid BETTER_AUTH_URL format"),
+  ADMIN_EMAIL: z.string().email("ADMIN_EMAIL must be a valid email").optional(),
+  ADMIN_PASSWORD: z.string().min(8, "ADMIN_PASSWORD must be at least 8 characters").optional(),
 });
 
 type EnvConfig = z.infer<typeof envSchema>;

@@ -9,8 +9,23 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {},
   ): Promise<ApiResponse<T>> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+
+    // Auto-forward headers during SSR
+    if (typeof window === 'undefined') {
+      try {
+        const { getRequestHeader } = await import('@tanstack/react-start/server');
+        const cookie = getRequestHeader('cookie');
+        if (cookie) headers.cookie = cookie;
+        const auth = getRequestHeader('authorization');
+        if (auth) headers.authorization = auth;
+      } catch (e) {
+        // Ignore import errors in edge cases
+      }
+    }
+
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      headers: { 'Content-Type': 'application/json', ...options.headers },
+      headers: { ...headers, ...options.headers },
       credentials: 'include',
       ...options,
     })
@@ -29,27 +44,29 @@ class ApiClient {
     }
   }
 
-  get<T = any>(endpoint: string, params?: Record<string, any>) {
+  get<T = any>(endpoint: string, params?: Record<string, any>, options?: RequestInit) {
     const url = params ? `${endpoint}?${new URLSearchParams(params)}` : endpoint
-    return this.request<T>(url)
+    return this.request<T>(url, options)
   }
 
-  post<T = any>(endpoint: string, data?: any) {
+  post<T = any>(endpoint: string, data?: any, options?: RequestInit) {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
+      ...options,
     })
   }
 
-  put<T = any>(endpoint: string, data?: any) {
+  put<T = any>(endpoint: string, data?: any, options?: RequestInit) {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
+      ...options,
     })
   }
 
-  delete<T = any>(endpoint: string) {
-    return this.request<T>(endpoint, { method: 'DELETE' })
+  delete<T = any>(endpoint: string, options?: RequestInit) {
+    return this.request<T>(endpoint, { method: 'DELETE', ...options })
   }
 
   private async parseResponse(response: Response): Promise<any> {

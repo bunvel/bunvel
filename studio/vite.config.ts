@@ -14,6 +14,9 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  optimizeDeps: {
+    include: ['@xyflow/react', 'react', 'react-dom'],
+  },
 })
 
 export default config

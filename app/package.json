@@ -9,13 +9,16 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.2",
+    "better-auth": "^1.6.23",
     "elysia": "^1.4.29",
     "elysia-http-exception": "^0.1.5",
     "elysia-rate-limit": "^4.6.2",
+    "pg": "^8.22.0",
     "pino": "^10.3.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/pg": "^8.20.0",
     "bun-types": "^1.3.14",
     "pino-pretty": "^13.1.3"
   },
