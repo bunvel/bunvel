@@ -1,19 +1,10 @@
 import { READONLY_SCHEMAS } from '@/constants/app'
-import { createServerFn } from '@tanstack/react-start'
 
 export const isReadonlySchema = (schema?: string): boolean => {
   return schema ? READONLY_SCHEMAS.includes(schema) : false
 }
 
-export const getEnv = createServerFn().handler(async () => {
-  const API_URL = process.env.VITE_API_URL
 
-  const BUNVEL_STUDIO_URL = process.env.VITE_BUNVEL_STUDIO_URL
-
-  return { API_URL, BUNVEL_STUDIO_URL }
-})
-
-export const Env = await getEnv()
 
 export function escapeIdentifier(identifier: string): string {
   return identifier.replace(/"/g, '""')

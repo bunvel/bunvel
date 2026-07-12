@@ -6,11 +6,12 @@
   "tailwind": {
     "config": "",
     "css": "src/styles.css",
-    "baseColor": "zinc",
+    "baseColor": "mist",
     "cssVariables": true,
     "prefix": ""
   },
   "iconLibrary": "hugeicons",
+  "rtl": false,
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
@@ -20,6 +21,5 @@
   },
   "menuColor": "default",
   "menuAccent": "subtle",
-  "rtl": false,
   "registries": {}
 }
