@@ -1,3 +1,7 @@
+import {
+  Tooltip,
+  TooltipContent, TooltipTrigger
+} from '@/components/ui/tooltip'
 import { format } from 'date-fns'
 import React from 'react'
 
@@ -79,16 +83,25 @@ export function formatCellValue(
       value.length > MAX_ARRAY_ITEMS
         ? `, ... +${value.length - MAX_ARRAY_ITEMS} more`
         : ''
+    const preview = `[${items
+      .map((v) => (typeof v === 'object' ? JSON.stringify(v) : String(v)))
+      .join(', ')}${suffix}]`
 
     return (
-      <span
-        className="font-mono text-xs max-w-[250px] truncate block"
-        title={JSON.stringify(value)}
-      >
-        {`[${items
-          .map((v) => (typeof v === 'object' ? JSON.stringify(v) : String(v)))
-          .join(', ')}${suffix}]`}
-      </span>
+      <Tooltip>
+        <TooltipTrigger
+          render={<span className="font-mono text-xs max-w-[250px] truncate block cursor-default text-left" />}
+        >
+          {preview}
+        </TooltipTrigger>
+        <TooltipContent
+          side="top"
+          align="start"
+          className="max-w-xl max-h-[400px] overflow-auto whitespace-pre font-mono text-xs z-[100]"
+        >
+          {JSON.stringify(value, null, 2)}
+        </TooltipContent>
+      </Tooltip>
     )
   }
 
@@ -117,18 +130,26 @@ export function formatCellValue(
   if (typeof value === 'object' || type === 'json' || type === 'jsonb') {
     try {
       const strVal = typeof value === 'string' ? value : JSON.stringify(value)
-      
+
       if (strVal === '{}' || strVal === '[]') {
         return <span className="italic text-muted-foreground text-xs">NULL</span>
       }
 
       return (
-        <span
-          className="font-mono text-xs bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded max-w-[200px] truncate block"
-          title={strVal}
-        >
-          {strVal}
-        </span>
+        <Tooltip>
+          <TooltipTrigger
+            render={<span className="font-mono text-xs max-w-[200px] truncate block cursor-default text-left" />}
+          >
+            {strVal}
+          </TooltipTrigger>
+          <TooltipContent
+            side="top"
+            align="start"
+            className="max-w-xl max-h-[400px] overflow-auto whitespace-pre font-mono text-xs z-[100]"
+          >
+            {typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
+          </TooltipContent>
+        </Tooltip>
       )
     } catch {
       return String(value)

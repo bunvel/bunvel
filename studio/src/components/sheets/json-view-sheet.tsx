@@ -28,21 +28,21 @@ interface JsonViewSheetProps {
 interface JsonNodeProps {
   data: any
   isLast: boolean
-  expandAll?: boolean
-  collapseAll?: boolean
+  expandVersion?: number
+  collapseVersion?: number
 }
 
-const JsonNode = ({ data, isLast, expandAll, collapseAll }: JsonNodeProps) => {
+const JsonNode = ({ data, isLast, expandVersion = 0, collapseVersion = 0 }: JsonNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(true)
 
-  // React to expand/collapse all commands
+  // React to expand/collapse all commands based on latest timestamp
   React.useEffect(() => {
-    if (expandAll) {
+    if (expandVersion > collapseVersion && expandVersion > 0) {
       setIsExpanded(true)
-    } else if (collapseAll) {
+    } else if (collapseVersion > expandVersion && collapseVersion > 0) {
       setIsExpanded(false)
     }
-  }, [expandAll, collapseAll])
+  }, [expandVersion, collapseVersion])
 
   const isObject =
     typeof data === 'object' && data !== null && !Array.isArray(data)
@@ -51,7 +51,7 @@ const JsonNode = ({ data, isLast, expandAll, collapseAll }: JsonNodeProps) => {
   const renderValue = (value: any): string => {
     if (value === null) return 'null'
     if (value === undefined) return 'undefined'
-    if (typeof value === 'string') return `"${value}"`
+    if (typeof value === 'string') return JSON.stringify(value) // Properly escapes strings
     if (typeof value === 'number' || typeof value === 'boolean')
       return String(value)
     return typeof value
@@ -71,24 +71,24 @@ const JsonNode = ({ data, isLast, expandAll, collapseAll }: JsonNodeProps) => {
 
   return (
     <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-      <CollapsibleTrigger>
-        <span className="flex items-center cursor-pointer hover:text-gray-300">
-          <HugeiconsIcon
-            icon={isExpanded ? ArrowDown : ArrowRight}
-            className="h-3 w-3 mr-1"
-          />
-          <span className="text-gray-400">
-            {!isExpanded && (
-              <>
-                {isArray ? '[' : '{'}
-                <span className="text-gray-500 ml-1">
-                  {itemCount} {isArray ? 'items' : 'properties'}
-                </span>
-                {isArray ? ']' : '}'}
-              </>
-            )}
-            {isExpanded && (isArray ? '[' : '{')}
-          </span>
+      <CollapsibleTrigger
+        render={<span className="flex items-center cursor-pointer hover:text-gray-300" />}
+      >
+        <HugeiconsIcon
+          icon={isExpanded ? ArrowDown : ArrowRight}
+          className="h-3 w-3 mr-1"
+        />
+        <span className="text-gray-400">
+          {!isExpanded && (
+            <>
+              {isArray ? '[' : '{'}
+              <span className="text-gray-500 ml-1">
+                {itemCount} {isArray ? 'items' : 'properties'}
+              </span>
+              {isArray ? ']' : '}'}
+            </>
+          )}
+          {isExpanded && (isArray ? '[' : '{')}
         </span>
       </CollapsibleTrigger>
       {isExpanded && (
@@ -102,8 +102,8 @@ const JsonNode = ({ data, isLast, expandAll, collapseAll }: JsonNodeProps) => {
                 <JsonNode
                   data={value}
                   isLast={index === itemCount - 1}
-                  expandAll={expandAll}
-                  collapseAll={collapseAll}
+                  expandVersion={expandVersion}
+                  collapseVersion={collapseVersion}
                 />
               </div>
             ))}
@@ -125,8 +125,9 @@ export function JsonViewSheet({
   disabled,
 }: JsonViewSheetProps) {
   const [open, setOpen] = useState(false)
-  const [expandAll, setExpandAll] = useState(false)
-  const [collapseAll, setCollapseAll] = useState(false)
+  const [expandVersion, setExpandVersion] = useState(0)
+  const [collapseVersion, setCollapseVersion] = useState(0)
+  const [isAllExpanded, setIsAllExpanded] = useState(true)
   const { copyRows } = useCopy()
 
   // Ensure data is always an array
@@ -139,18 +140,13 @@ export function JsonViewSheet({
     })
   }
 
-  const handleExpandAll = () => {
-    setExpandAll(true)
-    setCollapseAll(false)
-    // Reset the trigger after a brief moment to allow re-render
-    setTimeout(() => setExpandAll(false), 100)
-  }
-
-  const handleCollapseAll = () => {
-    setCollapseAll(true)
-    setExpandAll(false)
-    // Reset the trigger after a brief moment to allow re-render
-    setTimeout(() => setCollapseAll(false), 100)
+  const handleToggleExpandAll = () => {
+    if (isAllExpanded) {
+      setCollapseVersion(Date.now())
+    } else {
+      setExpandVersion(Date.now())
+    }
+    setIsAllExpanded(!isAllExpanded)
   }
 
   return (
@@ -160,7 +156,7 @@ export function JsonViewSheet({
       >
         <HugeiconsIcon icon={Code} className="h-4 w-4" />
       </SheetTrigger>
-      <SheetContent side="right" className="bg-card min-w-2xl flex flex-col">
+      <SheetContent side="right" className="bg-card min-w-[42rem] flex flex-col">
         <SheetHeader className="border-b p-4">
           <SheetTitle>
             JSON View - {schema}.{table}
@@ -173,11 +169,8 @@ export function JsonViewSheet({
               {dataArray.length !== 1 ? 's' : ''}
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleExpandAll}>
-                Expand All
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleCollapseAll}>
-                Collapse All
+              <Button variant="outline" size="sm" onClick={handleToggleExpandAll}>
+                {isAllExpanded ? 'Collapse All' : 'Expand All'}
               </Button>
               <Button variant="outline" size="icon-sm" onClick={handleCopyJson}>
                 <HugeiconsIcon icon={Copy} className="h-4 w-4" />
@@ -192,8 +185,8 @@ export function JsonViewSheet({
                 <JsonNode
                   data={dataArray[0]}
                   isLast={true}
-                  expandAll={expandAll}
-                  collapseAll={collapseAll}
+                  expandVersion={expandVersion}
+                  collapseVersion={collapseVersion}
                 />
               ) : (
                 <>
@@ -204,8 +197,8 @@ export function JsonViewSheet({
                         <JsonNode
                           data={record}
                           isLast={index === dataArray.length - 1}
-                          expandAll={expandAll}
-                          collapseAll={collapseAll}
+                          expandVersion={expandVersion}
+                          collapseVersion={collapseVersion}
                         />
                       </div>
                     ))}

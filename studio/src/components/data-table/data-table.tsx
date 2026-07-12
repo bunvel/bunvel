@@ -214,9 +214,9 @@ export function DataTable<TData, TValue = unknown>({
         <div className="flex-1 flex flex-col overflow-hidden border *:data-[slot=table-container]:h-full *:data-[slot=table-container]:overflow-auto!">
           {table.getRowModel().rows.length === 0 ? (
             <>
-              <Table className="w-auto">
+              <div className="flex items-center w-auto">
                 <DataTableHeader table={table} />
-              </Table>
+              </div>
               <div className="flex-1 flex items-center justify-center p-8">
                 <div className="text-sm text-muted-foreground">
                   No results found
@@ -232,11 +232,10 @@ export function DataTable<TData, TValue = unknown>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() ? 'selected' : undefined}
-                    className={`border-b ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} ${
-                      enableRowSelection && row.getIsSelected()
-                        ? 'bg-muted/30'
-                        : ''
-                    }`}
+                    className={`border-b ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} ${enableRowSelection && row.getIsSelected()
+                      ? 'bg-muted/30'
+                      : ''
+                      }`}
                     onClick={() => onRowClick?.(row.original)}
                   >
                     {row.getVisibleCells().map((cell) => (

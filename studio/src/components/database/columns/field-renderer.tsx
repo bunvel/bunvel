@@ -40,7 +40,7 @@ import {
 import { CalendarDays, Edit } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { format } from 'date-fns'
-import React from 'react'
+import React, { useState } from 'react'
 
 interface FieldRendererProps {
   column: ColumnMetadata
@@ -88,28 +88,13 @@ export function FieldRenderer({
     </div>
   )
 
-  const renderInputWithForeignKey = (inputElement: React.ReactNode) => {
-    // Don't add dropdown to Select fields since they already have NULL options
-    const isSelectField =
-      React.isValidElement(inputElement) &&
-      (inputElement.type === Select ||
-        (inputElement.props as any)?.children?.some?.(
-          (child: any) => child?.type === SelectTrigger,
-        ))
+  const renderInputWithForeignKey = (
+    inputElement: React.ReactNode,
+    options: { disableDropdown?: boolean; wrapInInputGroup?: boolean } = {}
+  ) => {
+    const { disableDropdown = false, wrapInInputGroup = true } = options
 
-    // Don't add dropdown to Popover (calendar) fields since they can't be wrapped in InputGroup
-    const isPopoverField =
-      React.isValidElement(inputElement) && inputElement.type === Popover
-
-    // Check if this is an InputGroupInput field
-    const isInputGroupInput =
-      React.isValidElement(inputElement) &&
-      (inputElement.type === InputGroupInput ||
-        inputElement.type === InputGroupTextarea)
-
-    // Add InputGroup wrapper for InputGroupInput fields for consistent styling
-    // Add dropdown for fields that need it
-    if (!isSelectField && !isPopoverField && isInputGroupInput) {
+    if (!disableDropdown) {
       const needsDropdown =
         !isDisabled && (isForeignKey || column.is_nullable === 'YES')
 
@@ -151,14 +136,14 @@ export function FieldRenderer({
             </InputGroupAddon>
           </InputGroup>
         )
-      } else {
-        // Just wrap in InputGroup for consistent styling, no dropdown
-        return <InputGroup>{inputElement}</InputGroup>
       }
-    } else {
-      // For select fields, popover fields, and others, return as-is
-      return inputElement
     }
+    
+    if (wrapInInputGroup) {
+      return <InputGroup>{inputElement}</InputGroup>
+    }
+    
+    return inputElement
   }
 
   // Date field rendering
@@ -282,6 +267,7 @@ export function FieldRenderer({
               )}
             </SelectContent>
           </Select>,
+          { disableDropdown: true, wrapInInputGroup: false }
         )}
       </div>
     )
@@ -310,7 +296,7 @@ export function FieldRenderer({
                   : `Enter ${column.column_name}`
             }
             {...commonProps}
-          />,
+          />
         )}
       </div>
     )
@@ -342,7 +328,7 @@ export function FieldRenderer({
                   : `Enter ${column.column_name}`
             }
             {...commonProps}
-          />,
+          />
         )}
       </div>
     )
@@ -388,6 +374,7 @@ export function FieldRenderer({
               )}
             </SelectContent>
           </Select>,
+          { disableDropdown: true, wrapInInputGroup: false }
         )}
       </div>
     )
@@ -421,19 +408,33 @@ export function FieldRenderer({
             }
             {...commonProps}
             rows={TEXTAREA_ROWS_TEXT}
-          />,
+          />
         )}
       </div>
     )
   }
 
-  // JSON and text field rendering
-  if (
-    (isJsonType(fieldType) || isTextType(fieldType)) &&
-    !fieldType.includes('[]')
-  ) {
-    const isJsonField = isJsonType(fieldType)
+  // JSON field rendering
+  if (isJsonType(fieldType) && !fieldType.includes('[]')) {
+    return (
+      <div
+        key={column.column_name}
+        className="grid grid-cols-[200px_1fr] gap-4 items-start"
+      >
+        {renderFieldLabel()}
+        <JsonFieldEditor 
+          column={column} 
+          value={value} 
+          onChange={onChange} 
+          commonProps={commonProps} 
+          renderInput={renderInputWithForeignKey} 
+        />
+      </div>
+    )
+  }
 
+  // Unbound Text field rendering
+  if (fieldType === 'text' && !fieldType.includes('[]')) {
     return (
       <div
         key={column.column_name}
@@ -443,46 +444,22 @@ export function FieldRenderer({
         {renderInputWithForeignKey(
           <InputGroupTextarea
             id={column.column_name}
-            value={
-              value === null || value === undefined
-                ? ''
-                : isJsonField
-                  ? typeof value === 'string'
-                    ? value
-                    : JSON.stringify(value, null, 2)
-                  : String(value)
+            value={value === null || value === undefined ? '' : String(value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              onChange(column.column_name, e.target.value)
             }
-            onChange={(e) => {
-              const val = e.target.value
-              if (isJsonField && val.trim()) {
-                try {
-                  // Try to parse as JSON, if fails, store as string
-                  const parsed = JSON.parse(val)
-                  onChange(column.column_name, parsed)
-                } catch {
-                  // If invalid JSON, store as string
-                  onChange(column.column_name, val)
-                }
-              } else {
-                onChange(column.column_name, val || null)
-              }
-            }}
             placeholder={
               value === null ? 'NULL' : `Enter ${column.column_name}`
             }
             {...commonProps}
-            rows={
-              isTextType(fieldType) && !isJsonType(fieldType)
-                ? TEXTAREA_ROWS_TEXT
-                : TEXTAREA_ROWS_JSON
-            }
-          />,
+            rows={TEXTAREA_ROWS_TEXT}
+          />
         )}
       </div>
     )
   }
 
-  // Text field rendering
+  // Text/Varchar field rendering (Single Line)
   if (isTextType(fieldType) && !fieldType.includes('[]')) {
     return (
       <div
@@ -501,7 +478,7 @@ export function FieldRenderer({
               value === null ? 'NULL' : `Enter ${column.column_name}`
             }
             {...commonProps}
-          />,
+          />
         )}
       </div>
     )
@@ -523,8 +500,49 @@ export function FieldRenderer({
           }
           placeholder={value === null ? 'NULL' : `Enter ${column.column_name}`}
           {...commonProps}
-        />,
+        />
       )}
     </div>
+  )
+}
+
+function JsonFieldEditor({ column, value, onChange, commonProps, renderInput }: any) {
+  const [localValue, setLocalValue] = useState('')
+  const [isFocused, setIsFocused] = useState(false)
+
+  const displayValue = isFocused 
+    ? localValue 
+    : (value === null || value === undefined 
+        ? '' 
+        : typeof value === 'string' 
+          ? value 
+          : JSON.stringify(value, null, 2))
+
+  return renderInput(
+    <InputGroupTextarea
+      id={column.column_name}
+      value={displayValue}
+      onFocus={() => {
+        setLocalValue(displayValue)
+        setIsFocused(true)
+      }}
+      onBlur={() => {
+        setIsFocused(false)
+        if (localValue.trim()) {
+          try {
+            const parsed = JSON.parse(localValue)
+            onChange(column.column_name, parsed)
+          } catch {
+            onChange(column.column_name, localValue)
+          }
+        } else {
+          onChange(column.column_name, null)
+        }
+      }}
+      onChange={(e) => setLocalValue(e.target.value)}
+      placeholder={value === null ? 'NULL' : `Enter ${column.column_name} (valid JSON)`}
+      rows={TEXTAREA_ROWS_JSON}
+      {...commonProps}
+    />
   )
 }
