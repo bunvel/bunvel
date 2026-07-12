@@ -1,5 +1,6 @@
 import { apiClient, handleApiError } from '@/lib/api-client'
 import { logWideEvent } from '@/lib/logger'
+import { validateRestrictedSchemaQuery } from '@/lib/restricated-schema'
 import { createServerFn } from '@tanstack/react-start'
 
 export const executeQuery = createServerFn({ method: 'POST' })
@@ -8,6 +9,9 @@ export const executeQuery = createServerFn({ method: 'POST' })
     if (!data?.trim()) {
       throw new Error('Query cannot be empty')
     }
+
+    // Validate restricted schema restrictions
+    validateRestrictedSchemaQuery(data)
 
     try {
       const startTime = performance.now()

@@ -10,14 +10,9 @@ import type {
 } from '@tanstack/react-table'
 import {
   getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { useEffect, useEffectEvent, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { DataTableCell } from './data-table-cell'
 import { DataTableHeader } from './data-table-header'
 import { DataTablePagination } from './data-table-pagination'
@@ -130,7 +125,30 @@ export function DataTable<TData, TValue = unknown>({
       return String(offset + index)
     },
     enableRowSelection,
-    onRowSelectionChange: onRowSelectionStateChange,
+    onRowSelectionChange: (updaterOrValue) => {
+      if (onRowSelectionStateChange) {
+        onRowSelectionStateChange(updaterOrValue)
+      }
+      
+      if (onRowSelectionChange) {
+        const newRowSelection = typeof updaterOrValue === 'function' ? updaterOrValue(state.rowSelection || {}) : updaterOrValue
+        
+        const getRowId = (row: any, index: number) => {
+          if (metadata?.primary_keys?.length) {
+            return metadata.primary_keys.map((pk: string) => String(row[pk])).join('::')
+          }
+          const offset = state.pagination ? state.pagination.pageIndex * state.pagination.pageSize : 0
+          return String(offset + index)
+        }
+        
+        const selectedRows = data.filter((row, index) => {
+          const id = getRowId(row, index)
+          return newRowSelection[id]
+        })
+        
+        onRowSelectionChange(selectedRows)
+      }
+    },
     onSortingChange: (updater) => {
       if (onSortingChange) {
         const newSorting =
@@ -138,7 +156,9 @@ export function DataTable<TData, TValue = unknown>({
         onSortingChange(newSorting)
       }
     },
-    manualPagination: true, // Enable manual pagination
+    manualPagination: true,
+    manualSorting: true,
+    manualFiltering: true,
     pageCount,
     onPaginationChange: (updater) => {
       const newPagination =
@@ -147,29 +167,7 @@ export function DataTable<TData, TValue = unknown>({
     },
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
   })
-
-  // Handle row selection changes without re-running effect unnecessarily
-  const onRowSelectionChangeHandler = useEffectEvent(
-    (selectedRows: Array<TData>) => {
-      if (onRowSelectionChange) {
-        onRowSelectionChange(selectedRows)
-      }
-    },
-  )
-
-  useEffect(() => {
-    if (state.rowSelection) {
-      const selectedRows =
-        table?.getSelectedRowModel().flatRows.map((row) => row.original) || []
-      onRowSelectionChangeHandler(selectedRows)
-    }
-  }, [state.rowSelection, table])
 
   // Show skeleton loading state when loading
   if (isLoading) {

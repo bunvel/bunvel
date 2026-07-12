@@ -1,5 +1,3 @@
-"use client"
-
 import { queryClient } from '@/lib/query-client'
 import { truncateTable } from '@/services/table.service'
 import { reactQueryKeys } from '@/utils/react-query-keys'

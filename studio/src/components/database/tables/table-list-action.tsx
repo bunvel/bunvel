@@ -1,5 +1,3 @@
-"use client"
-
 import { ConfirmDeleteDialog } from '@/components/common/confirm-delete-dialog'
 import {
   DropdownMenu,
@@ -12,6 +10,7 @@ import { SidebarMenuAction } from '@/components/ui/sidebar'
 import { useDeleteTable } from '@/hooks/mutations/useDeleteTable'
 import { useTruncateTable } from '@/hooks/mutations/useTruncateTable'
 import { useCopyToClipboard } from '@/hooks/use-clipboard'
+import { isRestrictedSchema } from '@/lib/restricated-schema'
 import type { TableListActionProps } from '@/types/components'
 import { Copy01Icon, MoreVertical, Trash2 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -21,9 +20,11 @@ import { toast } from 'sonner'
 export function TableListAction({ schema, table }: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isTruncateDialogOpen, setIsTruncateDialogOpen] = useState(false)
-  const { mutateAsync: deleteTableAsync, isPending: isDeleting } = useDeleteTable()
+  const { mutateAsync: deleteTableAsync, isPending: isDeleting } =
+    useDeleteTable()
   const { mutate: truncateTable, isPending: isTruncating } = useTruncateTable()
   const [, copyToClipboard] = useCopyToClipboard()
+  const isRestricted = isRestrictedSchema(schema)
 
   const handleDelete = async (cascade: boolean) => {
     try {
@@ -75,18 +76,25 @@ export function TableListAction({ schema, table }: TableListActionProps) {
             />
             <span>Copy Name</span>
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setIsTruncateDialogOpen(true)}>
-            <HugeiconsIcon icon={Trash2} className="text-muted-foreground" />
-            <span>Truncate Table</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => setIsDeleteDialogOpen(true)}
-            className="text-destructive focus:text-destructive"
-          >
-            <HugeiconsIcon icon={Trash2} className="text-destructive" />
-            <span>Delete Table</span>
-          </DropdownMenuItem>
+          {!isRestricted && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setIsTruncateDialogOpen(true)}>
+                <HugeiconsIcon
+                  icon={Trash2}
+                  className="text-muted-foreground"
+                />
+                <span>Truncate Table</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setIsDeleteDialogOpen(true)}
+                className="text-destructive focus:text-destructive"
+              >
+                <HugeiconsIcon icon={Trash2} className="text-destructive" />
+                <span>Delete Table</span>
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 

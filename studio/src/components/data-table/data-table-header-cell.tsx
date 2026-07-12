@@ -1,6 +1,6 @@
 import { ColumnKeyIndicator } from '@/components/common/column-key-indicator'
 import { cn } from '@/lib/utils'
-import type { ColumnMetadata, SortConfig } from '@/types/table'
+import type { ColumnMetadata } from '@/types/table'
 import { formatDataType } from '@/utils/format'
 import {
   ArrowDown01Icon,
@@ -8,68 +8,21 @@ import {
   Sorting05Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
+import type { Column } from '@tanstack/react-table'
 
 interface DataTableHeaderCellProps {
   column: ColumnMetadata
   className?: string
-  sorts?: Array<SortConfig>
-  onSortChange?: (sorts: Array<SortConfig>) => void
+  tanstackColumn?: Column<any, unknown>
 }
 
 export function DataTableHeaderCell({
   column,
   className,
-  sorts = [],
-  onSortChange,
+  tanstackColumn,
 }: DataTableHeaderCellProps) {
-  const sortIndex = sorts.findIndex((s) => s.column === column.column_name)
-  const activeSort = sortIndex !== -1 ? sorts[sortIndex] : null
-  const isSorted = activeSort !== null
-  const sortDirection = activeSort ? activeSort.direction : null
-
-  const handleClick = (e: React.MouseEvent) => {
-    if (!onSortChange) return
-
-    const columnName = column.column_name
-    const isShiftKey = e.shiftKey
-    let newSorts: Array<SortConfig> = []
-
-    if (isShiftKey) {
-      // Multi-column sorting: modify or append
-      const existingIndex = sorts.findIndex((s) => s.column === columnName)
-
-      if (existingIndex !== -1) {
-        const existingSort = sorts[existingIndex]
-        if (existingSort.direction === 'asc') {
-          // Toggle to desc
-          newSorts = sorts.map((s, idx) =>
-            idx === existingIndex ? { ...s, direction: 'desc' as const } : s,
-          )
-        } else {
-          // Remove from sorting
-          newSorts = sorts.filter((s) => s.column !== columnName)
-        }
-      } else {
-        // Append new sort
-        newSorts = [...sorts, { column: columnName, direction: 'asc' as const }]
-      }
-    } else {
-      // Single-column sorting: clear all others and set/toggle this column
-      const existing = sorts.find((s) => s.column === columnName)
-      if (existing) {
-        if (existing.direction === 'asc') {
-          newSorts = [{ column: columnName, direction: 'desc' as const }]
-        } else {
-          // Clear sorting (unsorted)
-          newSorts = []
-        }
-      } else {
-        newSorts = [{ column: columnName, direction: 'asc' as const }]
-      }
-    }
-
-    onSortChange(newSorts)
-  }
+  const isSorted = tanstackColumn?.getIsSorted()
+  const canSort = tanstackColumn?.getCanSort()
 
   return (
     <div
@@ -77,10 +30,10 @@ export function DataTableHeaderCell({
       className={cn(
         className,
         'flex items-center gap-1 group/header select-none',
-        onSortChange &&
+        canSort &&
           'cursor-pointer hover:bg-muted/30 active:bg-muted/50 rounded px-1 -mx-1 py-1 transition-colors',
       )}
-      onClick={handleClick}
+      onClick={tanstackColumn?.getToggleSortingHandler()}
     >
       <div className="flex items-center gap-1">
         <ColumnKeyIndicator
@@ -96,18 +49,18 @@ export function DataTableHeaderCell({
       </span>
 
       {/* Sorting Indicators */}
-      {onSortChange && (
+      {canSort && (
         <div className="flex items-center gap-0.5 ml-auto">
           {isSorted ? (
             <div className="flex items-center gap-0.5 text-primary">
               <HugeiconsIcon
-                icon={sortDirection === 'asc' ? ArrowUp01Icon : ArrowDown01Icon}
+                icon={isSorted === 'asc' ? ArrowUp01Icon : ArrowDown01Icon}
                 className="h-3 w-3 shrink-0"
                 strokeWidth={2.5}
               />
-              {sorts.length > 1 && (
+              {tanstackColumn && tanstackColumn.getSortIndex() >= 0 && (
                 <span className="flex items-center justify-center bg-primary/10 text-primary rounded-full min-w-3.5 h-3.5 text-[9px] font-bold px-0.5 leading-none">
-                  {sortIndex + 1}
+                  {tanstackColumn.getSortIndex() + 1}
                 </span>
               )}
             </div>

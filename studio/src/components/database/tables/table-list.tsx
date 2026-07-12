@@ -13,6 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PLACEHOLDERS } from '@/constants/ui'
 import { useTables } from '@/hooks/queries/useTables'
+import { isRestrictedSchema } from '@/lib/restricated-schema'
 import type { Table } from '@/types/database'
 import { TableIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -29,6 +30,7 @@ export function TableList() {
   const { schema } = search
   const { data: tables = [], isLoading, error, refetch } = useTables(schema)
   const [searchQuery, setSearchQuery] = useState('')
+  const isRestricted = isRestrictedSchema(schema)
 
   const filteredTables = !searchQuery
     ? tables
@@ -117,7 +119,9 @@ export function TableList() {
           No tables or views found in schema{' '}
           <span className="font-medium text-foreground">{schema}</span>
         </p>
-        <TableFormSheet schema={schema} children={<p>Create Table</p>} />
+        {!isRestricted && (
+          <TableFormSheet schema={schema} children={<p>Create Table</p>} />
+        )}
       </div>
     )
   }
@@ -132,7 +136,7 @@ export function TableList() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="flex-1"
           />
-          <TableFormSheet schema={schema} />
+          {!isRestricted && <TableFormSheet schema={schema} />}
         </div>
       </div>
       <ScrollArea
