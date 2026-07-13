@@ -13,7 +13,7 @@ export const JSON_CONTENT_TYPE = "application/json";
 
 export const CORS_CONFIG = {
   methods: [...ALLOWED_METHODS],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "cookie"],
   exposeHeaders: ["Content-Length"],
   credentials: true,
   maxAge: 86400, // 24 hours

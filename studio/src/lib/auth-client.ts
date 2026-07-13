@@ -6,6 +6,7 @@ import { API_URL } from "@/constants/app";
 export const authClient = createAuthClient({
   baseURL: API_URL,
   fetchOptions: {
+    credentials: "include",
     headers: async () => await getIsomorphicHeaders(),
   },
   plugins: [adminClient()],

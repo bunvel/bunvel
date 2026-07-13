@@ -14,6 +14,11 @@ export const getIsomorphicHeaders = createIsomorphicFn()
       if (cookie) headers.cookie = cookie;
       const auth = getRequestHeader('authorization');
       if (auth) headers.authorization = auth;
+      // Forward the original browser origin so Better Auth validates it against
+      // trustedOrigins (e.g. http://localhost:3000) rather than the internal
+      // Docker hostname (http://app:8000) which would fail the origin check.
+      const origin = getRequestHeader('origin');
+      if (origin) headers.origin = origin;
       return headers;
     } catch {
       return {};

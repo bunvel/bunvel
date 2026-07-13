@@ -2,31 +2,34 @@ import { AppSidebar } from '@/components/layout/app-sidebar'
 import { SiteHeader } from '@/components/layout/site-header'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { ProjectProvider } from '@/contexts/project-context'
-import { authClient } from '@/lib/auth-client'
+import { fetchSession } from '@/lib/session'
+import type { fetchSession as FetchSessionType } from '@/lib/session'
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/(main)')({
-  beforeLoad: async () => {
-    // 1. Await the session securely from the backend (forwards cookies automatically)
-    const { data: session } = await authClient.getSession();
+type Session = NonNullable<Awaited<ReturnType<typeof FetchSessionType>>>
 
-    // 2. Reject unauthorized users BEFORE loaders run
+export interface MainRouteContext {
+  session: Session
+}
+
+export const Route = createFileRoute('/(main)')({
+  beforeLoad: async (): Promise<MainRouteContext> => {
+    // fetchSession is a server function — it has proper request context so
+    // getRequestHeader can read the browser's cookie and forward it to the
+    // backend. Using authClient.getSession() directly here would silently
+    // drop the cookie because beforeLoad does not run inside a server
+    // function context.
+    const session = await fetchSession()
+
     if (!session) {
-      throw redirect({
-        to: '/login',
-      });
+      throw redirect({ to: '/login' })
     }
 
     if (session.user.role !== 'admin') {
-      throw redirect({
-        to: '/login', // Or a dedicated unauthorized page if you have one
-      });
+      throw redirect({ to: '/login' })
     }
 
-    // 3. Expose session data to child routes via context
-    return {
-      session,
-    };
+    return { session }
   },
   component: MainLayout,
 })

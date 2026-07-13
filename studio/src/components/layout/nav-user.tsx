@@ -17,19 +17,18 @@ import {
   BadgeCheck, ChevronsUpDown, LogOut
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { signOut, useSession } from '@/lib/auth-client'
-import { useNavigate } from '@tanstack/react-router'
+import { signOut } from '@/lib/auth-client'
+import { useNavigate, useRouteContext } from '@tanstack/react-router'
 import { toast } from 'sonner'
 
 export function NavUser() {
-  const { data: session } = useSession()
+  // Read the session that was already fetched and validated in beforeLoad —
+  // avoids an extra network round-trip and the brief "Loading..." flash that
+  // useSession() causes while it re-fetches on the client.
+  const { session } = useRouteContext({ from: '/(main)' })
   const navigate = useNavigate()
 
-  const user = session?.user || {
-    name: 'Loading...',
-    email: '',
-    image: '/logo.svg',
-  }
+  const user = session.user
 
   const handleSignOut = async () => {
     try {

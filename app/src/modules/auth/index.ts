@@ -15,7 +15,27 @@ export const auth = betterAuth({
   database: pool,
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BETTER_AUTH_URL,
-  trustedOrigins: env.VITE_BUNVEL_STUDIO_URL ? [env.VITE_BUNVEL_STUDIO_URL] : [],
+  trustedOrigins: [
+    // Always trust the API server itself so server-to-server session checks
+    // (e.g. SSR fetching http://app:8000 from inside Docker) are never rejected.
+    env.BETTER_AUTH_URL,
+    // Trust the studio frontend origin so browser requests pass the check.
+    ...(env.VITE_BUNVEL_STUDIO_URL ? [env.VITE_BUNVEL_STUDIO_URL] : []),
+  ],
+  advanced: {
+    // Don't pin the cookie to a specific domain — allows the session cookie
+    // to be sent regardless of whether the request comes from the browser
+    // (localhost) or the SSR layer (internal Docker hostname).
+    crossSubDomainCookies: {
+      enabled: false,
+    },
+    // Use lax so the cookie is sent on same-site navigations (refreshes).
+    // "none" would require HTTPS; "strict" would break cross-origin SSR reads.
+    cookieOptions: {
+      sameSite: "lax",
+      secure: env.NODE_ENV === "production",
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },
