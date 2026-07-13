@@ -17,14 +17,30 @@ import {
   BadgeCheck, ChevronsUpDown, LogOut
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-
-const user = {
-  name: 'Bunvel',
-  email: 'admin@bunvel.com',
-  avatar: '/logo.svg',
-}
+import { signOut, useSession } from '@/lib/auth-client'
+import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 
 export function NavUser() {
+  const { data: session } = useSession()
+  const navigate = useNavigate()
+
+  const user = session?.user || {
+    name: 'Loading...',
+    email: '',
+    image: '/logo.svg',
+  }
+
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+      toast.success('Logged out successfully')
+      navigate({ to: '/login' })
+    } catch (err) {
+      toast.error('Failed to log out')
+    }
+  }
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -36,8 +52,8 @@ export function NavUser() {
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground md:h-12 md:px-4"
               >
                 <Avatar className="h-8 w-8 rounded-lg after:rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarImage src={user.image || '/logo.svg'} alt={user.name} />
+                  <AvatarFallback className="rounded-lg">{user.name?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -60,8 +76,8 @@ export function NavUser() {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg after:rounded-lg">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    <AvatarImage src={user.image || '/logo.svg'} alt={user.name} />
+                    <AvatarFallback className="rounded-lg">{user.name?.charAt(0) || 'U'}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{user.name}</span>
@@ -78,7 +94,7 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-500 focus:text-red-500">
               <HugeiconsIcon icon={LogOut} />
               Log out
             </DropdownMenuItem>

@@ -15,7 +15,7 @@ const config = defineConfig({
     viteReact(),
   ],
   optimizeDeps: {
-    include: ['@xyflow/react', 'react', 'react-dom'],
+    include: ['@xyflow/react', 'react', 'react-dom', 'monaco-editor', '@monaco-editor/react'],
   },
 })
 

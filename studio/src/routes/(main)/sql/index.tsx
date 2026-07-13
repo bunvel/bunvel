@@ -1,8 +1,12 @@
-import { SqlEditor } from '@/components/sql/sql-editor'
 import { SqlSidebar } from '@/components/sql/sql-sidebar'
 import { useSqlManager } from '@/hooks/use-sql-manager'
 import { cn } from '@/lib/utils'
 import { createFileRoute } from '@tanstack/react-router'
+import { Suspense, lazy } from 'react'
+
+const SqlEditor = lazy(() => 
+  import('@/components/sql/sql-editor').then((m) => ({ default: m.SqlEditor }))
+)
 
 export const Route = createFileRoute('/(main)/sql/')({
   component: RouteComponent,
@@ -27,7 +31,9 @@ function RouteComponent() {
           showSidebar ? 'w-[80%]' : 'w-full',
         )}
       >
-        <SqlEditor />
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-muted-foreground">Loading SQL Editor...</div>}>
+          <SqlEditor />
+        </Suspense>
       </div>
     </div>
   )

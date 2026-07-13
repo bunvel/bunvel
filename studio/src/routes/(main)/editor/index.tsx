@@ -2,12 +2,15 @@ import { ToggleSidebar } from '@/components/common/toggle-sidebar'
 import { SchemaSelector } from '@/components/database/schema/schema-selector'
 import { TableList } from '@/components/database/tables/table-list'
 import { TableTabs } from '@/components/database/tables/table-tabs'
-import { TableViewer } from '@/components/database/tables/table-viewer'
 import { Separator } from '@/components/ui/separator'
 import { isRestrictedSchema } from '@/lib/restricated-schema'
 import { cn } from '@/lib/utils'
 import { createFileRoute, useSearch } from '@tanstack/react-router'
-import { useState } from 'react'
+import { Suspense, lazy, useState } from 'react'
+
+const TableViewer = lazy(() =>
+  import('@/components/database/tables/table-viewer').then((m) => ({ default: m.TableViewer }))
+)
 
 export const Route = createFileRoute('/(main)/editor/')({
   component: RouteComponent,
@@ -64,7 +67,9 @@ function RouteComponent() {
             />
             <TableTabs />
           </div>
-          <TableViewer />
+          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-muted-foreground">Loading Editor...</div>}>
+            <TableViewer />
+          </Suspense>
         </div>
       </div>
     </div>
