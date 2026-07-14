@@ -1,4 +1,5 @@
 import type { IconSvgElement } from '@hugeicons/react'
+import type { TableKind } from '@/types/database'
 
 export interface TableColumn {
   key: string
@@ -22,4 +23,5 @@ export interface SqlTemplate {
 export interface TableListActionProps {
   schema: string
   table: string
+  kind?: TableKind
 }

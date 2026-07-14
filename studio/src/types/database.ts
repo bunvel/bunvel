@@ -51,6 +51,7 @@ export interface DeleteTableParams {
   schema: string
   table: string
   cascade: boolean
+  kind?: TableKind
 }
 
 export type IndexType = 'btree' | 'hash' | 'gist' | 'spgist' | 'gin' | 'brin'

@@ -16,26 +16,11 @@ import {
 import { HugeiconsIcon } from '@hugeicons/react'
 import type { Table } from '@tanstack/react-table'
 
-interface DataTablePaginationProps<TData> {
-  table: Table<TData>
-  enableRowSelection?: boolean
-}
-
-export function DataTablePagination<TData>({
-  table,
-  enableRowSelection = true,
-}: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData>({ table }: { table: Table<TData> }) {
   return (
     <div className="bg-secondary h-10 flex items-center justify-between px-2">
-      <div className="flex-1 text-sm text-muted-foreground">
-        {enableRowSelection ? (
-          <>
-            {table.getFilteredSelectedRowModel().rows.length} of{' '}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </>
-        ) : (
-          <>{table.getFilteredRowModel().rows.length} row(s) total.</>
-        )}
+      <div className="flex-1 text-sm text-muted-foreground flex items-center gap-2">
+        <span>{table.getRowCount().toLocaleString()} records</span>
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">

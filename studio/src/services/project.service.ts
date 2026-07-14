@@ -25,10 +25,10 @@ export const getDatabaseStats = createServerFn({ method: 'GET' }).handler(
     try {
       const query = `
         SELECT
-          (SELECT count(*)::int FROM information_schema.tables WHERE table_schema = 'public') as tables_count,
-          (SELECT coalesce(sum(n_live_tup)::int, 0) FROM pg_stat_user_tables) as rows_count,
+          (SELECT count(*)::int FROM pg_stat_activity WHERE state = 'active') as active_connections,
+          (SELECT current_setting('server_version')) as pg_version,
           (SELECT pg_database_size(current_database())) as db_size_bytes,
-          (SELECT count(*)::int FROM pg_indexes WHERE schemaname = 'public') as indexes_count
+          (SELECT pg_size_bytes(current_setting('shared_buffers'))) as memory_usage_bytes
       `
       const response = await apiClient.post<Array<Record<string, any>>>(
         '/meta/query',
@@ -36,18 +36,18 @@ export const getDatabaseStats = createServerFn({ method: 'GET' }).handler(
       )
       const data = response.data?.[0]
       return {
-        tablesCount: Number(data?.tables_count ?? 0),
-        rowsCount: Number(data?.rows_count ?? 0),
+        activeConnections: Number(data?.active_connections ?? 0),
+        pgVersion: String(data?.pg_version ?? 'Unknown'),
         dbSizeBytes: Number(data?.db_size_bytes ?? 0),
-        indexesCount: Number(data?.indexes_count ?? 0),
+        memoryUsageBytes: Number(data?.memory_usage_bytes ?? 0),
       }
     } catch (error) {
       logWideEvent('project.stats.error', { error })
       return {
-        tablesCount: 0,
-        rowsCount: 0,
+        activeConnections: 0,
+        pgVersion: 'Unknown',
         dbSizeBytes: 0,
-        indexesCount: 0,
+        memoryUsageBytes: 0,
       }
     }
   },

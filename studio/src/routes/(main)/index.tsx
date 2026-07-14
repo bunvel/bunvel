@@ -10,10 +10,10 @@ import { getDatabaseStats } from '@/services/project.service'
 import {
   ArrowRight,
   Database,
-  ListTodo,
-  Search,
   SqlIcon,
   TableIcon,
+  UserMultipleIcon,
+  RamMemoryIcon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Link, createFileRoute } from '@tanstack/react-router'
@@ -43,45 +43,45 @@ function Dashboard() {
       {/* Database Metrics Section */}
       <div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {/* Total Tables Card */}
+          {/* Active Connections Card */}
           <Card className="relative overflow-hidden transition-all duration-300 hover:ring-2 hover:ring-primary/20 hover:shadow-md">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Tables
+                Active Connections
               </CardTitle>
               <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                <HugeiconsIcon icon={TableIcon} className="size-4" />
+                <HugeiconsIcon icon={UserMultipleIcon} className="size-4" />
               </div>
             </CardHeader>
             <CardContent>
               <div>
                 <div className="text-2xl font-bold">
-                  {stats?.tablesCount ?? 0}
+                  {stats?.activeConnections ?? 0}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  In public schema
+                  Current DB connections
                 </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Total Rows Card */}
+          {/* PostgreSQL Version Card */}
           <Card className="relative overflow-hidden transition-all duration-300 hover:ring-2 hover:ring-primary/20 hover:shadow-md">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Rows
+                PostgreSQL Version
               </CardTitle>
               <div className="p-2 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
-                <HugeiconsIcon icon={ListTodo} className="size-4" />
+                <HugeiconsIcon icon={SqlIcon} className="size-4" />
               </div>
             </CardHeader>
             <CardContent>
               <div>
                 <div className="text-2xl font-bold">
-                  {(stats?.rowsCount ?? 0).toLocaleString()}
+                  {stats?.pgVersion ?? 'Unknown'}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Across all user tables
+                  Database server
                 </p>
               </div>
             </CardContent>
@@ -109,23 +109,23 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Index Count Card */}
+          {/* Memory Usage Card */}
           <Card className="relative overflow-hidden transition-all duration-300 hover:ring-2 hover:ring-primary/20 hover:shadow-md">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Indexes
+                Memory Usage
               </CardTitle>
               <div className="p-2 rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400">
-                <HugeiconsIcon icon={Search} className="size-4" />
+                <HugeiconsIcon icon={RamMemoryIcon} className="size-4" />
               </div>
             </CardHeader>
             <CardContent>
               <div>
                 <div className="text-2xl font-bold">
-                  {stats?.indexesCount ?? 0}
+                  {formatBytes(stats?.memoryUsageBytes ?? 0)}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Active indexing rules
+                  Allocated shared buffers
                 </p>
               </div>
             </CardContent>
@@ -141,67 +141,67 @@ function Dashboard() {
             Common development tools and shortcuts
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-3">
+        <CardContent className="grid gap-4 md:grid-cols-3">
           <Button
             variant="outline"
-            className="w-full justify-between h-auto py-3"
+            className="w-full justify-between h-auto p-4"
             nativeButton={false}
             render={
               <Link to="/editor" search={{ schema: 'public' }}>
-                <span className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                    <HugeiconsIcon icon={TableIcon} className="size-4" />
+                <span className="flex items-center gap-4">
+                  <div className="p-3 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                    <HugeiconsIcon icon={TableIcon} className="size-5" />
                   </div>
                   <div className="text-left">
                     <div className="font-medium">Table Editor</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-muted-foreground mt-0.5">
                       Manage database tables
                     </div>
                   </div>
                 </span>
-                <HugeiconsIcon icon={ArrowRight} className="size-3.5" />
+                <HugeiconsIcon icon={ArrowRight} className="size-4 text-muted-foreground" />
               </Link>
             }
           />
           <Button
             variant="outline"
-            className="w-full justify-between h-auto py-3"
+            className="w-full justify-between h-auto p-4"
             nativeButton={false}
             render={
               <Link to="/sql">
-                <span className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
-                    <HugeiconsIcon icon={SqlIcon} className="size-4" />
+                <span className="flex items-center gap-4">
+                  <div className="p-3 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400">
+                    <HugeiconsIcon icon={SqlIcon} className="size-5" />
                   </div>
                   <div className="text-left">
                     <div className="font-medium">SQL Editor</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-muted-foreground mt-0.5">
                       Execute SQL queries
                     </div>
                   </div>
                 </span>
-                <HugeiconsIcon icon={ArrowRight} className="size-3.5" />
+                <HugeiconsIcon icon={ArrowRight} className="size-4 text-muted-foreground" />
               </Link>
             }
           />
           <Button
             variant="outline"
-            className="w-full justify-between h-auto py-3"
+            className="w-full justify-between h-auto p-4"
             nativeButton={false}
             render={
               <Link to="/database/schemas">
-                <span className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                    <HugeiconsIcon icon={Database} className="size-4" />
+                <span className="flex items-center gap-4">
+                  <div className="p-3 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                    <HugeiconsIcon icon={Database} className="size-5" />
                   </div>
                   <div className="text-left">
                     <div className="font-medium">Schema Diagram</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-muted-foreground mt-0.5">
                       Visual database schema
                     </div>
                   </div>
                 </span>
-                <HugeiconsIcon icon={ArrowRight} className="size-3.5" />
+                <HugeiconsIcon icon={ArrowRight} className="size-4 text-muted-foreground" />
               </Link>
             }
           />

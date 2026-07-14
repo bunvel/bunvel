@@ -136,9 +136,10 @@ export const deleteTable = createServerFn({ method: 'POST' })
   })
   .handler(async ({ data }) => {
     try {
-      const { schema, table, cascade } = data
+      const { schema, table, cascade, kind } = data
       const cascadeClause = cascade ? ' CASCADE' : ''
-      const query = `DROP TABLE IF EXISTS "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}"${cascadeClause}`
+      const dropType = kind === 'VIEW' ? 'VIEW' : kind === 'MATERIALIZED VIEW' ? 'MATERIALIZED VIEW' : 'TABLE'
+      const query = `DROP ${dropType} IF EXISTS "${escapeIdentifier(schema)}"."${escapeIdentifier(table)}"${cascadeClause}`
 
       await apiClient.post(
         '/meta/query?key=' + QUERY_OPERATION_KEYS.DELETE_TABLE,

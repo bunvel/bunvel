@@ -167,7 +167,7 @@ export function TableList() {
                       <TableKindIcon kind={table.kind} />
                       {table.name}
                     </SidebarMenuButton>
-                    <TableListAction schema={schema} table={table.name} />
+                    <TableListAction schema={schema} table={table.name} kind={table.kind} />
                   </SidebarMenuItem>
                 )
               })}

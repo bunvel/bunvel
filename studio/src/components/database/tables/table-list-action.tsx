@@ -18,7 +18,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-export function TableListAction({ schema, table }: TableListActionProps) {
+export function TableListAction({ schema, table, kind }: TableListActionProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isTruncateDialogOpen, setIsTruncateDialogOpen] = useState(false)
   const { mutateAsync: deleteTableAsync, isPending: isDeleting } =
@@ -35,6 +35,7 @@ export function TableListAction({ schema, table }: TableListActionProps) {
         schema,
         table,
         cascade,
+        kind,
       })
       if (search.table === table) {
         navigate({ search: { schema: search.schema } as any })
@@ -85,19 +86,21 @@ export function TableListAction({ schema, table }: TableListActionProps) {
           {!isRestricted && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setIsTruncateDialogOpen(true)}>
-                <HugeiconsIcon
-                  icon={Trash2}
-                  className="text-muted-foreground"
-                />
-                <span>Truncate Table</span>
-              </DropdownMenuItem>
+              {kind === 'TABLE' && (
+                <DropdownMenuItem onClick={() => setIsTruncateDialogOpen(true)}>
+                  <HugeiconsIcon
+                    icon={Trash2}
+                    className="text-muted-foreground"
+                  />
+                  <span>Truncate Table</span>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 onClick={() => setIsDeleteDialogOpen(true)}
                 className="text-destructive focus:text-destructive"
               >
                 <HugeiconsIcon icon={Trash2} className="text-destructive" />
-                <span>Delete Table</span>
+                <span>Delete {kind === 'VIEW' || kind === 'MATERIALIZED VIEW' ? 'View' : 'Table'}</span>
               </DropdownMenuItem>
             </>
           )}
@@ -108,9 +111,9 @@ export function TableListAction({ schema, table }: TableListActionProps) {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDelete}
-        title="Delete Table"
+        title={`Delete ${kind === 'VIEW' || kind === 'MATERIALIZED VIEW' ? 'View' : 'Table'}`}
         description={`Are you sure you want to delete ${schema}.${table}? This action cannot be undone.`}
-        confirmText={isDeleting ? 'Deleting...' : 'Delete Table'}
+        confirmText={isDeleting ? 'Deleting...' : `Delete ${kind === 'VIEW' || kind === 'MATERIALIZED VIEW' ? 'View' : 'Table'}`}
         isLoading={isDeleting}
         showCascadeOption
       />

@@ -38,6 +38,7 @@ interface DataTableProps<TData, TValue = unknown> {
   }) => void
   onSortingChange?: (sorting: SortingState) => void
   pageCount: number
+  totalCount?: number
   state: {
     pagination: { pageIndex: number; pageSize: number }
     sorting?: SortingState
@@ -62,6 +63,7 @@ export function DataTable<TData, TValue = unknown>({
   onPaginationChange,
   onSortingChange,
   pageCount,
+  totalCount,
   state,
   manualPagination = true,
   manualSorting = true,
@@ -173,6 +175,7 @@ export function DataTable<TData, TValue = unknown>({
     manualSorting,
     manualFiltering,
     pageCount,
+    rowCount: totalCount,
     onPaginationChange: (updater) => {
       const newPagination =
         typeof updater === 'function' ? updater(state.pagination) : updater
@@ -267,7 +270,6 @@ export function DataTable<TData, TValue = unknown>({
         <div className="border-t bg-background">
           <DataTablePagination
             table={table}
-            enableRowSelection={enableRowSelection}
           />
         </div>
       </div>

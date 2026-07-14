@@ -148,6 +148,7 @@ export function TableViewer() {
           onPaginationChange={handlePaginationChange}
           onSortingChange={handleSortingChange}
           pageCount={tableData?.totalPages || 0}
+          totalCount={tableData?.total || 0}
           state={{
             pagination,
             rowSelection,

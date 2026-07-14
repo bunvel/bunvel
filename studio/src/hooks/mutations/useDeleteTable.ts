@@ -5,20 +5,23 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTableManager } from '../use-table-manager'
 
+import type { DeleteTableParams } from '@/types/database'
+
 export function useDeleteTable() {
   const { removeTableBySchema } = useTableManager()
 
   return useMutation({
-    mutationFn: (params: { schema: string; table: string; cascade: boolean }) =>
+    mutationFn: (params: DeleteTableParams) =>
       deleteTable({ data: params }),
-    onSuccess: (_, { schema, table }) => {
+    onSuccess: (_, { schema, table, kind }) => {
       queryClient.invalidateQueries({
         queryKey: reactQueryKeys.tables.list(schema),
       })
 
       removeTableBySchema(schema, table)
 
-      toast.success('Table deleted successfully')
+      const kindName = kind === 'VIEW' ? 'View' : kind === 'MATERIALIZED VIEW' ? 'Materialized view' : 'Table'
+      toast.success(`${kindName} deleted successfully`)
     },
     onError: (error: unknown) => {
       const message =

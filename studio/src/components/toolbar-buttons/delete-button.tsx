@@ -1,8 +1,8 @@
 import { ConfirmRowDeleteDialog } from '@/components/common/confirm-row-delete-dialog'
 import { Button } from '@/components/ui/button'
+import { BUTTON_LABELS } from '@/constants/ui'
 import { useDeleteRows } from '@/hooks/mutations/useTableMutations'
 import { useTableManager } from '@/hooks/use-table-manager'
-import { BUTTON_LABELS } from '@/constants/ui'
 import { isReadonlySchema } from '@/utils/func'
 import { Trash } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -35,7 +35,6 @@ export function DeleteButton() {
       },
       {
         onSuccess: () => {
-          toast.success('Rows deleted successfully')
           handleSelectionClear()
           setShowConfirmDialog(false)
         },
