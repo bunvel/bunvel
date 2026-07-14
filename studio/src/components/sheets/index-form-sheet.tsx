@@ -50,6 +50,78 @@ type FormValues = {
   indexType: IndexType
 }
 
+function SchemaSelector({
+  value,
+  schemas,
+  onChange,
+}: {
+  value: string
+  schemas: Array<Schema>
+  onChange: (value: string | null) => void
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium">Schema</label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger className="w-full h-9">
+          <SelectValue placeholder="Select a schema" />
+        </SelectTrigger>
+        <SelectContent>
+          {schemas.map((schema: Schema) => (
+            <SelectItem key={schema.schema_name} value={schema.schema_name}>
+              {schema.schema_name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  )
+}
+
+function TableSelector({
+  value,
+  tables,
+  isLoading,
+  disabled,
+  onChange,
+}: {
+  value: string
+  tables: Array<{ name: string }>
+  isLoading: boolean
+  disabled: boolean
+  onChange: (value: string | null) => void
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium">Table</label>
+      <Select value={value} onValueChange={onChange} disabled={disabled}>
+        <SelectTrigger className="w-full h-9">
+          <SelectValue
+            placeholder={disabled ? 'Select schema first' : 'Select a table'}
+          />
+        </SelectTrigger>
+        <SelectContent>
+          {isLoading ? (
+            <div className="p-2 text-sm text-muted-foreground">
+              Loading tables...
+            </div>
+          ) : tables.length === 0 ? (
+            <div className="p-2 text-sm text-muted-foreground">
+              No tables found
+            </div>
+          ) : (
+            tables.map((table) => (
+              <SelectItem key={table.name} value={table.name}>
+                {table.name}
+              </SelectItem>
+            ))
+          )}
+        </SelectContent>
+      </Select>
+    </div>
+  )
+}
+
 export function IndexFormSheet({ children }: IndexFormSheetProps) {
   const [open, setOpen] = useState(false)
   const { mutate: createIndex, isPending: isSubmitting } = useCreateIndex()
@@ -142,67 +214,27 @@ export function IndexFormSheet({ children }: IndexFormSheetProps) {
           <div className="flex-1 overflow-auto">
             <div className="p-6 space-y-6">
               {/* Schema Selector */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Schema</label>
-                <Select
-                  value={formData.schema}
-                  onValueChange={(value) => {
+              <SchemaSelector
+                value={formData.schema}
+                schemas={schemasResult.data}
+                onChange={(value) => {
+                  if (value) {
                     handleInputChange('schema', value)
                     handleInputChange('table', '') // Reset table when schema changes
-                  }}
-                >
-                  <SelectTrigger className="w-full h-9">
-                    <SelectValue placeholder="Select a schema" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {schemasResult.data.map((schema: Schema) => (
-                      <SelectItem
-                        key={schema.schema_name}
-                        value={schema.schema_name}
-                      >
-                        {schema.schema_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                  }
+                }}
+              />
 
               {/* Table Selector */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Table</label>
-                <Select
-                  value={formData.table}
-                  onValueChange={(value) => handleInputChange('table', value)}
-                  disabled={!formData.schema || isLoadingTables}
-                >
-                  <SelectTrigger className="w-full h-9">
-                    <SelectValue
-                      placeholder={
-                        formData.schema
-                          ? 'Select a table'
-                          : 'Select schema first'
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {isLoadingTables ? (
-                      <div className="p-2 text-sm text-muted-foreground">
-                        Loading tables...
-                      </div>
-                    ) : tables.length === 0 ? (
-                      <div className="p-2 text-sm text-muted-foreground">
-                        No tables found
-                      </div>
-                    ) : (
-                      tables.map((table) => (
-                        <SelectItem key={table.name} value={table.name}>
-                          {table.name}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
+              <TableSelector
+                value={formData.table}
+                tables={tables}
+                isLoading={isLoadingTables}
+                disabled={!formData.schema}
+                onChange={(value) => {
+                  if (value) handleInputChange('table', value)
+                }}
+              />
 
               {/* Multi-select Columns */}
               {formData.table && (

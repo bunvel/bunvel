@@ -69,6 +69,118 @@ function getFilterTypeForDataType(
   return 'TEXT'
 }
 
+function FilterRow({
+  filter,
+  columns,
+  onUpdateFilter,
+  onValueChange,
+}: {
+  filter: FilterConfig
+  columns: Array<TableColumnMetadata>
+  onUpdateFilter: (id: string, updates: Partial<FilterConfig>) => void
+  onValueChange: (id: string, value: string) => void
+}) {
+  const selectedCol = columns.find(
+    (col: TableColumnMetadata) => col.column_name === filter.column,
+  )
+  const filterType = selectedCol
+    ? getFilterTypeForDataType(selectedCol.data_type)
+    : 'TEXT'
+  const allowedOperators = FilterOperatorTypes[filterType]
+
+  return (
+    <div className="flex items-center gap-2 w-full">
+      <div className="flex-1 grid grid-cols-3 gap-2">
+        <Select
+          value={filter.column}
+          onValueChange={(value: string | null) => {
+            if (value !== null) {
+              const newCol = columns.find(
+                (col: TableColumnMetadata) => col.column_name === value,
+              )
+              const newFilterType = newCol
+                ? getFilterTypeForDataType(newCol.data_type)
+                : 'TEXT'
+              const newAllowedOps = FilterOperatorTypes[newFilterType]
+              const isOpValid = newAllowedOps.includes(filter.operator as any)
+              const defaultOp = newAllowedOps[0] || '='
+
+              onUpdateFilter(filter.id, {
+                column: value,
+                operator: isOpValid ? filter.operator : (defaultOp as any),
+                value:
+                  (isOpValid ? filter.operator : defaultOp) === 'IS NULL' ||
+                  (isOpValid ? filter.operator : defaultOp) === 'IS NOT NULL'
+                    ? null
+                    : filter.value,
+              })
+            }
+          }}
+        >
+          <SelectTrigger className="h-8 w-full">
+            <SelectValue title="Column" />
+          </SelectTrigger>
+          <SelectContent>
+            {columns.map((col: TableColumnMetadata) => (
+              <SelectItem key={col.column_name} value={col.column_name}>
+                {col.column_name}
+              </SelectItem>
+            ))}
+            {columns.length === 0 && (
+              <div className="text-sm text-muted-foreground px-2 py-1.5">
+                No columns available
+              </div>
+            )}
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={filter.operator}
+          onValueChange={(value: FilterOperator | null) => {
+            if (value !== null) {
+              onUpdateFilter(filter.id, {
+                operator: value,
+                value:
+                  value === 'IS NULL' || value === 'IS NOT NULL'
+                    ? null
+                    : filter.value,
+              })
+            } else {
+              onUpdateFilter(filter.id, {
+                operator: '=',
+              })
+            }
+          }}
+        >
+          <SelectTrigger className="h-8 w-full">
+            <SelectValue title="Operator" />
+          </SelectTrigger>
+          <SelectContent>
+            {allowedOperators.map((op) => {
+              const label = FilterOperatorLabels[op]
+              return (
+                <SelectItem key={op} value={op}>
+                  {String(label)}
+                </SelectItem>
+              )
+            })}
+          </SelectContent>
+        </Select>
+
+        {filter.operator !== 'IS NULL' && filter.operator !== 'IS NOT NULL' && (
+          <Input
+            type="text"
+            value={filter.value?.toString() ?? ''}
+            onChange={(e) => onValueChange(filter.id, e.target.value)}
+            onKeyDown={(e) => e.stopPropagation()}
+            placeholder="Value"
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
 interface FilterButtonProps {
   schema?: string
   table?: string
@@ -152,6 +264,12 @@ export function FilterButton({
     )
   }
 
+  const handleFilterValueChange = (id: string, value: string) => {
+    setPendingFilters((prev) =>
+      prev.map((f) => (f.id === id ? { ...f, value } : f)),
+    )
+  }
+
   const handleApplyFilters = () => {
     const validFilters = pendingFilters.filter(isFilterValid)
 
@@ -230,139 +348,12 @@ export function FilterButton({
                     id={filter.id}
                     onRemove={() => handleRemoveFilter(filter.id)}
                   >
-                    <div className="flex items-center gap-2 w-full">
-                      <div className="flex-1 grid grid-cols-3 gap-2">
-                        {(() => {
-                          const selectedCol = columns.find(
-                            (col: TableColumnMetadata) =>
-                              col.column_name === filter.column,
-                          )
-                          const filterType = selectedCol
-                            ? getFilterTypeForDataType(selectedCol.data_type)
-                            : 'TEXT'
-                          const allowedOperators =
-                            FilterOperatorTypes[filterType]
-
-                          return (
-                            <>
-                              <Select
-                                value={filter.column}
-                                onValueChange={(value: string | null) => {
-                                  if (value !== null) {
-                                    const newCol = columns.find(
-                                      (col: TableColumnMetadata) =>
-                                        col.column_name === value,
-                                    )
-                                    const newFilterType = newCol
-                                      ? getFilterTypeForDataType(
-                                          newCol.data_type,
-                                        )
-                                      : 'TEXT'
-                                    const newAllowedOps =
-                                      FilterOperatorTypes[newFilterType]
-                                    const isOpValid = newAllowedOps.includes(
-                                      filter.operator as any,
-                                    )
-                                    const defaultOp = newAllowedOps[0] || '='
-
-                                    handleUpdateFilter(filter.id, {
-                                      column: value,
-                                      operator: isOpValid
-                                        ? filter.operator
-                                        : (defaultOp as any),
-                                      value:
-                                        (isOpValid
-                                          ? filter.operator
-                                          : defaultOp) === 'IS NULL' ||
-                                        (isOpValid
-                                          ? filter.operator
-                                          : defaultOp) === 'IS NOT NULL'
-                                          ? null
-                                          : filter.value,
-                                    })
-                                  }
-                                }}
-                              >
-                                <SelectTrigger className="h-8 w-full">
-                                  <SelectValue title="Column" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {availableColumns.map(
-                                    (col: TableColumnMetadata) => (
-                                      <SelectItem
-                                        key={col.column_name}
-                                        value={col.column_name}
-                                      >
-                                        {col.column_name}
-                                      </SelectItem>
-                                    ),
-                                  )}
-                                  {availableColumns.length === 0 && (
-                                    <div className="text-sm text-muted-foreground px-2 py-1.5">
-                                      No columns available
-                                    </div>
-                                  )}
-                                </SelectContent>
-                              </Select>
-
-                              <Select
-                                value={filter.operator}
-                                onValueChange={(
-                                  value: FilterOperator | null,
-                                ) => {
-                                  if (value !== null) {
-                                    handleUpdateFilter(filter.id, {
-                                      operator: value,
-                                      value:
-                                        value === 'IS NULL' ||
-                                        value === 'IS NOT NULL'
-                                          ? null
-                                          : filter.value,
-                                    })
-                                  } else {
-                                    handleUpdateFilter(filter.id, {
-                                      operator: '=',
-                                    })
-                                  }
-                                }}
-                              >
-                                <SelectTrigger className="h-8 w-full">
-                                  <SelectValue title="Operator" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {allowedOperators.map((op) => {
-                                    const label = FilterOperatorLabels[op]
-                                    return (
-                                      <SelectItem key={op} value={op}>
-                                        {String(label)}
-                                      </SelectItem>
-                                    )
-                                  })}
-                                </SelectContent>
-                              </Select>
-                            </>
-                          )
-                        })()}
-
-                        {filter.operator !== 'IS NULL' &&
-                          filter.operator !== 'IS NOT NULL' && (
-                            <Input
-                              type="text"
-                              value={filter.value?.toString() ?? ''}
-                              onChange={(e) => {
-                                const value = e.target.value
-                                setPendingFilters((prev) =>
-                                  prev.map((f) =>
-                                    f.id === filter.id ? { ...f, value } : f,
-                                  ),
-                                )
-                              }}
-                              onKeyDown={(e) => e.stopPropagation()}
-                              placeholder="Value"
-                            />
-                          )}
-                      </div>
-                    </div>
+                    <FilterRow
+                      filter={filter}
+                      columns={availableColumns}
+                      onUpdateFilter={handleUpdateFilter}
+                      onValueChange={handleFilterValueChange}
+                    />
                   </SortableItem>
                 ))}
               </SortableContext>

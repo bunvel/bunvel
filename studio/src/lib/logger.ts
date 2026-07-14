@@ -26,19 +26,6 @@ export const logger = pino({
     : undefined,
 })
 
-// Specialized loggers for different contexts
-export const appLogger = logger.child({
-  service: 'bunvel-studio',
-  component: 'app',
-})
-export const apiLogger = logger.child({
-  service: 'bunvel-studio',
-  component: 'api',
-})
-export const uiLogger = logger.child({
-  service: 'bunvel-studio',
-  component: 'ui',
-})
 
 // Utility for creating context-specific loggers
 export const createLogger = (context: string) =>

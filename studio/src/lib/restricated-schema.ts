@@ -11,7 +11,7 @@ export function isRestrictedSchema(schema?: string): boolean {
 /**
  * Check if a query is a mutation operation
  */
-export function isMutationQuery(query: string): boolean {
+function isMutationQuery(query: string): boolean {
   const upperQuery = query.toUpperCase()
   return MUTATION_KEYWORDS.some((keyword) =>
     upperQuery.includes(keyword),
@@ -22,7 +22,7 @@ export function isMutationQuery(query: string): boolean {
  * Check if a query targets a restricted schema
  * Matches patterns like auth.table, storage.table, AUTH.TABLE, STORAGE.TABLE, etc.
  */
-export function targetsRestrictedSchema(query: string): boolean {
+function targetsRestrictedSchema(query: string): boolean {
   const upperQuery = query.toUpperCase()
   // Check for any restricted schema.table pattern
   const restrictedSchemaPattern = new RegExp(
