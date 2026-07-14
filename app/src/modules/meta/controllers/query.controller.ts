@@ -8,10 +8,12 @@ import {
   MAX_QUERY_LENGTH,
 } from "../../../config/constants";
 import { QueryService } from "../services/query.service";
+import { auth } from "../../auth";
+import { ForbiddenException } from "elysia-http-exception";
 
 export const queryRoutes = new Elysia({ prefix: "/query" }).post(
   "/",
-  async ({ body }) => {
+  async ({ request, body }) => {
     // Validate query
     if (!body.query || body.query.length > MAX_QUERY_LENGTH) {
       throw new BadRequestException({
@@ -39,7 +41,15 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
     }
 
     try {
-      const result = await QueryService.execute(query, body.params);
+      const session = await auth.api.getSession({
+        headers: request.headers,
+      });
+
+      if (!session) {
+        throw new ForbiddenException({ error: "No session found" });
+      }
+
+      const result = await QueryService.execute(query, session.user.id, body.params);
       return result;
     } catch (error) {
       const message =

@@ -2,6 +2,8 @@ import { db } from "../../../core/database";
 
 import type { ColumnInfo, ForeignKeyInfo, TableInfo, SchemaCache } from "../types/rest.types";
 
+const RESTRICTED_SCHEMAS = "'pg_catalog','information_schema','pg_toast','auth','drizzle'";
+
 export abstract class SchemaService {
   private static cache: SchemaCache | null = null;
   private static readonly CACHE_TTL_MS = 60_000;
@@ -22,7 +24,7 @@ export abstract class SchemaService {
   >(`
     SELECT table_schema, table_name, table_type
     FROM information_schema.tables
-    WHERE table_schema NOT IN ('pg_catalog','information_schema','pg_toast','auth','drizzle')
+    WHERE table_schema NOT IN (${RESTRICTED_SCHEMAS})
       AND table_type IN ('BASE TABLE','VIEW')
     ORDER BY table_schema, table_name
   `);
@@ -33,7 +35,7 @@ export abstract class SchemaService {
   >(`
     SELECT schemaname, matviewname
     FROM pg_matviews
-    WHERE schemaname NOT IN ('pg_catalog','information_schema','pg_toast','auth','drizzle')
+    WHERE schemaname NOT IN (${RESTRICTED_SCHEMAS})
     ORDER BY schemaname, matviewname
   `);
 
@@ -60,7 +62,7 @@ export abstract class SchemaService {
       c.column_default,
       c.character_maximum_length
     FROM information_schema.columns c
-    WHERE c.table_schema NOT IN ('pg_catalog','information_schema','pg_toast','auth','drizzle')
+    WHERE c.table_schema NOT IN (${RESTRICTED_SCHEMAS})
     ORDER BY c.table_schema, c.table_name, c.ordinal_position
   `);
 
@@ -89,7 +91,7 @@ export abstract class SchemaService {
     WHERE c.relkind = 'm'
       AND a.attnum > 0
       AND NOT a.attisdropped
-      AND n.nspname NOT IN ('pg_catalog','information_schema','pg_toast','auth','drizzle')
+      AND n.nspname NOT IN (${RESTRICTED_SCHEMAS})
     ORDER BY n.nspname, c.relname, a.attnum
   `);
 
@@ -106,7 +108,7 @@ export abstract class SchemaService {
       ON tc.constraint_name = kcu.constraint_name
       AND tc.table_schema   = kcu.table_schema
     WHERE tc.constraint_type = 'PRIMARY KEY'
-      AND tc.table_schema NOT IN ('pg_catalog','information_schema','pg_toast','auth','drizzle')
+      AND tc.table_schema NOT IN (${RESTRICTED_SCHEMAS})
   `);
 
   // Build a fast lookup set for PKs: "schema.table.column"
@@ -144,7 +146,7 @@ export abstract class SchemaService {
       ON ccu.constraint_name = tc.constraint_name
       AND ccu.table_schema = tc.table_schema
     WHERE tc.constraint_type = 'FOREIGN KEY'
-      AND tc.table_schema NOT IN ('pg_catalog','information_schema','pg_toast','auth','drizzle')
+      AND tc.table_schema NOT IN (${RESTRICTED_SCHEMAS})
   `);
 
   const fkByTable = new Map<string, ForeignKeyInfo[]>();
