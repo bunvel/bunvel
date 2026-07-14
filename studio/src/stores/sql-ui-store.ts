@@ -1,4 +1,4 @@
-import type { QueryHistoryItem } from '@/types/history'
+import type { QueryHistoryItem } from '@/types/components'
 import { createStore } from './create-store'
 import { createPersistence } from './persistence'
 

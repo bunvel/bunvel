@@ -1,6 +1,6 @@
 import { sqlTabsActions, useSqlTabsStore } from '@/stores/sql-tabs-store'
 import { sqlUiActions, useSqlUiStore } from '@/stores/sql-ui-store'
-import type { QueryHistoryItem } from '@/types/history'
+import type { QueryHistoryItem } from '@/types/components'
 import type { SqlTab } from '@/types/tabs'
 import { useEffect } from 'react'
 
