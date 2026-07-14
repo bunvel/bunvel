@@ -21,8 +21,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGREST_URL=http://rest:8001
-      - VITE_BUNVEL_STUDIO_URL=http://${DOMAIN}:3000
+      - VITE_BUNVEL_STUDIO_URL=${VITE_BUNVEL_STUDIO_URL}
       - DEFAULT_ORGANIZATION=${DEFAULT_ORGANIZATION}
       - DEFAULT_PROJECT=${DEFAULT_PROJECT}
       - LOG_LEVEL=${LOG_LEVEL}
@@ -65,23 +64,6 @@ services:
       timeout: 5s
       retries: 30
       start_period: 5s
-    networks:
-      - bunvel-network
-
-  rest:
-    container_name: bunvel-rest
-    image: postgrest/postgrest:v14.14
-    restart: unless-stopped
-    ports:
-      - "8001:8001"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      PGRST_DB_URI: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
-      PGRST_DB_SCHEMA: public
-      PGRST_DB_ANON_ROLE: ${POSTGRES_USER}
-      PGRST_SERVER_PORT: 8001
     networks:
       - bunvel-network
 

@@ -15,9 +15,6 @@ const envSchema = z.object({
   // Database
   DATABASE_URL: z.string().url("Invalid DATABASE_URL format"),
 
-  // PostgREST
-  POSTGREST_URL: z.string().url("Invalid PostgREST URL format").default("http://rest:8001"),
-
   // Frontend
   VITE_BUNVEL_STUDIO_URL: z.string().url("Invalid VITE_BUNVEL_STUDIO_URL format").optional(),
   VITE_API_URL: z.string().url("Invalid VITE_API_URL format").optional(),
