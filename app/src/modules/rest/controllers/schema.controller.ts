@@ -8,7 +8,7 @@
 
 import Elysia, { t } from "elysia";
 import { NotFoundException } from "elysia-http-exception";
-import { getSchema, invalidateSchemaCache } from "../schema";
+import { SchemaService } from "../services/schema.service";
 
 export const schemaRoutes = new Elysia()
 
@@ -18,7 +18,7 @@ export const schemaRoutes = new Elysia()
   .get(
     "/",
     async () => {
-      const { tables, fetchedAt } = await getSchema();
+      const { tables, fetchedAt } = await SchemaService.get();
       const relations = [...tables.values()].map((t) => ({
         name: t.name,
         schema: t.schema,
@@ -68,8 +68,8 @@ export const schemaRoutes = new Elysia()
   .post(
     "/_schema/refresh",
     async () => {
-      invalidateSchemaCache();
-      const { tables, fetchedAt } = await getSchema(true);
+      SchemaService.invalidate();
+      const { tables, fetchedAt } = await SchemaService.get(true);
       return {
         message: "Schema cache refreshed",
         relations: tables.size,
@@ -97,7 +97,7 @@ export const schemaRoutes = new Elysia()
   .get(
     "/:table/columns",
     async ({ params }) => {
-      const { tables } = await getSchema();
+      const { tables } = await SchemaService.get();
       const table = tables.get(params.table);
       if (!table) throw new NotFoundException(`Relation "${params.table}" does not exist`);
 

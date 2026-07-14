@@ -33,9 +33,9 @@
  */
 
 import Elysia from "elysia";
-import { rowRoutes } from "./src/routes/row.routes";
-import { schemaRoutes } from "./src/routes/schema.routes";
-import { tableRoutes } from "./src/routes/table.routes";
+import { rowRoutes } from "./controllers/row.controller";
+import { schemaRoutes } from "./controllers/schema.controller";
+import { tableRoutes } from "./controllers/table.controller";
 
 export const restService = new Elysia({
   name: "Rest Service",

@@ -17,21 +17,17 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from "elysia-http-exception";
-import { db } from "../../../../core/database";
-import { getSchema } from "../schema";
-import {
-  buildDeleteByPk,
-  buildSelectByPk,
-  buildUpdateByPk,
-  parseQueryParams,
-} from "../query-builder";
+import { db } from "../../../core/database";
+import { SchemaService } from "../services/schema.service";
+import { QueryBuilderService } from "../services/query-builder.service";
+import { QueryParserService } from "../services/query-parser.service";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 async function resolveTable(name: string) {
-  const schema = await getSchema();
+  const schema = await SchemaService.get();
   const table = schema.tables.get(name);
   if (!table) throw new NotFoundException(`Relation "${name}" does not exist`);
   return table;
@@ -87,7 +83,7 @@ export const rowRoutes = new Elysia({ prefix: "/:table/:id" })
   .get(
     "/",
     async ({ params, request }) => {
-      const schema = await getSchema();
+      const schema = await SchemaService.get();
       const table = schema.tables.get(params.table);
       if (!table) throw new NotFoundException(`Relation "${params.table}" does not exist`);
       const pkValues = parsePkSegment(table, params.id);
@@ -95,7 +91,7 @@ export const rowRoutes = new Elysia({ prefix: "/:table/:id" })
       const urlParams = new URL(request.url).searchParams;
       let parsed;
       try {
-        parsed = parseQueryParams(urlParams, table);
+        parsed = QueryParserService.parseQueryParams(urlParams, table);
       } catch (err) {
         throw new BadRequestException({
           error: "Invalid query parameters",
@@ -103,7 +99,7 @@ export const rowRoutes = new Elysia({ prefix: "/:table/:id" })
         });
       }
 
-      const built = buildSelectByPk(table, pkValues, parsed, schema);
+      const built = QueryBuilderService.buildSelectByPk(table, pkValues, parsed, schema);
       if (!built) {
         throw new BadRequestException({
           error: `"${table.name}" has no primary key — use collection endpoint`,
@@ -162,7 +158,7 @@ export const rowRoutes = new Elysia({ prefix: "/:table/:id" })
       const pkValues = parsePkSegment(table, params.id);
 
       try {
-        const { sql, params: p } = buildUpdateByPk(
+        const { sql, params: p } = QueryBuilderService.buildUpdateByPk(
           table,
           pkValues,
           body as Record<string, unknown>,
@@ -219,7 +215,7 @@ export const rowRoutes = new Elysia({ prefix: "/:table/:id" })
       const pkValues = parsePkSegment(table, params.id);
 
       try {
-        const { sql, params: p } = buildUpdateByPk(
+        const { sql, params: p } = QueryBuilderService.buildUpdateByPk(
           table,
           pkValues,
           body as Record<string, unknown>,
@@ -272,7 +268,7 @@ export const rowRoutes = new Elysia({ prefix: "/:table/:id" })
       const pkValues = parsePkSegment(table, params.id);
 
       try {
-        const { sql, params: p } = buildDeleteByPk(table, pkValues);
+        const { sql, params: p } = QueryBuilderService.buildDeleteByPk(table, pkValues);
         const rows = await run(sql, p);
         if (rows.length === 0) throw new NotFoundException(`Row not found in "${table.name}"`);
         set.status = 200;

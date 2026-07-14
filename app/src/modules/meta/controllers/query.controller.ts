@@ -3,16 +3,15 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from "elysia-http-exception";
-import { db } from "../../../../core/database";
 import {
   MAX_PARAMS_LENGTH,
   MAX_QUERY_LENGTH,
-} from "../../../../config/constants";
-import { queryLogger } from "../../../../core/logger";
+} from "../../../config/constants";
+import { QueryService } from "../services/query.service";
 
 export const queryRoutes = new Elysia({ prefix: "/query" }).post(
   "/",
-  async ({ body, set }) => {
+  async ({ body }) => {
     // Validate query
     if (!body.query || body.query.length > MAX_QUERY_LENGTH) {
       throw new BadRequestException({
@@ -40,25 +39,13 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
     }
 
     try {
-      // Execute query with or without parameters
-      const result = await db.begin(async (tx) =>
-        body.params ? await tx.unsafe(query, body.params) : await tx.unsafe(query),
-      );
-
+      const result = await QueryService.execute(query, body.params);
       return result;
     } catch (error) {
       const message =
         error instanceof Error
           ? `Query execution failed: ${error.message}`
           : "An unexpected error occurred while executing the query";
-
-      queryLogger.error({
-        event: "sql.query.failed",
-        query: query,
-        params: body.params,
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-      });
 
       throw new InternalServerErrorException({
         error: "Query execution failed",
@@ -88,5 +75,5 @@ export const queryRoutes = new Elysia({ prefix: "/query" }).post(
         message: t.Optional(t.Union([t.String(), t.Any()])),
       }),
     ]),
-  },
+  }
 );

@@ -1,19 +1,10 @@
 import Elysia, { t } from "elysia";
-import { env } from "../../../../config/env";
+import { ProjectService } from "../services/project.service";
 
 export const projectRoutes = new Elysia({ prefix: "/project" }).get(
   "/",
   async () => {
-    const defaultProject = {
-      id: Bun.randomUUIDv7(),
-      name: env.DEFAULT_PROJECT,
-      organization: {
-        id: Bun.randomUUIDv7(),
-        name: env.DEFAULT_ORGANIZATION,
-      },
-    };
-
-    return defaultProject;
+    return ProjectService.getDefaultProject();
   },
   {
     response: t.Object({
@@ -24,5 +15,5 @@ export const projectRoutes = new Elysia({ prefix: "/project" }).get(
         name: t.String(),
       }),
     }),
-  },
+  }
 );

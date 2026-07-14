@@ -13,24 +13,17 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from "elysia-http-exception";
-import { db } from "../../../../core/database";
-import { getSchema } from "../schema";
-import {
-  buildBulkInsert,
-  buildCount,
-  buildDeleteByFilter,
-  buildInsert,
-  buildSelect,
-  buildUpdateByFilter,
-  parseQueryParams,
-} from "../query-builder";
+import { db } from "../../../core/database";
+import { SchemaService } from "../services/schema.service";
+import { QueryBuilderService } from "../services/query-builder.service";
+import { QueryParserService } from "../services/query-parser.service";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 async function resolveTable(name: string) {
-  const schema = await getSchema();
+  const schema = await SchemaService.get();
   const table = schema.tables.get(name);
   if (!table) {
     throw new NotFoundException(`Relation "${name}" does not exist`);
@@ -64,7 +57,7 @@ export const tableRoutes = new Elysia({ prefix: "/:table" })
   .get(
     "/",
     async ({ params, query, request, set }) => {
-      const schema = await getSchema();
+      const schema = await SchemaService.get();
       const table = schema.tables.get(params.table);
       if (!table) {
         throw new NotFoundException(`Relation "${params.table}" does not exist`);
@@ -73,7 +66,7 @@ export const tableRoutes = new Elysia({ prefix: "/:table" })
 
       let parsed;
       try {
-        parsed = parseQueryParams(urlParams, table);
+        parsed = QueryParserService.parseQueryParams(urlParams, table);
       } catch (err) {
         throw new BadRequestException({
           error: "Invalid query parameters",
@@ -82,10 +75,10 @@ export const tableRoutes = new Elysia({ prefix: "/:table" })
       }
 
       try {
-        const { sql, params: sqlParams } = buildSelect(table, parsed, schema);
+        const { sql, params: sqlParams } = QueryBuilderService.buildSelect(table, parsed, schema);
 
         // Return Content-Range header (like PostgREST)
-        const { sql: countSql, params: countParams } = buildCount(table, parsed);
+        const { sql: countSql, params: countParams } = QueryBuilderService.buildCount(table, parsed);
         const [countRow] = await run<{ count: string }>(countSql, countParams);
         const total = parseInt(countRow?.count ?? "0", 10);
 
@@ -148,12 +141,12 @@ export const tableRoutes = new Elysia({ prefix: "/:table" })
 
         if (Array.isArray(body)) {
           if (body.length === 0) throw new BadRequestException({ error: "Body array is empty" });
-          const { sql, params: p } = buildBulkInsert(table, body as Record<string, unknown>[]);
+          const { sql, params: p } = QueryBuilderService.buildBulkInsert(table, body as Record<string, unknown>[]);
           result = await run(sql, p);
           set.status = 201;
           return result;
         } else {
-          const { sql, params: p } = buildInsert(table, body as Record<string, unknown>);
+          const { sql, params: p } = QueryBuilderService.buildInsert(table, body as Record<string, unknown>);
           result = await run(sql, p);
           set.status = 201;
           return result[0] ?? null;
@@ -207,7 +200,7 @@ export const tableRoutes = new Elysia({ prefix: "/:table" })
       const urlParams = new URL(request.url).searchParams;
       let parsed;
       try {
-        parsed = parseQueryParams(urlParams, table);
+        parsed = QueryParserService.parseQueryParams(urlParams, table);
       } catch (err) {
         throw new BadRequestException({
           error: "Invalid query parameters",
@@ -216,7 +209,7 @@ export const tableRoutes = new Elysia({ prefix: "/:table" })
       }
 
       try {
-        const { sql, params: p } = buildUpdateByFilter(table, parsed, body as Record<string, unknown>);
+        const { sql, params: p } = QueryBuilderService.buildUpdateByFilter(table, parsed, body as Record<string, unknown>);
         const rows = await run(sql, p);
         return rows;
       } catch (err) {
@@ -264,7 +257,7 @@ export const tableRoutes = new Elysia({ prefix: "/:table" })
       const urlParams = new URL(request.url).searchParams;
       let parsed;
       try {
-        parsed = parseQueryParams(urlParams, table);
+        parsed = QueryParserService.parseQueryParams(urlParams, table);
       } catch (err) {
         throw new BadRequestException({
           error: "Invalid query parameters",
@@ -273,7 +266,7 @@ export const tableRoutes = new Elysia({ prefix: "/:table" })
       }
 
       try {
-        const { sql, params: p } = buildDeleteByFilter(table, parsed);
+        const { sql, params: p } = QueryBuilderService.buildDeleteByFilter(table, parsed);
         const rows = await run(sql, p);
         set.status = 200;
         return rows;

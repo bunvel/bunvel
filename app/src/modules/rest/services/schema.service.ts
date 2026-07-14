@@ -1,50 +1,20 @@
 import { db } from "../../../core/database";
 
-export interface ColumnInfo {
-  name: string;
-  type: string;         // pg data_type (e.g. "integer", "text", "boolean")
-  udtName: string;      // underlying type / enum name
-  isNullable: boolean;
-  isPrimaryKey: boolean;
-  hasDefault: boolean;
-  maxLength: number | null;
-}
+import type { ColumnInfo, ForeignKeyInfo, TableInfo, SchemaCache } from "../types/rest.types";
 
-export interface ForeignKeyInfo {
-  constraintName: string;
-  columnName: string;
-  foreignTableSchema: string;
-  foreignTableName: string;
-  foreignColumnName: string;
-}
+export abstract class SchemaService {
+  private static cache: SchemaCache | null = null;
+  private static readonly CACHE_TTL_MS = 60_000;
 
-export interface TableInfo {
-  name: string;
-  schema: string;
-  tableType: "BASE TABLE" | "VIEW" | "MATERIALIZED VIEW";
-  columns: ColumnInfo[];
-  primaryKeys: string[];
-  foreignKeys: ForeignKeyInfo[];
-}
-
-export interface SchemaCache {
-  tables: Map<string, TableInfo>;
-  fetchedAt: number;
-}
-
-// Simple in-memory cache: refreshed after 60 s
-let _cache: SchemaCache | null = null;
-const CACHE_TTL_MS = 60_000;
-
-/**
- * Returns all user-accessible tables, views and materialized views from the
- * connected database, with full column metadata. Results are cached for 60 s.
- */
-export async function getSchema(forceRefresh = false): Promise<SchemaCache> {
-  const now = Date.now();
-  if (!forceRefresh && _cache && now - _cache.fetchedAt < CACHE_TTL_MS) {
-    return _cache;
-  }
+  /**
+   * Returns all user-accessible tables, views and materialized views from the
+   * connected database, with full column metadata. Results are cached for 60 s.
+   */
+  static async get(forceRefresh = false): Promise<SchemaCache> {
+    const now = Date.now();
+    if (!forceRefresh && this.cache && now - this.cache.fetchedAt < this.CACHE_TTL_MS) {
+      return this.cache;
+    }
 
   // --- 1. Base tables & views from information_schema ---
   const tableRows = await db.unsafe<
@@ -253,11 +223,12 @@ export async function getSchema(forceRefresh = false): Promise<SchemaCache> {
     });
   }
 
-  _cache = { tables, fetchedAt: now };
-  return _cache;
-}
+    this.cache = { tables, fetchedAt: now };
+    return this.cache;
+  }
 
-/** Invalidate the schema cache (called after DDL mutations). */
-export function invalidateSchemaCache(): void {
-  _cache = null;
+  /** Invalidate the schema cache (called after DDL mutations). */
+  static invalidate(): void {
+    this.cache = null;
+  }
 }
