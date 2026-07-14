@@ -1,6 +1,15 @@
 import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import type { TableMetadata } from '@/types/table'
+import { DatabaseIcon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -205,8 +214,17 @@ export function DataTable<TData, TValue = unknown>({
         : 'An unknown error occurred'
 
     return (
-      <div className="bg-card flex items-center justify-center h-full text-red-500">
-        Error loading data: {errorMessage}
+      <div className="bg-card flex items-center justify-center h-full p-8">
+        <Empty className="rounded-md border-solid border-destructive/20 bg-destructive/5 p-4 gap-2">
+          <EmptyHeader className="gap-1">
+            <EmptyTitle className="text-destructive text-sm">
+              Error loading data
+            </EmptyTitle>
+            <EmptyDescription className="text-destructive/80 text-xs">
+              {errorMessage}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       </div>
     )
   }
@@ -223,9 +241,17 @@ export function DataTable<TData, TValue = unknown>({
                 </Table>
               </div>
               <div className="flex-1 flex items-center justify-center p-8">
-                <div className="text-sm text-muted-foreground">
-                  No results found
-                </div>
+                <Empty className="border-0">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <HugeiconsIcon icon={DatabaseIcon} />
+                    </EmptyMedia>
+                    <EmptyTitle>No data found</EmptyTitle>
+                    <EmptyDescription>
+                      There is no data to display for this table.
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
               </div>
             </>
           ) : (

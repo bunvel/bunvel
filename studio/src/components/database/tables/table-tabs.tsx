@@ -19,7 +19,6 @@ export function TableTabs() {
             key={tableKey}
             value={tableKey}
             title={tableKey}
-            isActive={tabsValue === tableKey}
             onClose={handleTabClose}
           />
         ))}

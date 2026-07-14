@@ -29,7 +29,6 @@ export function SqlTabs() {
               key={tab.id}
               value={tab.id}
               title={tab.title}
-              isActive={activeTabId === tab.id}
               isModified={tab.isModified}
               onClose={handleTabClose}
             />
@@ -38,11 +37,12 @@ export function SqlTabs() {
       </Tabs>
       <Button
         variant="ghost"
+        size="icon"
         onClick={createNewQueryTab}
         title="New Query Tab"
-        className="rounded-none"
+        className="h-9 w-9 rounded-none shrink-0 text-muted-foreground hover:text-foreground"
       >
-        <HugeiconsIcon icon={Plus} />
+        <HugeiconsIcon icon={Plus} className="h-4 w-4" />
       </Button>
     </div>
   )

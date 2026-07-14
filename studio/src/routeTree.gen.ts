@@ -9,9 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as mainRouteRouteImport } from './routes/(main)/route'
 import { Route as mainIndexRouteImport } from './routes/(main)/index'
+import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as mainDatabaseRouteRouteImport } from './routes/(main)/database/route'
 import { Route as mainSqlIndexRouteImport } from './routes/(main)/sql/index'
 import { Route as mainEditorIndexRouteImport } from './routes/(main)/editor/index'
@@ -23,11 +23,6 @@ import { Route as mainDatabaseIndexesIndexRouteImport } from './routes/(main)/da
 import { Route as mainDatabaseFunctionsIndexRouteImport } from './routes/(main)/database/functions/index'
 import { Route as mainDatabaseTablesOidRouteImport } from './routes/(main)/database/tables/$oid'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const mainRouteRoute = mainRouteRouteImport.update({
   id: '/(main)',
   getParentRoute: () => rootRouteImport,
@@ -36,6 +31,11 @@ const mainIndexRoute = mainIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => mainRouteRoute,
+} as any)
+const authLoginRoute = authLoginRouteImport.update({
+  id: '/(auth)/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const mainDatabaseRouteRoute = mainDatabaseRouteRouteImport.update({
   id: '/database',
@@ -93,8 +93,8 @@ const mainDatabaseTablesOidRoute = mainDatabaseTablesOidRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/login': typeof LoginRoute
   '/database': typeof mainDatabaseRouteRouteWithChildren
+  '/login': typeof authLoginRoute
   '/': typeof mainIndexRoute
   '/editor/': typeof mainEditorIndexRoute
   '/sql/': typeof mainSqlIndexRoute
@@ -107,8 +107,8 @@ export interface FileRoutesByFullPath {
   '/database/types/': typeof mainDatabaseTypesIndexRoute
 }
 export interface FileRoutesByTo {
-  '/login': typeof LoginRoute
   '/database': typeof mainDatabaseRouteRouteWithChildren
+  '/login': typeof authLoginRoute
   '/': typeof mainIndexRoute
   '/editor': typeof mainEditorIndexRoute
   '/sql': typeof mainSqlIndexRoute
@@ -123,8 +123,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(main)': typeof mainRouteRouteWithChildren
-  '/login': typeof LoginRoute
   '/(main)/database': typeof mainDatabaseRouteRouteWithChildren
+  '/(auth)/login': typeof authLoginRoute
   '/(main)/': typeof mainIndexRoute
   '/(main)/editor/': typeof mainEditorIndexRoute
   '/(main)/sql/': typeof mainSqlIndexRoute
@@ -139,8 +139,8 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/login'
     | '/database'
+    | '/login'
     | '/'
     | '/editor/'
     | '/sql/'
@@ -153,8 +153,8 @@ export interface FileRouteTypes {
     | '/database/types/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/login'
     | '/database'
+    | '/login'
     | '/'
     | '/editor'
     | '/sql'
@@ -168,8 +168,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/(main)'
-    | '/login'
     | '/(main)/database'
+    | '/(auth)/login'
     | '/(main)/'
     | '/(main)/editor/'
     | '/(main)/sql/'
@@ -184,18 +184,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   mainRouteRoute: typeof mainRouteRouteWithChildren
-  LoginRoute: typeof LoginRoute
+  authLoginRoute: typeof authLoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(main)': {
       id: '/(main)'
       path: ''
@@ -209,6 +202,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof mainIndexRouteImport
       parentRoute: typeof mainRouteRoute
+    }
+    '/(auth)/login': {
+      id: '/(auth)/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof authLoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(main)/database': {
       id: '/(main)/database'
@@ -326,7 +326,7 @@ const mainRouteRouteWithChildren = mainRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   mainRouteRoute: mainRouteRouteWithChildren,
-  LoginRoute: LoginRoute,
+  authLoginRoute: authLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

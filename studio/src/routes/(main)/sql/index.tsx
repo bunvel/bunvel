@@ -2,6 +2,7 @@ import { SqlSidebar } from '@/components/sql/sql-sidebar'
 import { useSqlManager } from '@/hooks/use-sql-manager'
 import { cn } from '@/lib/utils'
 import { createFileRoute } from '@tanstack/react-router'
+import { ClientOnly } from '@/components/common/client-only'
 import { Suspense, lazy } from 'react'
 
 const SqlEditor = lazy(() => 
@@ -31,9 +32,11 @@ function RouteComponent() {
           showSidebar ? 'w-[80%]' : 'w-full',
         )}
       >
-        <Suspense fallback={<div className="flex-1 flex items-center justify-center text-muted-foreground">Loading SQL Editor...</div>}>
-          <SqlEditor />
-        </Suspense>
+        <ClientOnly fallback={<div className="flex-1 flex items-center justify-center text-muted-foreground">Loading SQL Editor...</div>}>
+          <Suspense fallback={<div className="flex-1 flex items-center justify-center text-muted-foreground">Loading SQL Editor...</div>}>
+            <SqlEditor />
+          </Suspense>
+        </ClientOnly>
       </div>
     </div>
   )

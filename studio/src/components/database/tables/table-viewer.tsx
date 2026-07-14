@@ -7,6 +7,15 @@ import type { TableRow } from '@/types/table'
 import { formatCellValue } from '@/utils/format'
 import type { ColumnDef } from '@tanstack/react-table'
 import { useMemo } from 'react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { TableIcon } from '@hugeicons/core-free-icons'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
 import { NewColumnForm } from '../columns/new-column-form'
 import { TableToolbar } from './table-toolbar'
 
@@ -115,12 +124,15 @@ export function TableViewer() {
   // Show message when no table is selected
   if (!schema || !table) {
     return (
-      <div className="h-full flex items-center justify-center text-muted-foreground bg-card">
-        <div className="text-center p-8">
-          <div className="text-2xl font-medium mb-2">No Table Selected</div>
-          <p className="text-sm">Please select a table to explore its data</p>
-        </div>
-      </div>
+      <Empty className="h-full rounded-none border-0 bg-card">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <HugeiconsIcon icon={TableIcon} />
+          </EmptyMedia>
+          <EmptyTitle>No Table Selected</EmptyTitle>
+          <EmptyDescription>Please select a table to explore its data</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     )
   }
 

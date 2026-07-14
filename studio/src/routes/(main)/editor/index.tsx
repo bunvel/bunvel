@@ -3,9 +3,9 @@ import { SchemaSelector } from '@/components/database/schema/schema-selector'
 import { TableList } from '@/components/database/tables/table-list'
 import { TableTabs } from '@/components/database/tables/table-tabs'
 import { Separator } from '@/components/ui/separator'
-import { isRestrictedSchema } from '@/lib/restricated-schema'
+
 import { cn } from '@/lib/utils'
-import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { Suspense, lazy, useState } from 'react'
 
 const TableViewer = lazy(() =>
@@ -18,16 +18,10 @@ export const Route = createFileRoute('/(main)/editor/')({
 
 function RouteComponent() {
   const [showSidebar, setShowSidebar] = useState(true)
-  const search = useSearch({ strict: false }) as {
-    schema?: string
-    table?: string
-  }
 
   const handleToggleSidebar = () => {
     setShowSidebar(!showSidebar)
   }
-
-  const isProtected = isRestrictedSchema(search.schema)
 
   return (
     <div className="h-full flex">
@@ -51,15 +45,6 @@ function RouteComponent() {
         )}
       >
         <div className="h-full flex flex-col">
-          {isProtected && (
-            <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2">
-              <p className="text-sm text-amber-700 dark:text-amber-300">
-                <span className="font-medium">Viewing protected schema:</span>{' '}
-                The {search.schema} schema is managed by Bunvel and is read-only
-                through the dashboard.
-              </p>
-            </div>
-          )}
           <div className="flex items-center">
             <ToggleSidebar
               onToggleSidebar={handleToggleSidebar}

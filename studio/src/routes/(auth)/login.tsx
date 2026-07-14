@@ -7,25 +7,33 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
-  Field, FieldDescription, FieldGroup,
+  Field, FieldGroup,
   FieldLabel
 } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group'
-import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { authClient } from '@/lib/auth-client'
 import { ViewIcon, ViewOffIcon } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useRouter, redirect } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-export const Route = createFileRoute('/login')({
+import { fetchSession } from '@/lib/session'
+
+export const Route = createFileRoute('/(auth)/login')({
+  beforeLoad: async () => {
+    const session = await fetchSession()
+    if (session && session.user.role === 'admin') {
+      throw redirect({ to: '/' })
+    }
+  },
   component: LoginPage,
 })
 
@@ -35,6 +43,8 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
+
+  const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,6 +60,7 @@ function LoginPage() {
         toast.error(error.message || 'Login failed')
       } else {
         toast.success('Logged in successfully')
+        await router.invalidate()
         navigate({ to: '/' })
       }
     } catch (err: any) {
@@ -108,9 +119,6 @@ function LoginPage() {
                       </InputGroupButton>
                     </InputGroupAddon>
                   </InputGroup>
-                  <FieldDescription>
-                    Must be at least 8 characters long
-                  </FieldDescription>
                 </Field>
                 <Field>
                   <Button type="submit" className="w-full" disabled={isLoading}>

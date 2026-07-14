@@ -14,6 +14,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle,
+} from '@/components/ui/empty'
 import { cn } from '@/lib/utils'
 import type { TableColumn, TableData } from '@/types/components'
 import { Back, Loading03Icon, Search } from '@hugeicons/core-free-icons'
@@ -168,36 +174,45 @@ export function DatabaseTable<T = TableData>({
               </TableRow>
             ) : error ? (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-32 text-center"
-                >
-                  <div className="flex flex-col items-center justify-center space-y-2 text-destructive">
-                    <p className="font-medium">Error loading data</p>
-                    <p className="text-sm text-muted-foreground">
-                      {error.message}
-                    </p>
-                  </div>
+                <TableCell colSpan={columns.length} className="h-48 p-4">
+                  <Empty className="rounded-md border-solid border-destructive/20 bg-destructive/5 p-4 gap-2">
+                    <EmptyHeader className="gap-1">
+                      <EmptyTitle className="text-destructive text-sm">
+                        Error loading data
+                      </EmptyTitle>
+                      <EmptyDescription className="text-destructive/80 text-xs">
+                        {error.message}
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             ) : filteredData.length > 0 ? (
               filteredData.map((item, index) => renderBodyRow(item, index))
             ) : searchable && searchQuery ? (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  No results found for "{searchQuery}"
+                <TableCell colSpan={columns.length} className="h-48 p-0">
+                  <Empty className="border-0 rounded-none bg-transparent">
+                    <EmptyHeader>
+                      <EmptyTitle>No results found</EmptyTitle>
+                      <EmptyDescription>
+                        No items match your search for "{searchQuery}"
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  No data available
+                <TableCell colSpan={columns.length} className="h-48 p-0">
+                  <Empty className="border-0 rounded-none bg-transparent">
+                    <EmptyHeader>
+                      <EmptyTitle>No data available</EmptyTitle>
+                      <EmptyDescription>
+                        There is no data to display in this view.
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             )}

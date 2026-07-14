@@ -11,6 +11,14 @@ import { TableFormSheet } from '@/components/sheets/table-form-sheet'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty'
 import { PLACEHOLDERS } from '@/constants/ui'
 import { useTables } from '@/hooks/queries/useTables'
 import { isRestrictedSchema } from '@/lib/restricated-schema'
@@ -35,8 +43,8 @@ export function TableList() {
   const filteredTables = !searchQuery
     ? tables
     : tables.filter((table) =>
-        table.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
+      table.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
 
   const handleTableClick = (table: Table) => {
     navigate({
@@ -49,15 +57,15 @@ export function TableList() {
 
   if (!schema) {
     return (
-      <div className="p-4 flex-1 flex flex-col items-center justify-center text-center">
-        <HugeiconsIcon
-          icon={TableIcon}
-          className="mb-2 h-8 w-8 text-muted-foreground/50"
-        />
-        <p className="text-sm text-muted-foreground">
-          Select a schema to view tables
-        </p>
-      </div>
+      <Empty className="h-full flex-1 rounded-none border-0">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <HugeiconsIcon icon={TableIcon} />
+          </EmptyMedia>
+          <EmptyTitle>No schema selected</EmptyTitle>
+          <EmptyDescription>Select a schema to view tables</EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     )
   }
 
@@ -90,39 +98,46 @@ export function TableList() {
 
   if (error) {
     return (
-      <div className="p-4 space-y-2 h-full flex flex-col">
-        <div className="rounded-md border border-destructive/20 bg-destructive/5 p-4">
-          <h4 className="mb-1 text-sm font-medium text-destructive">
-            Error loading tables
-          </h4>
-          <p className="text-xs text-destructive/80">
-            {error instanceof Error
-              ? error.message
-              : 'An unknown error occurred'}
-            <Button variant="link" onClick={() => refetch()} className="ml-2">
+      <div className="p-4 h-full flex flex-col">
+        <Empty className="rounded-md border-solid border-destructive/20 bg-destructive/5 p-4 gap-2">
+          <EmptyHeader className="gap-1">
+            <EmptyTitle className="text-destructive text-sm">
+              Error loading tables
+            </EmptyTitle>
+            <EmptyDescription className="text-destructive/80 text-xs">
+              {error instanceof Error ? error.message : 'An unknown error occurred'}
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button variant="outline" size="sm" onClick={() => refetch()} className="mt-2 text-destructive border-destructive/20 hover:bg-destructive/10">
               Retry
             </Button>
-          </p>
-        </div>
+          </EmptyContent>
+        </Empty>
       </div>
     )
   }
 
   if (tables.length === 0) {
     return (
-      <div className="p-4 flex-1 flex flex-col items-center text-center">
-        <HugeiconsIcon
-          icon={TableIcon}
-          className="mb-2 h-8 w-8 text-muted-foreground/50"
-        />
-        <p className="text-sm text-muted-foreground my-1">
-          No tables or views found in schema{' '}
-          <span className="font-medium text-foreground">{schema}</span>
-        </p>
+      <Empty className="h-full flex-1 rounded-none border-0">
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <HugeiconsIcon icon={TableIcon} />
+          </EmptyMedia>
+          <EmptyTitle>No tables found</EmptyTitle>
+          <EmptyDescription>
+            No tables or views found in schema <span className="font-medium text-foreground">{schema}</span>
+          </EmptyDescription>
+        </EmptyHeader>
         {!isRestricted && (
-          <TableFormSheet schema={schema} children={<p>Create Table</p>} />
+          <EmptyContent>
+            <TableFormSheet schema={schema}>
+              <span className="ml-1">Create Table</span>
+            </TableFormSheet>
+          </EmptyContent>
         )}
-      </div>
+      </Empty>
     )
   }
 
@@ -144,14 +159,16 @@ export function TableList() {
         style={{ top: '0px' }}
       >
         {filteredTables.length === 0 ? (
-          <div
-            key="no-results"
-            className="py-4 text-center text-sm text-muted-foreground"
-          >
-            {searchQuery
-              ? `No tables found matching "${searchQuery}"`
-              : 'No tables found'}
-          </div>
+          <Empty className="h-full flex-1 rounded-none border-0 py-8">
+            <EmptyHeader>
+              <EmptyTitle className="text-sm">No results</EmptyTitle>
+              <EmptyDescription>
+                {searchQuery
+                  ? `No tables found matching "${searchQuery}"`
+                  : 'No tables found'}
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <SidebarGroup className="group-data-[collapsible=icon]:hidden">
             <SidebarMenu className="space-y-1">
@@ -167,7 +184,7 @@ export function TableList() {
                       <TableKindIcon kind={table.kind} />
                       {table.name}
                     </SidebarMenuButton>
-                    <TableListAction schema={schema} table={table.name} kind={table.kind} />
+                    {!isRestricted && <TableListAction schema={schema} table={table.name} kind={table.kind} />}
                   </SidebarMenuItem>
                 )
               })}
