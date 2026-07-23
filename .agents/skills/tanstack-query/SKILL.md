@@ -1,1058 +1,849 @@
 ---
 name: tanstack-query
-description: |
-  Manage server state in React with TanStack Query v5. Covers useMutationState, simplified optimistic updates, throwOnError, network mode (offline/PWA), and infiniteQueryOptions.
-
-  Use when setting up data fetching, fixing v4→v5 migration errors (object syntax, gcTime, isPending, keepPreviousData), or debugging SSR/hydration issues with streaming server components.
-user-invocable: true
+description: Powerful asynchronous state management, server-state utilities, and data fetching for TS/JS, React, Vue, Solid, Svelte & Angular.
 ---
 
-# TanStack Query (React Query) v5
 
-**Last Updated**: 2026-01-20
-**Versions**: @tanstack/react-query@5.90.19, @tanstack/react-query-devtools@5.91.2
-**Requires**: React 18.0+ (useSyncExternalStore), TypeScript 4.7+ (recommended)
+## Overview
 
----
+TanStack Query (formerly React Query) manages server state - data that lives on the server and needs to be fetched, cached, synchronized, and updated. It provides automatic caching, background refetching, stale-while-revalidate patterns, pagination, infinite scrolling, and optimistic updates out of the box.
 
-## v5 New Features
+**Package:** `@tanstack/react-query`
+**Devtools:** `@tanstack/react-query-devtools`
+**Current Version:** v5
 
-### useMutationState - Cross-Component Mutation Tracking
-
-Access mutation state from anywhere without prop drilling:
-
-```tsx
-import { useMutationState } from '@tanstack/react-query'
-
-function GlobalLoadingIndicator() {
-  // Get all pending mutations
-  const pendingMutations = useMutationState({
-    filters: { status: 'pending' },
-    select: (mutation) => mutation.state.variables,
-  })
-
-  if (pendingMutations.length === 0) return null
-  return <div>Saving {pendingMutations.length} items...</div>
-}
-
-// Filter by mutation key
-const todoMutations = useMutationState({
-  filters: { mutationKey: ['addTodo'] },
-})
-```
-
-### Simplified Optimistic Updates
-
-New pattern using `variables` - no cache manipulation, no rollback needed:
-
-```tsx
-function TodoList() {
-  const { data: todos } = useQuery({ queryKey: ['todos'], queryFn: fetchTodos })
-
-  const addTodo = useMutation({
-    mutationKey: ['addTodo'],
-    mutationFn: (newTodo) => api.addTodo(newTodo),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todos'] })
-    },
-  })
-
-  // Show optimistic UI using variables from pending mutations
-  const pendingTodos = useMutationState({
-    filters: { mutationKey: ['addTodo'], status: 'pending' },
-    select: (mutation) => mutation.state.variables,
-  })
-
-  return (
-    <ul>
-      {todos?.map(todo => <li key={todo.id}>{todo.title}</li>)}
-      {/* Show pending items with visual indicator */}
-      {pendingTodos.map((todo, i) => (
-        <li key={`pending-${i}`} style={{ opacity: 0.5 }}>{todo.title}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-### throwOnError - Error Boundaries
-
-Renamed from `useErrorBoundary` (breaking change):
-
-```tsx
-import { QueryErrorResetBoundary } from '@tanstack/react-query'
-import { ErrorBoundary } from 'react-error-boundary'
-
-function App() {
-  return (
-    <QueryErrorResetBoundary>
-      {({ reset }) => (
-        <ErrorBoundary onReset={reset} fallbackRender={({ resetErrorBoundary }) => (
-          <div>
-            Error! <button onClick={resetErrorBoundary}>Retry</button>
-          </div>
-        )}>
-          <Todos />
-        </ErrorBoundary>
-      )}
-    </QueryErrorResetBoundary>
-  )
-}
-
-function Todos() {
-  const { data } = useQuery({
-    queryKey: ['todos'],
-    queryFn: fetchTodos,
-    throwOnError: true, // ✅ v5 (was useErrorBoundary in v4)
-  })
-  return <div>{data.map(...)}</div>
-}
-```
-
-### Network Mode (Offline/PWA Support)
-
-Control behavior when offline:
-
-```tsx
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      networkMode: 'offlineFirst', // Use cache when offline
-    },
-  },
-})
-
-// Per-query override
-useQuery({
-  queryKey: ['todos'],
-  queryFn: fetchTodos,
-  networkMode: 'always', // Always try, even offline (for local APIs)
-})
-```
-
-| Mode | Behavior |
-|------|----------|
-| `online` (default) | Only fetch when online |
-| `always` | Always try (useful for local/service worker APIs) |
-| `offlineFirst` | Use cache first, fetch when online |
-
-**Detecting paused state:**
-```tsx
-const { isPending, fetchStatus } = useQuery(...)
-// isPending + fetchStatus === 'paused' = offline, waiting for network
-```
-
-### useQueries with Combine
-
-Combine results from parallel queries:
-
-```tsx
-const results = useQueries({
-  queries: userIds.map(id => ({
-    queryKey: ['user', id],
-    queryFn: () => fetchUser(id),
-  })),
-  combine: (results) => ({
-    data: results.map(r => r.data),
-    pending: results.some(r => r.isPending),
-    error: results.find(r => r.error)?.error,
-  }),
-})
-
-// Access combined result
-if (results.pending) return <Loading />
-console.log(results.data) // [user1, user2, user3]
-```
-
-### infiniteQueryOptions Helper
-
-Type-safe factory for infinite queries (parallel to `queryOptions`):
-
-```tsx
-import { infiniteQueryOptions, useInfiniteQuery, prefetchInfiniteQuery } from '@tanstack/react-query'
-
-const todosInfiniteOptions = infiniteQueryOptions({
-  queryKey: ['todos', 'infinite'],
-  queryFn: ({ pageParam }) => fetchTodosPage(pageParam),
-  initialPageParam: 0,
-  getNextPageParam: (lastPage) => lastPage.nextCursor,
-})
-
-// Reuse across hooks
-useInfiniteQuery(todosInfiniteOptions)
-useSuspenseInfiniteQuery(todosInfiniteOptions)
-prefetchInfiniteQuery(queryClient, todosInfiniteOptions)
-```
-
-### maxPages - Memory Optimization
-
-Limit pages stored in cache for infinite queries:
-
-```tsx
-useInfiniteQuery({
-  queryKey: ['posts'],
-  queryFn: ({ pageParam }) => fetchPosts(pageParam),
-  initialPageParam: 0,
-  getNextPageParam: (lastPage) => lastPage.nextCursor,
-  getPreviousPageParam: (firstPage) => firstPage.prevCursor, // Required with maxPages
-  maxPages: 3, // Only keep 3 pages in memory
-})
-```
-
-**Note:** `maxPages` requires bi-directional pagination (`getNextPageParam` AND `getPreviousPageParam`).
-
----
-
-## Quick Setup
+## Installation
 
 ```bash
-npm install @tanstack/react-query@latest
-npm install -D @tanstack/react-query-devtools@latest
+npm install @tanstack/react-query
+npm install -D @tanstack/react-query-devtools  # Optional
 ```
 
-### Step 2: Provider + Config
+## Setup
 
 ```tsx
-// src/main.tsx
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 min
-      gcTime: 1000 * 60 * 60, // 1 hour (v5: renamed from cacheTime)
-      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60, // 1 minute
+      gcTime: 1000 * 60 * 5, // 5 minutes (garbage collection)
+      retry: 3,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
     },
   },
 })
 
-<QueryClientProvider client={queryClient}>
-  <App />
-  <ReactQueryDevtools initialIsOpen={false} />
-</QueryClientProvider>
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <YourApp />
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  )
+}
 ```
 
-### Step 3: Query + Mutation Hooks
+## Core Concepts
+
+### Query Keys
+
+Query keys uniquely identify cached data. They must be serializable arrays:
 
 ```tsx
-// src/hooks/useTodos.ts
-import { useQuery, useMutation, useQueryClient, queryOptions } from '@tanstack/react-query'
+// Simple key
+useQuery({ queryKey: ['todos'], queryFn: fetchTodos })
 
-// Query options factory (v5 pattern)
+// With variables (dependency array pattern)
+useQuery({ queryKey: ['todos', { status, page }], queryFn: fetchTodos })
+
+// Hierarchical keys for invalidation
+useQuery({ queryKey: ['todos', todoId], queryFn: () => fetchTodo(todoId) })
+useQuery({ queryKey: ['todos', todoId, 'comments'], queryFn: () => fetchComments(todoId) })
+
+// Invalidation matches prefixes:
+// queryClient.invalidateQueries({ queryKey: ['todos'] })
+// ^ Invalidates ALL queries starting with 'todos'
+```
+
+### Query Functions
+
+```tsx
+// Query function receives a QueryFunctionContext
+useQuery({
+  queryKey: ['todos', todoId],
+  queryFn: async ({ queryKey, signal, meta }) => {
+    const [_key, id] = queryKey
+    const response = await fetch(`/api/todos/${id}`, { signal })
+    if (!response.ok) throw new Error('Failed to fetch')
+    return response.json()
+  },
+})
+
+// Using the signal for automatic cancellation
+useQuery({
+  queryKey: ['todos'],
+  queryFn: async ({ signal }) => {
+    const response = await fetch('/api/todos', { signal })
+    return response.json()
+  },
+})
+```
+
+### queryOptions Helper
+
+Create reusable, type-safe query configurations:
+
+```tsx
+import { queryOptions } from '@tanstack/react-query'
+
 export const todosQueryOptions = queryOptions({
   queryKey: ['todos'],
-  queryFn: async () => {
+  queryFn: fetchTodos,
+  staleTime: 5000,
+})
+
+export const todoQueryOptions = (todoId: string) =>
+  queryOptions({
+    queryKey: ['todos', todoId],
+    queryFn: () => fetchTodo(todoId),
+    enabled: !!todoId,
+  })
+
+// Usage
+const { data } = useQuery(todosQueryOptions)
+const { data } = useSuspenseQuery(todoQueryOptions(id))
+await queryClient.prefetchQuery(todosQueryOptions)
+```
+
+## Queries (useQuery)
+
+### Basic Usage
+
+```tsx
+import { useQuery } from '@tanstack/react-query'
+
+function Todos() {
+  const {
+    data,
+    error,
+    isLoading,      // First load, no data yet
+    isFetching,     // Any fetch in progress (including background)
+    isError,
+    isSuccess,
+    isPending,      // No data yet (same as isLoading in most cases)
+    status,         // 'pending' | 'error' | 'success'
+    fetchStatus,    // 'fetching' | 'paused' | 'idle'
+    refetch,
+    isStale,
+    isPlaceholderData,
+    dataUpdatedAt,
+    errorUpdatedAt,
+  } = useQuery({
+    queryKey: ['todos'],
+    queryFn: fetchTodos,
+  })
+
+  if (isLoading) return <Spinner />
+  if (isError) return <Error message={error.message} />
+  return <TodoList todos={data} />
+}
+```
+
+### Query Options
+
+```tsx
+useQuery({
+  queryKey: ['todos'],
+  queryFn: fetchTodos,
+
+  // Freshness
+  staleTime: 5000,            // ms data stays fresh (default: 0)
+  gcTime: 300000,             // ms unused data stays in cache (default: 5 min)
+
+  // Refetching
+  refetchInterval: 10000,     // Poll every 10s
+  refetchIntervalInBackground: false, // Don't poll when tab hidden
+  refetchOnMount: true,       // Refetch on component mount if stale
+  refetchOnWindowFocus: true, // Refetch on window focus if stale
+  refetchOnReconnect: true,   // Refetch on network reconnect
+
+  // Retry
+  retry: 3,                   // Number of retries (or function)
+  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+
+  // Conditional
+  enabled: !!userId,          // Only run when truthy
+
+  // Initial/placeholder data
+  initialData: () => cachedData,
+  initialDataUpdatedAt: Date.now() - 10000,
+  placeholderData: (previousData) => previousData, // keepPreviousData pattern
+  placeholderData: initialTodos,
+
+  // Transform
+  select: (data) => data.filter(todo => !todo.done),
+
+  // Structural sharing (default: true)
+  structuralSharing: true,
+
+  // Network mode
+  networkMode: 'online', // 'online' | 'always' | 'offlineFirst'
+
+  // Meta (accessible in query function context)
+  meta: { purpose: 'user-facing' },
+})
+```
+
+## Mutations (useMutation)
+
+### Basic Usage
+
+```tsx
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+function AddTodo() {
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    mutationFn: (newTodo: { title: string }) => {
+      return fetch('/api/todos', {
+        method: 'POST',
+        body: JSON.stringify(newTodo),
+      }).then(res => res.json())
+    },
+    // Lifecycle callbacks
+    onMutate: async (variables) => {
+      // Called before mutationFn
+      // Good for optimistic updates
+      return { previousTodos } // context for onError
+    },
+    onSuccess: (data, variables, context) => {
+      // Invalidate related queries
+      queryClient.invalidateQueries({ queryKey: ['todos'] })
+    },
+    onError: (error, variables, context) => {
+      // Rollback optimistic updates
+      queryClient.setQueryData(['todos'], context.previousTodos)
+    },
+    onSettled: (data, error, variables, context) => {
+      // Always runs (success or error)
+      queryClient.invalidateQueries({ queryKey: ['todos'] })
+    },
+  })
+
+  return (
+    <button
+      onClick={() => mutation.mutate({ title: 'New Todo' })}
+      disabled={mutation.isPending}
+    >
+      {mutation.isPending ? 'Adding...' : 'Add Todo'}
+    </button>
+  )
+}
+```
+
+### Mutation State
+
+```tsx
+const {
+  mutate,         // Fire-and-forget
+  mutateAsync,    // Returns promise
+  isPending,      // Mutation in progress
+  isError,
+  isSuccess,
+  isIdle,         // Not yet fired
+  data,           // Success response
+  error,          // Error object
+  reset,          // Reset state to idle
+  variables,      // Variables passed to mutate
+  status,         // 'idle' | 'pending' | 'error' | 'success'
+} = useMutation({ ... })
+```
+
+## Optimistic Updates
+
+```tsx
+const mutation = useMutation({
+  mutationFn: updateTodo,
+  onMutate: async (newTodo) => {
+    // 1. Cancel outgoing refetches
+    await queryClient.cancelQueries({ queryKey: ['todos', newTodo.id] })
+
+    // 2. Snapshot previous value
+    const previousTodo = queryClient.getQueryData(['todos', newTodo.id])
+
+    // 3. Optimistically update
+    queryClient.setQueryData(['todos', newTodo.id], newTodo)
+
+    // 4. Return context for rollback
+    return { previousTodo }
+  },
+  onError: (err, newTodo, context) => {
+    // Rollback on error
+    queryClient.setQueryData(['todos', newTodo.id], context.previousTodo)
+  },
+  onSettled: () => {
+    // Always refetch to sync with server
+    queryClient.invalidateQueries({ queryKey: ['todos'] })
+  },
+})
+```
+
+### Optimistic Updates on Lists
+
+```tsx
+onMutate: async (newTodo) => {
+  await queryClient.cancelQueries({ queryKey: ['todos'] })
+  const previousTodos = queryClient.getQueryData(['todos'])
+
+  queryClient.setQueryData(['todos'], (old) => [...old, newTodo])
+
+  return { previousTodos }
+},
+onError: (err, newTodo, context) => {
+  queryClient.setQueryData(['todos'], context.previousTodos)
+},
+```
+
+## Query Invalidation
+
+```tsx
+const queryClient = useQueryClient()
+
+// Invalidate all queries
+queryClient.invalidateQueries()
+
+// Invalidate by prefix
+queryClient.invalidateQueries({ queryKey: ['todos'] })
+
+// Invalidate exact match
+queryClient.invalidateQueries({ queryKey: ['todos', 1], exact: true })
+
+// Invalidate with predicate
+queryClient.invalidateQueries({
+  predicate: (query) =>
+    query.queryKey[0] === 'todos' && query.queryKey[1]?.status === 'done',
+})
+
+// Invalidate and refetch immediately
+queryClient.refetchQueries({ queryKey: ['todos'] })
+
+// Remove from cache entirely
+queryClient.removeQueries({ queryKey: ['todos', 1] })
+
+// Reset to initial state
+queryClient.resetQueries({ queryKey: ['todos'] })
+```
+
+## Infinite Queries
+
+```tsx
+import { useInfiniteQuery } from '@tanstack/react-query'
+
+function InfiniteList() {
+  const {
+    data,
+    fetchNextPage,
+    fetchPreviousPage,
+    hasNextPage,
+    hasPreviousPage,
+    isFetchingNextPage,
+    isFetchingPreviousPage,
+  } = useInfiniteQuery({
+    queryKey: ['projects'],
+    queryFn: async ({ pageParam }) => {
+      const res = await fetch(`/api/projects?cursor=${pageParam}`)
+      return res.json()
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages, lastPageParam) => {
+      return lastPage.nextCursor ?? undefined // undefined = no more pages
+    },
+    getPreviousPageParam: (firstPage, allPages, firstPageParam) => {
+      return firstPage.prevCursor ?? undefined
+    },
+    maxPages: 3, // Keep max 3 pages in cache (for performance)
+  })
+
+  return (
+    <div>
+      {data.pages.map((page) =>
+        page.items.map((item) => <Item key={item.id} item={item} />)
+      )}
+      <button
+        onClick={() => fetchNextPage()}
+        disabled={!hasNextPage || isFetchingNextPage}
+      >
+        {isFetchingNextPage ? 'Loading...' : hasNextPage ? 'Load More' : 'No more'}
+      </button>
+    </div>
+  )
+}
+```
+
+## Parallel Queries
+
+```tsx
+// Multiple independent queries run in parallel automatically
+function Dashboard() {
+  const usersQuery = useQuery({ queryKey: ['users'], queryFn: fetchUsers })
+  const projectsQuery = useQuery({ queryKey: ['projects'], queryFn: fetchProjects })
+
+  // Both fetch simultaneously
+}
+
+// Dynamic parallel queries with useQueries
+function UserProjects({ userIds }) {
+  const queries = useQueries({
+    queries: userIds.map((id) => ({
+      queryKey: ['user', id],
+      queryFn: () => fetchUser(id),
+    })),
+    combine: (results) => ({
+      data: results.map(r => r.data),
+      pending: results.some(r => r.isPending),
+    }),
+  })
+}
+```
+
+## Dependent Queries
+
+```tsx
+// Sequential queries using enabled
+function UserPosts({ userId }) {
+  const userQuery = useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => fetchUser(userId),
+  })
+
+  const postsQuery = useQuery({
+    queryKey: ['posts', userId],
+    queryFn: () => fetchPostsByUser(userId),
+    enabled: !!userQuery.data, // Only run when user is loaded
+  })
+}
+```
+
+## Paginated Queries
+
+```tsx
+function PaginatedList() {
+  const [page, setPage] = useState(1)
+
+  const { data, isPlaceholderData } = useQuery({
+    queryKey: ['todos', page],
+    queryFn: () => fetchTodos(page),
+    placeholderData: (previousData) => previousData, // Keep showing old data
+  })
+
+  return (
+    <div style={{ opacity: isPlaceholderData ? 0.5 : 1 }}>
+      {data.items.map(item => <Item key={item.id} item={item} />)}
+      <button
+        onClick={() => setPage(p => p + 1)}
+        disabled={isPlaceholderData || !data.hasMore}
+      >
+        Next
+      </button>
+    </div>
+  )
+}
+```
+
+## Suspense Integration
+
+```tsx
+import { useSuspenseQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query'
+
+// Component will suspend until data is loaded
+function TodoList() {
+  const { data } = useSuspenseQuery({
+    queryKey: ['todos'],
+    queryFn: fetchTodos,
+  })
+  // data is guaranteed to be defined here
+  return <ul>{data.map(todo => <li key={todo.id}>{todo.title}</li>)}</ul>
+}
+
+// Wrap with Suspense boundary
+function App() {
+  return (
+    <ErrorBoundary fallback={<Error />}>
+      <Suspense fallback={<Loading />}>
+        <TodoList />
+      </Suspense>
+    </ErrorBoundary>
+  )
+}
+
+// Multiple suspense queries (fetch in parallel)
+function Dashboard() {
+  const [{ data: users }, { data: projects }] = useSuspenseQueries({
+    queries: [
+      { queryKey: ['users'], queryFn: fetchUsers },
+      { queryKey: ['projects'], queryFn: fetchProjects },
+    ],
+  })
+}
+```
+
+## Prefetching
+
+```tsx
+const queryClient = useQueryClient()
+
+// Prefetch on hover
+function TodoLink({ todoId }) {
+  const prefetch = () => {
+    queryClient.prefetchQuery({
+      queryKey: ['todo', todoId],
+      queryFn: () => fetchTodo(todoId),
+      staleTime: 5000, // Only prefetch if data older than 5s
+    })
+  }
+
+  return (
+    <Link to={`/todos/${todoId}`} onMouseEnter={prefetch}>
+      Todo {todoId}
+    </Link>
+  )
+}
+
+// Prefetch in route loader (TanStack Router integration)
+export const Route = createFileRoute('/todos/$todoId')({
+  loader: ({ context: { queryClient }, params: { todoId } }) =>
+    queryClient.ensureQueryData(todoQueryOptions(todoId)),
+})
+
+// Prefetch infinite queries
+queryClient.prefetchInfiniteQuery({
+  queryKey: ['projects'],
+  queryFn: fetchProjects,
+  initialPageParam: 0,
+  pages: 3, // Prefetch first 3 pages
+})
+```
+
+## SSR & Hydration
+
+### Server-Side Prefetching
+
+```tsx
+// Server component or loader
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
+
+async function getServerSideProps() {
+  const queryClient = new QueryClient()
+
+  await queryClient.prefetchQuery({
+    queryKey: ['todos'],
+    queryFn: fetchTodos,
+  })
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+  }
+}
+
+function Page({ dehydratedState }) {
+  return (
+    <HydrationBoundary state={dehydratedState}>
+      <Todos />
+    </HydrationBoundary>
+  )
+}
+```
+
+### Streaming SSR (React Server Components)
+
+```tsx
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { makeQueryClient } from './query-client'
+
+export default async function Page() {
+  const queryClient = makeQueryClient()
+
+  // Prefetch on server
+  await queryClient.prefetchQuery({
+    queryKey: ['todos'],
+    queryFn: fetchTodos,
+  })
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <TodoList />
+    </HydrationBoundary>
+  )
+}
+```
+
+## QueryClient API
+
+```tsx
+const queryClient = useQueryClient()
+
+// Get cached data
+queryClient.getQueryData(['todos'])
+
+// Set cached data
+queryClient.setQueryData(['todos'], updatedTodos)
+queryClient.setQueryData(['todos'], (old) => [...old, newTodo])
+
+// Get query state
+queryClient.getQueryState(['todos'])
+
+// Check if fetching
+queryClient.isFetching({ queryKey: ['todos'] })
+queryClient.isMutating()
+
+// Cancel queries
+queryClient.cancelQueries({ queryKey: ['todos'] })
+
+// Invalidate (marks stale, refetches active)
+queryClient.invalidateQueries({ queryKey: ['todos'] })
+
+// Refetch (force refetch even if fresh)
+queryClient.refetchQueries({ queryKey: ['todos'] })
+
+// Remove from cache
+queryClient.removeQueries({ queryKey: ['todos'] })
+
+// Reset to initial state
+queryClient.resetQueries({ queryKey: ['todos'] })
+
+// Clear entire cache
+queryClient.clear()
+
+// Prefetch
+queryClient.prefetchQuery({ queryKey: ['todos'], queryFn: fetchTodos })
+queryClient.ensureQueryData({ queryKey: ['todos'], queryFn: fetchTodos })
+
+// Get/set defaults
+queryClient.setQueryDefaults(['todos'], { staleTime: 10000 })
+queryClient.getQueryDefaults(['todos'])
+queryClient.setMutationDefaults(['addTodo'], { mutationFn: addTodo })
+```
+
+## Testing
+
+```tsx
+import { renderHook, waitFor } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false, // Don't retry in tests
+        gcTime: Infinity, // Prevent garbage collection during tests
+      },
+    },
+  })
+  return ({ children }) => (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  )
+}
+
+test('fetches todos', async () => {
+  const { result } = renderHook(() => useQuery({
+    queryKey: ['todos'],
+    queryFn: fetchTodos,
+  }), { wrapper: createWrapper() })
+
+  await waitFor(() => expect(result.current.isSuccess).toBe(true))
+  expect(result.current.data).toEqual(expectedTodos)
+})
+
+// Mock with setQueryData for component tests
+test('renders todos', () => {
+  const queryClient = new QueryClient()
+  queryClient.setQueryData(['todos'], mockTodos)
+
+  render(
+    <QueryClientProvider client={queryClient}>
+      <TodoList />
+    </QueryClientProvider>
+  )
+
+  expect(screen.getByText('Todo 1')).toBeInTheDocument()
+})
+```
+
+## TypeScript Patterns
+
+### Typing Query Functions
+
+```tsx
+interface Todo {
+  id: number
+  title: string
+  completed: boolean
+}
+
+// Type is inferred from queryFn return type
+const { data } = useQuery({
+  queryKey: ['todos'],
+  queryFn: async (): Promise<Todo[]> => {
     const res = await fetch('/api/todos')
-    if (!res.ok) throw new Error('Failed to fetch')
+    return res.json()
+  },
+})
+// data: Todo[] | undefined
+
+// With select
+const { data } = useQuery({
+  queryKey: ['todos'],
+  queryFn: fetchTodos,
+  select: (data): string[] => data.map(t => t.title),
+})
+// data: string[] | undefined
+```
+
+### Typing Errors
+
+```tsx
+// Default error type is Error
+const { error } = useQuery<Todo[], AxiosError>({
+  queryKey: ['todos'],
+  queryFn: fetchTodos,
+})
+
+// Or register globally
+declare module '@tanstack/react-query' {
+  interface Register {
+    defaultError: AxiosError
+  }
+}
+```
+
+### Query Options Pattern (Recommended)
+
+```tsx
+import { queryOptions, infiniteQueryOptions } from '@tanstack/react-query'
+
+export const todosOptions = queryOptions({
+  queryKey: ['todos'] as const,
+  queryFn: fetchTodos,
+  staleTime: 5000,
+})
+
+export const todoOptions = (id: string) =>
+  queryOptions({
+    queryKey: ['todos', id] as const,
+    queryFn: () => fetchTodo(id),
+    enabled: !!id,
+  })
+
+// Full type inference everywhere
+const { data } = useQuery(todosOptions)
+const { data } = useSuspenseQuery(todoOptions('123'))
+await queryClient.ensureQueryData(todosOptions)
+queryClient.invalidateQueries({ queryKey: todosOptions.queryKey })
+```
+
+## Advanced Patterns
+
+### Window Focus Refetching
+
+```tsx
+// Disable globally
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { refetchOnWindowFocus: false },
+  },
+})
+
+// Custom focus manager
+import { focusManager } from '@tanstack/react-query'
+
+// For React Native
+focusManager.setEventListener((handleFocus) => {
+  const subscription = AppState.addEventListener('change', (state) => {
+    handleFocus(state === 'active')
+  })
+  return () => subscription.remove()
+})
+```
+
+### Network Mode
+
+```tsx
+useQuery({
+  queryKey: ['todos'],
+  queryFn: fetchTodos,
+  // 'online' (default): only fetch when online
+  // 'always': always fetch (useful for local-first)
+  // 'offlineFirst': try fetch, use cache if offline
+  networkMode: 'offlineFirst',
+})
+```
+
+### Query Cancellation
+
+```tsx
+useQuery({
+  queryKey: ['todos'],
+  queryFn: async ({ signal }) => {
+    // signal is AbortSignal - automatically cancelled on unmount or key change
+    const res = await fetch('/api/todos', { signal })
     return res.json()
   },
 })
 
-export function useTodos() {
-  return useQuery(todosQueryOptions)
-}
-
-export function useAddTodo() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: async (newTodo) => {
-      const res = await fetch('/api/todos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newTodo),
-      })
-      if (!res.ok) throw new Error('Failed to add')
-      return res.json()
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todos'] })
-    },
-  })
-}
-
-// Usage:
-function TodoList() {
-  const { data, isPending, isError, error } = useTodos()
-  const { mutate } = useAddTodo()
-
-  if (isPending) return <div>Loading...</div>
-  if (isError) return <div>Error: {error.message}</div>
-  return <ul>{data.map(todo => <li key={todo.id}>{todo.title}</li>)}</ul>
-}
+// Manual cancellation
+queryClient.cancelQueries({ queryKey: ['todos'] })
 ```
 
----
+### Persistence
 
-## Critical Rules
-
-### Always Do
-
-✅ **Use object syntax for all hooks**
 ```tsx
-// v5 ONLY supports this:
-useQuery({ queryKey, queryFn, ...options })
-useMutation({ mutationFn, ...options })
-```
+import { persistQueryClient } from '@tanstack/react-query-persist-client'
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 
-✅ **Use array query keys**
-```tsx
-queryKey: ['todos']              // List
-queryKey: ['todos', id]          // Detail
-queryKey: ['todos', { filter }]  // Filtered
-```
-
-✅ **Configure staleTime appropriately**
-```tsx
-staleTime: 1000 * 60 * 5 // 5 min - prevents excessive refetches
-```
-
-✅ **Use isPending for initial loading state**
-```tsx
-if (isPending) return <Loading />
-// isPending = no data yet AND fetching
-```
-
-✅ **Throw errors in queryFn**
-```tsx
-if (!response.ok) throw new Error('Failed')
-```
-
-✅ **Invalidate queries after mutations**
-```tsx
-onSuccess: () => {
-  queryClient.invalidateQueries({ queryKey: ['todos'] })
-}
-```
-
-✅ **Use queryOptions factory for reusable patterns**
-```tsx
-const opts = queryOptions({ queryKey, queryFn })
-useQuery(opts)
-useSuspenseQuery(opts)
-prefetchQuery(opts)
-```
-
-✅ **Use gcTime (not cacheTime)**
-```tsx
-gcTime: 1000 * 60 * 60 // 1 hour
-```
-
-### Never Do
-
-❌ **Never use v4 array/function syntax**
-```tsx
-// v4 (removed in v5):
-useQuery(['todos'], fetchTodos, options) // ❌
-
-// v5 (correct):
-useQuery({ queryKey: ['todos'], queryFn: fetchTodos }) // ✅
-```
-
-❌ **Never use query callbacks (onSuccess, onError, onSettled in queries)**
-```tsx
-// v5 removed these from queries:
-useQuery({
-  queryKey: ['todos'],
-  queryFn: fetchTodos,
-  onSuccess: (data) => {}, // ❌ Removed in v5
+const persister = createSyncStoragePersister({
+  storage: window.localStorage,
 })
 
-// Use useEffect instead:
-const { data } = useQuery({ queryKey: ['todos'], queryFn: fetchTodos })
-useEffect(() => {
-  if (data) {
-    // Do something
-  }
-}, [data])
-
-// Or use mutation callbacks (still supported):
-useMutation({
-  mutationFn: addTodo,
-  onSuccess: () => {}, // ✅ Still works for mutations
+persistQueryClient({
+  queryClient,
+  persister,
+  maxAge: 1000 * 60 * 60 * 24, // 24 hours
 })
 ```
 
-❌ **Never use deprecated options**
-```tsx
-// Deprecated in v5:
-cacheTime: 1000 // ❌ Use gcTime instead
-isLoading: true // ❌ Meaning changed, use isPending
-keepPreviousData: true // ❌ Use placeholderData instead
-onSuccess: () => {} // ❌ Removed from queries
-useErrorBoundary: true // ❌ Use throwOnError instead
-```
-
-❌ **Never assume isLoading means "no data yet"**
-```tsx
-// v5 changed this:
-isLoading = isPending && isFetching // ❌ Now means "pending AND fetching"
-isPending = no data yet // ✅ Use this for initial load
-```
-
-❌ **Never forget initialPageParam for infinite queries**
-```tsx
-// v5 requires this:
-useInfiniteQuery({
-  queryKey: ['projects'],
-  queryFn: ({ pageParam }) => fetchProjects(pageParam),
-  initialPageParam: 0, // ✅ Required in v5
-  getNextPageParam: (lastPage) => lastPage.nextCursor,
-})
-```
-
-❌ **Never use enabled with useSuspenseQuery**
-```tsx
-// Not allowed:
-useSuspenseQuery({
-  queryKey: ['todo', id],
-  queryFn: () => fetchTodo(id),
-  enabled: !!id, // ❌ Not available with suspense
-})
-
-// Use conditional rendering instead:
-{id && <TodoComponent id={id} />}
-```
-
-❌ **Never rely on refetchOnMount: false for errored queries**
-```tsx
-// Doesn't work - errors are always stale
-useQuery({
-  queryKey: ['data'],
-  queryFn: failingFetch,
-  refetchOnMount: false,  // ❌ Ignored when query has error
-})
-
-// Use retryOnMount instead
-useQuery({
-  queryKey: ['data'],
-  queryFn: failingFetch,
-  refetchOnMount: false,
-  retryOnMount: false,  // ✅ Prevents refetch for errored queries
-  retry: 0,
-})
-```
-
----
-
-## Known Issues Prevention
-
-This skill prevents **16 documented issues** from v5 migration, SSR/hydration bugs, and common mistakes:
-
-### Issue #1: Object Syntax Required
-**Error**: `useQuery is not a function` or type errors
-**Source**: [v5 Migration Guide](https://tanstack.com/query/latest/docs/framework/react/guides/migrating-to-v5#removed-overloads-in-favor-of-object-syntax)
-**Why It Happens**: v5 removed all function overloads, only object syntax works
-**Prevention**: Always use `useQuery({ queryKey, queryFn, ...options })`
-
-**Before (v4):**
-```tsx
-useQuery(['todos'], fetchTodos, { staleTime: 5000 })
-```
-
-**After (v5):**
-```tsx
-useQuery({
-  queryKey: ['todos'],
-  queryFn: fetchTodos,
-  staleTime: 5000
-})
-```
-
-### Issue #2: Query Callbacks Removed
-**Error**: Callbacks don't run, TypeScript errors
-**Source**: [v5 Breaking Changes](https://tanstack.com/query/latest/docs/framework/react/guides/migrating-to-v5#callbacks-on-usequery-and-queryobserver-have-been-removed)
-**Why It Happens**: onSuccess, onError, onSettled removed from queries (still work in mutations)
-**Prevention**: Use `useEffect` for side effects, or move logic to mutation callbacks
-
-**Before (v4):**
-```tsx
-useQuery({
-  queryKey: ['todos'],
-  queryFn: fetchTodos,
-  onSuccess: (data) => {
-    console.log('Todos loaded:', data)
-  },
-})
-```
-
-**After (v5):**
-```tsx
-const { data } = useQuery({ queryKey: ['todos'], queryFn: fetchTodos })
-useEffect(() => {
-  if (data) {
-    console.log('Todos loaded:', data)
-  }
-}, [data])
-```
-
-### Issue #3: Status Loading → Pending
-**Error**: UI shows wrong loading state
-**Source**: [v5 Migration: isLoading renamed](https://tanstack.com/query/latest/docs/framework/react/guides/migrating-to-v5#isloading-and-isfetching-flags)
-**Why It Happens**: `status: 'loading'` renamed to `status: 'pending'`, `isLoading` meaning changed
-**Prevention**: Use `isPending` for initial load, `isLoading` for "pending AND fetching"
-
-**Before (v4):**
-```tsx
-const { data, isLoading } = useQuery(...)
-if (isLoading) return <div>Loading...</div>
-```
-
-**After (v5):**
-```tsx
-const { data, isPending, isLoading } = useQuery(...)
-if (isPending) return <div>Loading...</div>
-// isLoading = isPending && isFetching (fetching for first time)
-```
-
-### Issue #4: cacheTime → gcTime
-**Error**: `cacheTime is not a valid option`
-**Source**: [v5 Migration: gcTime](https://tanstack.com/query/latest/docs/framework/react/guides/migrating-to-v5#cachetime-has-been-replaced-by-gctime)
-**Why It Happens**: Renamed to better reflect "garbage collection time"
-**Prevention**: Use `gcTime` instead of `cacheTime`
-
-**Before (v4):**
-```tsx
-useQuery({
-  queryKey: ['todos'],
-  queryFn: fetchTodos,
-  cacheTime: 1000 * 60 * 60,
-})
-```
-
-**After (v5):**
-```tsx
-useQuery({
-  queryKey: ['todos'],
-  queryFn: fetchTodos,
-  gcTime: 1000 * 60 * 60,
-})
-```
-
-### Issue #5: useSuspenseQuery + enabled
-**Error**: Type error, enabled option not available
-**Source**: [GitHub Discussion #6206](https://github.com/TanStack/query/discussions/6206)
-**Why It Happens**: Suspense guarantees data is available, can't conditionally disable
-**Prevention**: Use conditional rendering instead of `enabled` option
-
-**Before (v4/incorrect):**
-```tsx
-useSuspenseQuery({
-  queryKey: ['todo', id],
-  queryFn: () => fetchTodo(id),
-  enabled: !!id, // ❌ Not allowed
-})
-```
-
-**After (v5/correct):**
-```tsx
-// Conditional rendering:
-{id ? (
-  <TodoComponent id={id} />
-) : (
-  <div>No ID selected</div>
-)}
-
-// Inside TodoComponent:
-function TodoComponent({ id }: { id: number }) {
-  const { data } = useSuspenseQuery({
-    queryKey: ['todo', id],
-    queryFn: () => fetchTodo(id),
-    // No enabled option needed
-  })
-  return <div>{data.title}</div>
-}
-```
-
-### Issue #6: initialPageParam Required
-**Error**: `initialPageParam is required` type error
-**Source**: [v5 Migration: Infinite Queries](https://tanstack.com/query/latest/docs/framework/react/guides/migrating-to-v5#new-required-initialPageParam-option)
-**Why It Happens**: v4 passed `undefined` as first pageParam, v5 requires explicit value
-**Prevention**: Always specify `initialPageParam` for infinite queries
-
-**Before (v4):**
-```tsx
-useInfiniteQuery({
-  queryKey: ['projects'],
-  queryFn: ({ pageParam = 0 }) => fetchProjects(pageParam),
-  getNextPageParam: (lastPage) => lastPage.nextCursor,
-})
-```
-
-**After (v5):**
-```tsx
-useInfiniteQuery({
-  queryKey: ['projects'],
-  queryFn: ({ pageParam }) => fetchProjects(pageParam),
-  initialPageParam: 0, // ✅ Required
-  getNextPageParam: (lastPage) => lastPage.nextCursor,
-})
-```
-
-### Issue #7: keepPreviousData Removed
-**Error**: `keepPreviousData is not a valid option`
-**Source**: [v5 Migration: placeholderData](https://tanstack.com/query/latest/docs/framework/react/guides/migrating-to-v5#removed-keeppreviousdata-in-favor-of-placeholderdata-identity-function)
-**Why It Happens**: Replaced with more flexible `placeholderData` function
-**Prevention**: Use `placeholderData: keepPreviousData` helper
-
-**Before (v4):**
-```tsx
-useQuery({
-  queryKey: ['todos', page],
-  queryFn: () => fetchTodos(page),
-  keepPreviousData: true,
-})
-```
-
-**After (v5):**
-```tsx
-import { keepPreviousData } from '@tanstack/react-query'
-
-useQuery({
-  queryKey: ['todos', page],
-  queryFn: () => fetchTodos(page),
-  placeholderData: keepPreviousData,
-})
-```
-
-### Issue #8: TypeScript Error Type Default
-**Error**: Type errors with error handling
-**Source**: [v5 Migration: Error Types](https://tanstack.com/query/latest/docs/framework/react/guides/migrating-to-v5#typeerror-is-now-the-default-error)
-**Why It Happens**: v4 used `unknown`, v5 defaults to `Error` type
-**Prevention**: If throwing non-Error types, specify error type explicitly
-
-**Before (v4 - error was unknown):**
-```tsx
-const { error } = useQuery({
-  queryKey: ['data'],
-  queryFn: async () => {
-    if (Math.random() > 0.5) throw 'custom error string'
-    return data
-  },
-})
-// error: unknown
-```
-
-**After (v5 - specify custom error type):**
-```tsx
-const { error } = useQuery<DataType, string>({
-  queryKey: ['data'],
-  queryFn: async () => {
-    if (Math.random() > 0.5) throw 'custom error string'
-    return data
-  },
-})
-// error: string | null
-
-// Or better: always throw Error objects
-const { error } = useQuery({
-  queryKey: ['data'],
-  queryFn: async () => {
-    if (Math.random() > 0.5) throw new Error('custom error')
-    return data
-  },
-})
-// error: Error | null (default)
-```
-
-### Issue #9: Streaming Server Components Hydration Error
-**Error**: `Hydration failed because the initial UI does not match what was rendered on the server`
-**Source**: [GitHub Issue #9642](https://github.com/TanStack/query/issues/9642)
-**Affects**: v5.82.0+ with streaming SSR (void prefetch pattern)
-**Why It Happens**: Race condition where `hydrate()` resolves synchronously but `query.fetch()` creates async retryer, causing isFetching/isStale mismatch between server and client
-**Prevention**: Don't conditionally render based on `fetchStatus` with `useSuspenseQuery` and streaming prefetch, OR await prefetch instead of void pattern
-
-**Before (causes hydration error):**
-```tsx
-// Server: void prefetch
-streamingQueryClient.prefetchQuery({ queryKey: ['data'], queryFn: getData });
-
-// Client: conditional render on fetchStatus
-const { data, isFetching } = useSuspenseQuery({ queryKey: ['data'], queryFn: getData });
-return <>{data && <div>{data}</div>} {isFetching && <Loading />}</>;
-```
-
-**After (workaround):**
-```tsx
-// Option 1: Await prefetch
-await streamingQueryClient.prefetchQuery({ queryKey: ['data'], queryFn: getData });
-
-// Option 2: Don't render based on fetchStatus with Suspense
-const { data } = useSuspenseQuery({ queryKey: ['data'], queryFn: getData });
-return <div>{data}</div>;  // No conditional on isFetching
-```
-
-**Status**: Known issue, being investigated by maintainers. Requires implementation of `getServerSnapshot` in useSyncExternalStore.
-
-### Issue #10: useQuery Hydration Error with Prefetching
-**Error**: Text content mismatch during hydration
-**Source**: [GitHub Issue #9399](https://github.com/TanStack/query/issues/9399)
-**Affects**: v5.x with server-side prefetching
-**Why It Happens**: `tryResolveSync` detects resolved promises in RSC payload and extracts data synchronously during hydration, bypassing normal pending state
-**Prevention**: Use `useSuspenseQuery` instead of `useQuery` for SSR, or avoid conditional rendering based on `isLoading`
-
-**Before (causes hydration error):**
-```tsx
-// Server Component
-const queryClient = getServerQueryClient();
-await queryClient.prefetchQuery({ queryKey: ['todos'], queryFn: fetchTodos });
-
-// Client Component
-function Todos() {
-  const { data, isLoading } = useQuery({ queryKey: ['todos'], queryFn: fetchTodos });
-  if (isLoading) return <div>Loading...</div>;  // Server renders this
-  return <div>{data.length} todos</div>;  // Client hydrates with this
-}
-```
-
-**After (workaround):**
-```tsx
-// Use useSuspenseQuery instead
-function Todos() {
-  const { data } = useSuspenseQuery({ queryKey: ['todos'], queryFn: fetchTodos });
-  return <div>{data.length} todos</div>;
-}
-```
-
-**Status**: "At the top of my OSS list of things to fix" - maintainer Ephem (Nov 2025). Requires implementing `getServerSnapshot` in useSyncExternalStore.
-
-### Issue #11: refetchOnMount Not Respected for Errored Queries
-**Error**: Queries refetch on mount despite `refetchOnMount: false`
-**Source**: [GitHub Issue #10018](https://github.com/TanStack/query/issues/10018)
-**Affects**: v5.90.16+
-**Why It Happens**: Errored queries with no data are always treated as stale. This is intentional to avoid permanently showing error states
-**Prevention**: Use `retryOnMount: false` instead of (or in addition to) `refetchOnMount: false`
-
-**Before (refetches despite setting):**
-```tsx
-const { data, error } = useQuery({
-  queryKey: ['data'],
-  queryFn: () => { throw new Error('Fails') },
-  refetchOnMount: false,  // Ignored when query is in error state
-  retry: 0,
-});
-// Query refetches every time component mounts
-```
-
-**After (correct):**
-```tsx
-const { data, error } = useQuery({
-  queryKey: ['data'],
-  queryFn: failingFetch,
-  refetchOnMount: false,
-  retryOnMount: false,  // ✅ Prevents refetch on mount for errored queries
-  retry: 0,
-});
-```
-
-**Status**: Documented behavior (intentional). The name `retryOnMount` is slightly misleading - it controls whether errored queries trigger a new fetch on mount, not automatic retries.
-
-### Issue #12: Mutation Callback Signature Breaking Change (v5.89.0)
-**Error**: TypeScript errors in mutation callbacks
-**Source**: [GitHub Issue #9660](https://github.com/TanStack/query/issues/9660)
-**Affects**: v5.89.0+
-**Why It Happens**: `onMutateResult` parameter added between `variables` and `context`, changing callback signatures from 3 params to 4
-**Prevention**: Update all mutation callbacks to accept 4 parameters instead of 3
-
-**Before (v5.88 and earlier):**
-```tsx
-useMutation({
-  mutationFn: addTodo,
-  onError: (error, variables, context) => {
-    // context is now onMutateResult, missing final context param
-  },
-  onSuccess: (data, variables, context) => {
-    // Same issue
-  }
-});
-```
-
-**After (v5.89.0+):**
-```tsx
-useMutation({
-  mutationFn: addTodo,
-  onError: (error, variables, onMutateResult, context) => {
-    // onMutateResult = return value from onMutate
-    // context = mutation function context
-  },
-  onSuccess: (data, variables, onMutateResult, context) => {
-    // Correct signature with 4 parameters
-  }
-});
-```
-
-**Note**: If you don't use `onMutate`, the `onMutateResult` parameter will be undefined. This breaking change was introduced in a patch version.
-
-### Issue #13: Readonly Query Keys Break Partial Matching (v5.90.8)
-**Error**: `Type 'readonly ["todos", string]' is not assignable to type '["todos", string]'`
-**Source**: [GitHub Issue #9871](https://github.com/TanStack/query/issues/9871) | Fixed in [PR #9872](https://github.com/TanStack/query/pull/9872)
-**Affects**: v5.90.8 only (fixed in v5.90.9)
-**Why It Happens**: Partial query matching broke TypeScript types for readonly query keys (using `as const`)
-**Prevention**: Upgrade to v5.90.9+ or use type assertions if stuck on v5.90.8
-
-**Before (v5.90.8 - TypeScript error):**
-```tsx
-export function todoQueryKey(id?: string) {
-  return id ? ['todos', id] as const : ['todos'] as const;
-}
-// Type: readonly ['todos', string] | readonly ['todos']
-
-useMutation({
-  mutationFn: addTodo,
-  onSuccess: () => {
-    queryClient.invalidateQueries({
-      queryKey: todoQueryKey('123')
-      // Error: readonly ['todos', string] not assignable to ['todos', string]
-    });
-  }
-});
-```
-
-**After (v5.90.9+):**
-```tsx
-// Works correctly with readonly types
-queryClient.invalidateQueries({
-  queryKey: todoQueryKey('123')  // ✅ No type error
-});
-```
-
-**Status**: Fixed in v5.90.9. Particularly affected users of code generators like `openapi-react-query` that produce readonly query keys.
-
-### Issue #14: useMutationState Type Inference Lost
-**Error**: `mutation.state.variables` typed as `unknown` instead of actual type
-**Source**: [GitHub Issue #9825](https://github.com/TanStack/query/issues/9825)
-**Affects**: All v5.x versions
-**Why It Happens**: Fuzzy mutation key matching prevents guaranteed type inference (same issue as `queryClient.getQueryCache().find()`)
-**Prevention**: Explicitly cast types in the `select` callback
-
-**Before (type inference doesn't work):**
-```tsx
-const addTodo = useMutation({
-  mutationKey: ['addTodo'],
-  mutationFn: (todo: Todo) => api.addTodo(todo),
-});
-
-const pendingTodos = useMutationState({
-  filters: { mutationKey: ['addTodo'], status: 'pending' },
-  select: (mutation) => {
-    return mutation.state.variables;  // Type: unknown
-  },
-});
-```
-
-**After (with explicit cast):**
-```tsx
-const pendingTodos = useMutationState({
-  filters: { mutationKey: ['addTodo'], status: 'pending' },
-  select: (mutation) => mutation.state.variables as Todo,
-});
-// Or cast the entire state:
-select: (mutation) => mutation.state as MutationState<Todo, Error, Todo, unknown>
-```
-
-**Status**: Known limitation of fuzzy matching. No planned fix.
-
-### Issue #15: Query Cancellation in StrictMode with fetchQuery
-**Error**: `CancelledError` when using `fetchQuery()` with `useQuery`
-**Source**: [GitHub Issue #9798](https://github.com/TanStack/query/issues/9798)
-**Affects**: Development only (React StrictMode)
-**Why It Happens**: StrictMode causes double mount/unmount. When `useQuery` unmounts and is the last observer, it cancels the query even if `fetchQuery()` is also running
-**Prevention**: This is expected development-only behavior. Doesn't affect production
-
-**Example:**
-```tsx
-async function loadData() {
-  try {
-    const data = await queryClient.fetchQuery({
-      queryKey: ['data'],
-      queryFn: fetchData,
-    });
-    console.log('Loaded:', data);  // Never logs in StrictMode
-  } catch (error) {
-    console.error('Failed:', error);  // CancelledError
-  }
-}
-
-function Component() {
-  const { data } = useQuery({ queryKey: ['data'], queryFn: fetchData });
-  // In StrictMode, component unmounts/remounts, cancelling fetchQuery
-}
-```
-
-**Workaround:**
-```tsx
-// Keep query observed with staleTime
-const { data } = useQuery({
-  queryKey: ['data'],
-  queryFn: fetchData,
-  staleTime: Infinity,  // Keeps query active
-});
-```
-
-**Status**: Expected StrictMode behavior, not a bug. Production builds are unaffected.
-
-### Issue #16: invalidateQueries Only Refetches Active Queries
-**Error**: Inactive queries not refetching despite `invalidateQueries()` call
-**Source**: [GitHub Issue #9531](https://github.com/TanStack/query/issues/9531)
-**Affects**: All v5.x versions
-**Why It Happens**: Documentation was misleading - `invalidateQueries()` only refetches "active" queries by default, not "all" queries
-**Prevention**: Use `refetchType: 'all'` to force refetch of inactive queries
-
-**Default behavior:**
-```tsx
-// Only active queries (currently being observed) will refetch
-queryClient.invalidateQueries({ queryKey: ['todos'] });
-```
-
-**To refetch inactive queries:**
-```tsx
-queryClient.invalidateQueries({
-  queryKey: ['todos'],
-  refetchType: 'all'  // Refetch active AND inactive
-});
-```
-
-**Status**: Documentation fixed to clarify "active" queries. This is the intended behavior.
-
----
-
-## Community Tips
-
-> **Note**: These tips come from community experts and maintainer blogs. Verify against your version.
-
-### Tip: Query Options with Multiple Listeners
-
-**Source**: [TkDodo's Blog - API Design Lessons](https://tkdodo.eu/blog/react-query-api-design-lessons-learned) | **Confidence**: HIGH
-**Applies to**: v5.27.3+
-
-When multiple components use the same query with different options (like `staleTime`), the "last write wins" rule applies for future fetches, but the current in-flight query uses its original options. This can cause unexpected behavior when components mount at different times.
-
-**Example of unexpected behavior:**
-```tsx
-// Component A mounts first
-function ComponentA() {
-  const { data } = useQuery({
-    queryKey: ['todos'],
-    queryFn: fetchTodos,
-    staleTime: 5000,  // Applied initially
-  });
-}
-
-// Component B mounts while A's query is in-flight
-function ComponentB() {
-  const { data } = useQuery({
-    queryKey: ['todos'],
-    queryFn: fetchTodos,
-    staleTime: 60000,  // Won't affect current fetch, only future ones
-  });
-}
-```
-
-**Recommended approach:**
-```tsx
-// Write options as functions that reference latest values
-const getStaleTime = () => shouldUseLongCache ? 60000 : 5000;
-
-useQuery({
-  queryKey: ['todos'],
-  queryFn: fetchTodos,
-  staleTime: getStaleTime(),  // Evaluated on each render
-});
-```
-
-### Tip: refetch() is NOT for Changed Parameters
-
-**Source**: [Avoiding Common Mistakes with TanStack Query](https://www.buncolak.com/posts/avoiding-common-mistakes-with-tanstack-query-part-1/) | **Confidence**: HIGH
-
-The `refetch()` function should ONLY be used for refreshing with the same parameters (like a manual "reload" button). For new parameters (filters, page numbers, search terms, etc.), include them in the query key instead.
-
-**Anti-pattern:**
-```tsx
-// ❌ Wrong - using refetch() for different parameters
-const [page, setPage] = useState(1);
-const { data, refetch } = useQuery({
-  queryKey: ['todos'],  // Same key for all pages
-  queryFn: () => fetchTodos(page),
-});
-
-// This refetches with OLD page value, not new one
-<button onClick={() => { setPage(2); refetch(); }}>Next</button>
-```
-
-**Correct pattern:**
-```tsx
-// ✅ Correct - include parameters in query key
-const [page, setPage] = useState(1);
-const { data } = useQuery({
-  queryKey: ['todos', page],  // Key changes with page
-  queryFn: () => fetchTodos(page),
-  // Query automatically refetches when page changes
-});
-
-<button onClick={() => setPage(2)}>Next</button>  // Just update state
-```
-
-**When to use refetch():**
-```tsx
-// ✅ Manual refresh of same data (refresh button)
-const { data, refetch } = useQuery({
-  queryKey: ['todos'],
-  queryFn: fetchTodos,
-});
-
-<button onClick={() => refetch()}>Refresh</button>  // Same parameters
-```
-
----
-
-## Key Patterns
-
-**Dependent Queries** (Query B waits for Query A):
-```tsx
-const { data: posts } = useQuery({
-  queryKey: ['users', userId, 'posts'],
-  queryFn: () => fetchUserPosts(userId),
-  enabled: !!user, // Wait for user
-})
-```
-
-**Parallel Queries** (fetch multiple at once):
-```tsx
-const results = useQueries({
-  queries: ids.map(id => ({ queryKey: ['todos', id], queryFn: () => fetchTodo(id) })),
-})
-```
-
-**Prefetching** (preload on hover):
-```tsx
-queryClient.prefetchQuery({ queryKey: ['todo', id], queryFn: () => fetchTodo(id) })
-```
-
-**Infinite Scroll** (useInfiniteQuery):
-```tsx
-useInfiniteQuery({
-  queryKey: ['todos', 'infinite'],
-  queryFn: ({ pageParam }) => fetchTodosPage(pageParam),
-  initialPageParam: 0, // Required in v5
-  getNextPageParam: (lastPage) => lastPage.nextCursor,
-})
-```
-
-**Query Cancellation** (auto-cancel on queryKey change):
-```tsx
-queryFn: async ({ signal }) => {
-  const res = await fetch(`/api/todos?q=${search}`, { signal })
-  return res.json()
-}
-```
-
-**Data Transformation** (select):
-```tsx
-select: (data) => data.filter(todo => todo.completed)
-```
-
-**Avoid Request Waterfalls**: Fetch in parallel when possible (don't chain queries unless truly dependent)
-
----
-
-**Official Docs**: https://tanstack.com/query/latest | **v5 Migration**: https://tanstack.com/query/latest/docs/framework/react/guides/migrating-to-v5 | **GitHub**: https://github.com/TanStack/query | **Context7**: `/websites/tanstack_query`
+## Best Practices
+
+1. **Use `queryOptions` helper** for type-safe, reusable query configurations
+2. **Structure query keys hierarchically** for granular invalidation
+3. **Set appropriate `staleTime`** - 0 means always refetch on mount (default), increase for less dynamic data
+4. **Use `placeholderData`** (not `initialData`) for keeping previous page data during pagination
+5. **Prefer `useSuspenseQuery`** when using Suspense boundaries for cleaner component code
+6. **Use `enabled`** for dependent queries, not conditional hook calls
+7. **Always invalidate after mutations** - don't rely solely on optimistic updates
+8. **Cancel queries in `onMutate`** before optimistic updates to prevent race conditions
+9. **Use `ensureQueryData`** in route loaders instead of `prefetchQuery` for immediate access
+10. **Set `retry: false` in tests** to avoid timeout issues
+11. **Don't destructure the query result** if you need to pass it around (breaks reactivity)
+12. **Use `select`** for derived data instead of transforming in the component
+13. **Keep query functions pure** - they should only fetch, not cause side effects
+14. **Use `gcTime: Infinity`** in tests to prevent cache cleanup during assertions
+
+## Common Pitfalls
+
+- Using `initialData` when you mean `placeholderData` (initialData counts as "fresh" data)
+- Not providing `initialPageParam` for infinite queries (required in v5)
+- Calling hooks conditionally (violates React rules)
+- Not cancelling queries before optimistic updates (race conditions)
+- Setting `staleTime` higher than `gcTime` (data gets garbage collected while "fresh")
+- Forgetting to wrap tests with `QueryClientProvider`
+- Using same `QueryClient` instance across tests (shared state)
+- Not awaiting `invalidateQueries` in mutation callbacks when order matters
